@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<snippets>
+<snippet group="Sphinx" trigger=".. image::" id="rst_directive_image" complement="">.. image:: $file$
+
+</snippet>
+
+<snippet group="Sphinx" trigger=".. code-block::" id="rst_directive_code" complement="">.. code-block::
+
+    $code$
+
+</snippet>
+<snippet group="Sphinx" trigger=".. code-block:: python" id="rst_directive_code_python" complement="">.. code-block:: python
+
+    $code$
+
+</snippet>
+<snippet group="Sphinx" trigger=".. code-block:: generic" id="rst_directive_code_bash" complement="">.. code-block:: $lang$
+
+    $code$
+
+</snippet>
+<snippet group="Sphinx" trigger=":ref:" id="rst_role_ref" complement="">:ref:`$label$`</snippet>
+</snippets>

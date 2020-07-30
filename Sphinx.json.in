@@ -1,0 +1,25 @@
+{
+    \"Name\" : \"Sphinx\",
+    \"Version\" : \"1.0.0\",
+    \"CompatVersion\" : \"1.0.0\",
+    \"Vendor\" : \"PROCITEC GmbH \",
+    \"Copyright\" : \"(C) PROCITEC GmbH \",
+    \"License\" : \"GNU Lesser General Public License v2.1\",
+    \"Category\" : \"Other Languages\",
+    \"Description\" : \"Sphinx language support\",
+    \"Url\" : \"https://github.com/procitec/qtcreator-sphinx-plugin\",
+    $$dependencyList,
+
+    \"Mimetypes\" : [
+        \"<?xml version=\'1.0\'?>\",
+        \"<mime-info xmlns=\'http://www.freedesktop.org/standards/shared-mime-info\'>\",
+          \"<mime-type type=\'text/x-rst\'>\",
+            \"<sub-class-of type=\'text/plain\'/>\",
+            \"<comment>Sphinx restructuredText files</comment>\",
+            \"<glob pattern=\'*.rst\'/>\",
+            \"<glob pattern=\'*.rest\'/>\",
+          \"</mime-type>\",
+        \"</mime-info>\"
+    ]
+
+}

@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/dark">
+        <file alias="format-text-bold.svg">images/dark/format-text-bold.svg</file>
+        <file alias="format-text-italic.svg">images/dark/format-text-italic.svg</file>
+        <file alias="format-text-code.svg">images/dark/format-text-code.svg</file>
+        <file alias="format-line-spacing-double.svg">images/dark/format-line-spacing-double.svg</file>
+        <file alias="format-line-spacing-normal.svg">images/dark/format-line-spacing-normal.svg</file>
+        <file alias="format-indent-more.svg">images/dark/format-indent-more.svg</file>
+        <file alias="format-indent-less.svg">images/dark/format-indent-less.svg</file>
+        <file alias="format-list-unordered.svg">images/dark/format-list-unordered.svg</file>
+        <file alias="format-list-ordered.svg">images/dark/format-list-ordered.svg</file>
+        <file alias="format-text-blockquote.svg">images/dark/format-text-blockquote.svg</file>
+        <file alias="edit-comment.svg">images/dark/edit-comment.svg</file>
+        <file alias="delete-comment.svg">images/dark/delete-comment.svg</file>
+        <file alias="sphinx.png">images/sphinx.png</file>
+    </qresource>
+    <qresource>
+       <file alias="format-text-bold.svg">images/format-text-bold.svg</file>
+        <file alias="format-text-italic.svg">images/format-text-italic.svg</file>
+        <file alias="format-text-code.svg">images/format-text-code.svg</file>
+        <file alias="format-line-spacing-double.svg">images/format-line-spacing-double.svg</file>
+        <file alias="format-line-spacing-normal.svg">images/format-line-spacing-normal.svg</file>
+        <file alias="format-indent-more.svg">images/format-indent-more.svg</file>
+        <file alias="format-indent-less.svg">images/format-indent-less.svg</file>
+        <file alias="format-list-unordered.svg">images/format-list-unordered.svg</file>
+        <file alias="format-list-ordered.svg">images/format-list-ordered.svg</file>
+        <file alias="format-text-blockquote.svg">images/format-text-blockquote.svg</file>
+        <file alias="edit-comment.svg">images/edit-comment.svg</file>
+        <file alias="delete-comment.svg">images/delete-comment.svg</file>
+        <file alias="sphinx.png">images/sphinx.png</file>
+    </qresource>
+</RCC>
