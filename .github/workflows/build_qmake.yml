@@ -216,8 +216,11 @@ jobs:
 
         set(make_program make -j ${N})
         if ("${{ runner.os }}" STREQUAL "Windows")
-          set(make_program "qtcreator/bin/jom")
+          #set(make_program "qtcreator/bin/jom")
+          set(make_program "nmake")
         endif()
+        
+        message("start build using make_program ${make_program}")
 
         execute_process(
           COMMAND ${make_program}
