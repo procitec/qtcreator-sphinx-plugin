@@ -128,16 +128,16 @@ jobs:
 
         if ("${{ runner.os }}" STREQUAL "Windows")
           set(qtc_output_directory "qtcreator/lib/qtcreator/plugins")
-          set(qtc_binary_name "$ENV{PLUGIN_NAME}4.dll")
+          set(qtc_binary_name "$ENV{PLUGIN_NAME}.dll")
           if ("${{ matrix.config.environment_script }}" MATCHES "vcvars64.bat")
-            set(qtc_platform "windows_msvc2017_x64")
+            set(qtc_platform "windows_x64")
           elseif ("${{ matrix.config.environment_script }}" MATCHES "vcvars32.bat")
-            set(qtc_platform "windows_msvc2017_x86")
+            set(qtc_platform "windows_x86")
           endif()
         elseif ("${{ runner.os }}" STREQUAL "Linux")
           set(qtc_output_directory "qtcreator/lib/qtcreator/plugins")
           set(qtc_binary_name "lib$ENV{PLUGIN_NAME}.so")
-          set(qtc_platform "linux_gcc_64_rhel72")
+          set(qtc_platform "linux_x64")
         elseif ("${{ runner.os }}" STREQUAL "macOS")
           set(qtc_output_directory "qtcreator/bin/Qt Creator.app/Contents/PlugIns")
           set(qtc_binary_name "lib$ENV{PLUGIN_NAME}.dylib")
@@ -148,8 +148,6 @@ jobs:
         message("::set-output name=qtc_binary_name::${qtc_binary_name}")
         message("::set-output name=qtc_output_directory::${qtc_output_directory}")
         
-        message("do we reach this? qtc_binary_name=${qtc_binary_name}")
-
         file(MAKE_DIRECTORY qtcreator)
 
         foreach(package qtcreator qtcreator_dev)
@@ -169,8 +167,6 @@ jobs:
               "$ENV{GITHUB_WORKSPACE}/qtcreator/bin/Qt Creator.app"
           )
         endif()
-        
-        message("finished download")
 
     - name: Configure
       shell: cmake -P {0}
