@@ -124,7 +124,7 @@ jobs:
           set(qtc_base_url "https://download.qt.io/snapshots/qtcreator/${CMAKE_MATCH_1}/$ENV{QT_CREATOR_VERSION}${qtc_version_hint}/installer_source/${qtc_snapshot}")
         endif()
 
-        message("::set-output qtc base url=${qtc_base_url}")
+        message("using qtc_base_url=${qtc_base_url}")
 
         if ("${{ runner.os }}" STREQUAL "Windows")
           set(qtc_output_directory "qtcreator/lib/qtcreator/plugins")
@@ -147,10 +147,14 @@ jobs:
         # Save the path for other steps
         message("::set-output name=qtc_binary_name::${qtc_binary_name}")
         message("::set-output name=qtc_output_directory::${qtc_output_directory}")
+        
+        message("do we reach this? qtc_binary_name=${qtc_binary_name}")
 
         file(MAKE_DIRECTORY qtcreator)
 
         foreach(package qtcreator qtcreator_dev)
+          message("start download of ${qtc_base_url}/${qtc_platform}/${package}.7z to ./${package}.7z")
+
           file(DOWNLOAD
             "${qtc_base_url}/${qtc_platform}/${package}.7z" ./${package}.7z SHOW_PROGRESS)
           execute_process(COMMAND
@@ -165,6 +169,8 @@ jobs:
               "$ENV{GITHUB_WORKSPACE}/qtcreator/bin/Qt Creator.app"
           )
         endif()
+        
+        message("finished download")
 
     - name: Configure
       shell: cmake -P {0}
