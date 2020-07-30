@@ -124,6 +124,8 @@ jobs:
           set(qtc_base_url "https://download.qt.io/snapshots/qtcreator/${CMAKE_MATCH_1}/$ENV{QT_CREATOR_VERSION}${qtc_version_hint}/installer_source/${qtc_snapshot}")
         endif()
 
+        message("::set-output qtc base url=${qtc_base_url}")
+
         if ("${{ runner.os }}" STREQUAL "Windows")
           set(qtc_output_directory "qtcreator/lib/qtcreator/plugins")
           set(qtc_binary_name "$ENV{PLUGIN_NAME}4.dll")
