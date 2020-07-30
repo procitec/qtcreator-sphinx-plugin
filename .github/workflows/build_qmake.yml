@@ -226,9 +226,19 @@ jobs:
           COMMAND ${make_program}
           RESULT_VARIABLE result
         )
+
         if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status")
+          message(FATAL_ERROR "Bad exit status of ${make_program}")
         endif()
+        
+        execute_process(
+          COMMAND ninja
+          RESULT_VARIABLE result
+        )
+        if (NOT result EQUAL 0)
+          message(WARNING "ninja make program not found")
+        endif()
+
 
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
 
