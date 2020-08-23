@@ -1,5 +1,6 @@
 #pragma once
 
+#include "editor/SphinxCodeModel.h"
 #include "editor/SphinxEditorFactory.h"
 #include "editor/SphinxFormatActions.h"
 #include "editor/SphinxOutputParser.h"
@@ -18,6 +19,7 @@ public:
     EditorFactory editorFactory;
     ReSTCheckHighLighter highlighter;
     CustomParser parser;
+    CodeModel codeModel;
 };
 } // namespace Internal
 

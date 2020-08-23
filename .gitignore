@@ -36,3 +36,7 @@ __pycache__
 *.pyc
 
 
+# QtCreator files
+*.pro.user
+CMakeLists.txt.user
+

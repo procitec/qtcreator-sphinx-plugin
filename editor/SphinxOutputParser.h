@@ -12,6 +12,7 @@ public:
     CustomParser();
 
 private:
-    ProjectExplorer::Internal::CustomParserSettings mSettings;
+    ProjectExplorer::CustomParserSettings mIssueWithLineNumber;
+    ProjectExplorer::CustomParserSettings mIssueWithoutLineNumber;
 };
 } // namespace qtcreator::plugin::sphinx

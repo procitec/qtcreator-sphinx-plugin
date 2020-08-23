@@ -7,7 +7,7 @@ namespace qtcreator::plugin::sphinx::Constants {
 const char EditorId[] = "Sphinx.SphinxEditor";
 //const char ProjectId[] = "Sphinx.Project";
 //const char RubyIcon[] = ":/rubysupport/Ruby.png";
-const char SettingsId[] = "Sphinx.Settings";
+const char SettingsGeneralId[] = "Sphinx.Settings";
 //const char SnippetGroupId[] = "Sphinx.Snippets";
 const char EditorDisplayName[] = "Sphinx Editor";
 //const char LangSphinx[] = "SPHINX";

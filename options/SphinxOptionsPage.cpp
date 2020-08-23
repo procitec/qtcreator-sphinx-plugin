@@ -7,10 +7,10 @@ OptionsPage::OptionsPage(Settings *settings, QObject *parent)
     : IOptionsPage(parent)
     , mSettings(settings)
 {
-    setId(Constants::SettingsId);  // page ID
-    setDisplayName(tr("General")); // page label in tabs
-    setCategory("Sphinx");         // category ID
-    setDisplayCategory("Sphinx");  // category label in options - set once
+    setId(Constants::SettingsGeneralId); // page ID
+    setDisplayName(tr("General"));       // page label in tabs
+    setCategory("Sphinx");               // category ID
+    setDisplayCategory("Sphinx");        // category label in options - set once
     auto prefix = QIcon::themeName().contains("dark", Qt::CaseInsensitive) ? QStringLiteral("/dark")
                                                                            : QStringLiteral("");
     setCategoryIcon(Utils::Icon((QString(":%1/sphinx.png").arg(prefix)))); // category icon - set once

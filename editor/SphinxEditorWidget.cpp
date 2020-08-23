@@ -1,10 +1,14 @@
 #include "SphinxEditorWidget.h"
 #include "../options/SphinxSettings.h"
+#include "../qtcreator-sphinx-plugin-projectsettings.h"
 #include "Constants.h"
 #include "SphinxFormatActions.h"
 #include "SphinxRstcheckHighlighter.h"
 
 #include "coreplugin/icore.h"
+#include "coreplugin/rightpane.h"
+#include "projectexplorer/project.h"
+#include "projectexplorer/session.h"
 
 namespace qtcreator::plugin::sphinx {
 
@@ -13,7 +17,7 @@ const int RSTCHECK_UPDATE_INTERVAL = 300;
 EditorWidget::EditorWidget()
     : TextEditor::TextEditorWidget()
 {
-    setLanguageSettingsId(Constants::SettingsId);
+    setLanguageSettingsId(Constants::SettingsGeneralId);
     readSettings();
 
     connectActions();
@@ -25,10 +29,30 @@ EditorWidget::EditorWidget()
         if (mReSTCheckUpdatePending)
             updateRstCheck();
     });
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QWidget::customContextMenuRequested, this, &EditorWidget::onCustomContextMenu);
 }
 void EditorWidget::finalizeInitialization()
 {
     connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleRstCheckUpdate);
+}
+
+void EditorWidget::onCustomContextMenu(const QPoint &pos)
+{
+    QMenu menu(this);
+
+    this->appendStandardContextMenuActions(&menu);
+
+    menu.addSeparator();
+
+    if (mPreview) {
+        menu.addAction(mPreviewAction);
+    } else {
+        menu.addAction(mUrlAction);
+    }
+
+    menu.exec(this->mapToGlobal(pos));
 }
 
 void EditorWidget::unCommentSelection()
@@ -36,12 +60,16 @@ void EditorWidget::unCommentSelection()
     // todo determine in comment or not
     // than call formatter action
 }
-EditorWidget::~EditorWidget() {}
+EditorWidget::~EditorWidget()
+{
+    saveFileSettings();
+}
 
 void EditorWidget::aboutToOpen(const QString &fileName, const QString &realFileName)
 {
     Q_UNUSED(fileName)
     mRealFileName = realFileName;
+    readFileSettings();
 }
 
 void EditorWidget::connectActions()
@@ -107,6 +135,27 @@ void EditorWidget::connectActions()
             SIGNAL(triggered(bool)),
             this,
             SLOT(onParagraphs()));
+
+    mUrlAction = new QAction(tr("link to preview url"), this);
+    connect(mUrlAction, &QAction::triggered, this, &EditorWidget::onUrlAction);
+    mPreviewAction = new QAction(tr("toogle preview"), this);
+    connect(mPreviewAction, &QAction::triggered, this, &EditorWidget::onPreviewAction);
+}
+
+void EditorWidget::onUrlAction()
+{
+    if (!mPreview) {
+        mPreview = new PreviewPage(this);
+    }
+    updatePreview(true);
+    mPreview->onOpenUrl();
+}
+
+void EditorWidget::onPreviewAction()
+{
+    if (mPreview) {
+        updatePreview(!mPreview->isVisible());
+    }
 }
 
 void EditorWidget::addToolBar()
@@ -120,18 +169,9 @@ void EditorWidget::addToolBar()
 void EditorWidget::readSettings()
 {
     QSettings *s = Core::ICore::settings();
-    s->beginGroup(Constants::SettingsId);
+    s->beginGroup(Constants::SettingsGeneralId);
     mUseReSTCheckHighlighter = s->value(SettingsIds::ReSTCheckHighlighter, QVariant(true)).toBool();
     s->endGroup();
-
-    //    parts\char="#"
-    //    parts\overline=true
-    //    chapters\char="*"
-    //    chapters\overline=true
-    //    sections\char="="
-    //    subsections\char="-"
-    //    subsubsections\char="^"
-    //    paragraphs\char="""
 
     mParts = "#";
     mPartsOverline = true;
@@ -145,6 +185,48 @@ void EditorWidget::readSettings()
     mSubSubSectionsOverline = false;
     mParagraphs = QString(R"-(")-");
     mParagraphsOverline = false;
+}
+
+void EditorWidget::readFileSettings()
+{
+    auto *project = ProjectExplorer::SessionManager::projectForFile(textDocument()->filePath());
+    if (!project) {
+        project = ProjectExplorer::SessionManager::startupProject();
+    }
+    if (project) {
+        const auto projectSettings = Internal::ProjectSettings::getSettings(project);
+        auto linkedPreviews = projectSettings->linkedPreviews();
+        for (auto iter = linkedPreviews.begin(); iter != linkedPreviews.end(); ++iter) {
+            auto filePath = Utils::FilePath::fromString(mRealFileName);
+            if (filePath == iter.key()) {
+                if (!iter.value().isEmpty()) {
+                    if (!mPreview) {
+                        mPreview = new PreviewPage(this);
+                    }
+                    updatePreview(true);
+                    mPreview->setUrl(iter.value());
+                }
+            }
+        }
+    }
+}
+
+void EditorWidget::saveFileSettings()
+{
+    if (mPreview) {
+        auto *project = ProjectExplorer::SessionManager::projectForFile(textDocument()->filePath());
+        if (!project) {
+            project = ProjectExplorer::SessionManager::startupProject();
+        }
+        if (project) {
+            const auto projectSettings = Internal::ProjectSettings::getSettings(project);
+            auto url = mPreview->url();
+            auto filePath = textDocument()->filePath();
+            if (!url.isEmpty() && filePath.exists()) {
+                projectSettings->addLinkedPreview(Internal::LinkedPreview(filePath, url));
+            }
+        }
+    }
 }
 
 void EditorWidget::onBold()
@@ -307,6 +389,33 @@ void EditorWidget::updateRstCheck()
         && !ReSTCheckHighLighter::instance()->run(textDocument(), mRealFileName)) {
         mReSTCheckUpdatePending = true;
         mUpdateRstCheckTimer.start();
+    }
+}
+
+void EditorWidget::showEvent(QShowEvent *e)
+{
+    updatePreview(true);
+    TextEditorWidget::showEvent(e);
+}
+
+void EditorWidget::hideEvent(QHideEvent *e)
+{
+    updatePreview(false);
+    TextEditorWidget::hideEvent(e);
+}
+
+void EditorWidget::updatePreview(bool show)
+{
+    if (mPreview) {
+        if (show) {
+            mPreview->show();
+            Core::RightPaneWidget::instance()->setWidget(mPreview);
+            Core::RightPaneWidget::instance()->setShown(true);
+        } else {
+            mPreview->hide();
+            Core::RightPaneWidget::instance()->setWidget(nullptr);
+            Core::RightPaneWidget::instance()->setShown(false);
+        }
     }
 }
 

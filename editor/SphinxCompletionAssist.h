@@ -8,6 +8,8 @@
 
 namespace qtcreator::plugin::sphinx {
 
+class CodeModel;
+
 class CompletionAssistProvider : public TextEditor::CompletionAssistProvider
 {
 public:

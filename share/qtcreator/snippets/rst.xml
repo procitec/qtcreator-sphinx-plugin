@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<snippets>
-<snippet group="ReST" trigger=".. image::" id="rest_image" complement="">.. image:: $file$
-
-</snippet>
-</snippets>

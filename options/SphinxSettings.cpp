@@ -11,7 +11,7 @@ void Settings::load()
 {
     QSettings *s = Core::ICore::settings();
 
-    s->beginGroup(Constants::SettingsId);
+    s->beginGroup(Constants::SettingsGeneralId);
     mUseCustomHighlighter = s->value(SettingsIds::CustomHighlighter, QVariant(true)).toBool();
     mIndentSize = s->value(SettingsIds::IndentSize, QVariant(4)).toInt();
     mUseReSTCheckHighlighter = s->value(SettingsIds::ReSTCheckHighlighter, QVariant(false)).toBool();
@@ -23,7 +23,7 @@ void Settings::save()
 {
     QSettings *s = Core::ICore::settings();
 
-    s->beginGroup(Constants::SettingsId);
+    s->beginGroup(Constants::SettingsGeneralId);
     s->setValue(SettingsIds::CustomHighlighter, mUseCustomHighlighter);
     s->setValue(SettingsIds::IndentSize, mIndentSize);
     s->setValue(SettingsIds::ReSTCheckHighlighter, mUseReSTCheckHighlighter);

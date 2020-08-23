@@ -16,6 +16,11 @@ Highlighter::Highlighter(QObject *parent)
     , mDirectiveRegEx("^\\.\\.\\s+[\\w\\-_]+::\\s*")
     , mDirectiveOptionRegEx("\\s+:[A-Za-z-]+:")
     , mTitleRegEx("^[=|\\*|#|\\^|\\-]+")
+    , mBoldRegEx("[\\s+]\\*{2,}\\w+\\*{2,}|^\\*{2,}\\w+\\*{2,}")
+    , mItalicRegEx("[\\s+]\\*{1,1}\\w+\\*{1,1}|^\\*{1,1}\\w+\\*{1,1}")
+    , mCodeRegEx("[\\s+]`{2,2}[^`]+`{2,2}")
+    , mRoleRegEx("\\s+:\\w+:")
+    , mRoleContentRegEx(":`[^`]+`")
 {
     auto colorScheme = fontSettings().colorScheme();
 
@@ -40,6 +45,8 @@ Highlighter::Highlighter(QObject *parent)
 
     mTickFormat.setForeground(
         colorScheme.formatFor(TextEditor::TextStyle::C_PRIMITIVE_TYPE).foreground());
+
+    mCodeFormat = mTickFormat;
 
     mTodoFormat = mDirectiveFormat;
     mTodoFormat.setBackground(
@@ -129,32 +136,34 @@ void Highlighter::highlightBlock(const QString &text)
         }
 
         // now we do inline matching
-        QRegularExpression expression("[\\s+]\\*{2,}\\w+\\*{2,}|^\\*{2,}\\w+\\*{2,}");
-        QRegularExpressionMatchIterator i = expression.globalMatch(text);
+        QRegularExpressionMatchIterator i = mBoldRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mBoldFormat);
         }
 
-        expression = QRegularExpression("[\\s+]\\*{1,1}\\w+\\*{1,1}|^\\*{1,1}\\w+\\*{1,1}");
-        i = expression.globalMatch(text);
+        i = mItalicRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mItalicFormat);
         }
 
-        expression = QRegularExpression("\\s+:.+:");
-        i = expression.globalMatch(text);
+        i = mRoleRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mInlineFormat);
         }
 
-        expression = QRegularExpression("`.+`");
-        i = expression.globalMatch(text);
+        i = mCodeRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
-            setFormat(match.capturedStart(), match.capturedLength(), mTickFormat);
+            setFormat(match.capturedStart(), match.capturedLength(), mCodeFormat);
+        }
+
+        i = mRoleContentRegEx.globalMatch(text);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            setFormat(match.capturedStart() + 1, match.capturedLength() - 1, mTickFormat);
         }
     }
 

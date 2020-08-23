@@ -3,7 +3,7 @@ name: Build plugin
 on: [push]
 
 env:
-  QT_VERSION: 5.14.2
+  QT_VERSION: 5.15.0
   QT_CREATOR_VERSION: 4.13.0
   QT_CREATOR_VERSION_HINT: -rc1
   QT_CREATOR_SNAPSHOT: latest
@@ -21,11 +21,6 @@ jobs:
             name: "Windows Latest x64", artifact: "Windows-x64.zip",
             os: windows-latest,
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-        - {
-            name: "Windows Latest x86", artifact: "Windows-x86.zip",
-            os: windows-latest,
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars32.bat"
           }
         - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
@@ -60,9 +55,6 @@ jobs:
           if ("${{ matrix.config.environment_script }}" MATCHES "vcvars64.bat")
             set(qt_package_name "qt.qt5.${qt_version_dotless}.win64_msvc2017_64")
             set(qt_dir_prefix "${qt_version}/msvc2017_64")
-          elseif ("${{ matrix.config.environment_script }}" MATCHES "vcvars32.bat")
-            set(qt_package_name "qt.qt5.${qt_version_dotless}.win32_msvc2017")
-            set(qt_dir_prefix "${qt_version}/msvc2017")
           else()
           endif()
         elseif ("${{ runner.os }}" STREQUAL "Linux")
@@ -131,8 +123,6 @@ jobs:
           set(qtc_binary_name "$ENV{PLUGIN_NAME}.dll")
           if ("${{ matrix.config.environment_script }}" MATCHES "vcvars64.bat")
             set(qtc_platform "windows_x64")
-          elseif ("${{ matrix.config.environment_script }}" MATCHES "vcvars32.bat")
-            set(qtc_platform "windows_x86")
           endif()
         elseif ("${{ runner.os }}" STREQUAL "Linux")
           set(qtc_output_directory "qtcreator/lib/qtcreator/plugins")
@@ -216,7 +206,6 @@ jobs:
 
         set(make_program make -j ${N})
         if ("${{ runner.os }}" STREQUAL "Windows")
-          #set(make_program "qtcreator/bin/jom")
           set(make_program "nmake")
         endif()
         
@@ -289,10 +278,6 @@ jobs:
         config:
         - {
             name: "Windows Latest x64", artifact: "Windows-x64.zip",
-            os: ubuntu-latest
-          }
-        - {
-            name: "Windows Latest x86", artifact: "Windows-x86.zip",
             os: ubuntu-latest
           }
         - {

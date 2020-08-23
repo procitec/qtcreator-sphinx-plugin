@@ -25,7 +25,7 @@ EditorFactory::EditorFactory()
     addMimeType(Constants::MimeType);
 
     QSettings *s = Core::ICore::settings();
-    s->beginGroup(Constants::SettingsId);
+    s->beginGroup(Constants::SettingsGeneralId);
     bool useInternalHighlighter = s->value(SettingsIds::CustomHighlighter, QVariant(true)).toBool();
     s->endGroup();
 

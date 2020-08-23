@@ -69,14 +69,14 @@ ReSTCheckHighLighter::ReSTCheckHighLighter()
     mExtraFormats[2] = format;
 
     QSettings *s = Core::ICore::settings();
-    s->beginGroup(Constants::SettingsId);
+    s->beginGroup(Constants::SettingsGeneralId);
     QString pythonFilePath = s->value(SettingsIds::PythonFilePath, QVariant("")).toString();
     s->endGroup();
 
     QFileInfo info(pythonFilePath);
     if (info.exists() && info.isExecutable()) {
         mPythonFilePath = info.absoluteFilePath();
-        mReSTCheckScript = Core::ICore::resourcePath() + "/sphinx/rest_check.py";
+        mReSTCheckScript = Core::ICore::resourcePath() + "/sphinx/rstcheck/rest_check.py";
         mReSTCheckFound = QFileInfo(mReSTCheckScript).exists();
     } else {
         mPythonFilePath.clear();

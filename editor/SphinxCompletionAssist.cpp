@@ -1,5 +1,6 @@
 #include "SphinxCompletionAssist.h"
 #include "../qtcreator-sphinx-pluginconstants.h"
+#include "SphinxCodeModel.h"
 
 #include <coreplugin/id.h>
 #include <texteditor/codeassist/assistinterface.h>
@@ -37,45 +38,61 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     int startPosition = interface->position();
     const QString line = interface->textDocument()->findBlock(startPosition).text();
-    QString role;
-    int linePos = interface->textDocument()->findBlock(startPosition).position();
-    int rolePos = line.lastIndexOf(":", (line.length() - (startPosition - linePos)) - 1);
-    if (0 < rolePos) {
-        role = line.mid(rolePos, startPosition);
+    QString context;
+    int linePos = line.lastIndexOf(QRegExp(R"-(\s+)-"));
+    if (0 < linePos) {
+        linePos++; // the letter afther the space
+        context = line.mid(linePos, startPosition);
+    } else {
+        context = line;
+        linePos = 0;
     }
 
     QString myTyping = interface->textAt(startPosition, interface->position() - startPosition);
     const QString fileName = interface->fileName();
 
-    QList<TextEditor::AssistProposalItemInterface *> lineProposals;
-    QList<TextEditor::AssistProposalItemInterface *> roleProposals;
-
-    bool hasRole = !role.isEmpty();
-    bool hasLine = !line.isEmpty();
+    QList<TextEditor::AssistProposalItemInterface *> snippetProposal;
 
     for (auto *snippet : m_SphinxSnippetCollector.collect()) {
-        if (hasLine && snippet->text().startsWith(line)) { // this should match all directives
-            lineProposals += snippet;
-        } else if (hasRole) {
-            if (snippet->text().startsWith(role)) {
-                roleProposals += snippet;
+        if (snippet->text().startsWith(context)) { // this should match all directives
+            snippetProposal += snippet;
+        }
+    }
+
+    if (snippetProposal.empty()) {
+        // load from code model, directives or roles
+        linePos = line.lastIndexOf(QRegExp(R"-(\s+)-"));
+        if (0 <= linePos) {
+            linePos++;
+            context = line.mid(linePos, startPosition);
+        } else {
+            context = line;
+            linePos = 0;
+        }
+
+        for (const auto &snippet : CodeModel::instance()->collectDirectives()) {
+            if (snippet.trigger().startsWith(context)) {
+                auto item = new TextEditor::AssistProposalItem;
+                item->setText(snippet.trigger() + QLatin1Char(' ') + snippet.complement());
+                item->setData(snippet.content());
+                item->setDetail(snippet.generateTip());
+                //                item->setIcon(icon);
+                //                item->setOrder(order);
+                snippetProposal += item;
             }
         }
     }
 
-    if (lineProposals.empty() && roleProposals.isEmpty()) {
+    if (snippetProposal.empty()) {
         return nullptr;
     }
 
     TextEditor::GenericProposalModelPtr model(new TextEditor::GenericProposalModel);
-    if (!lineProposals.isEmpty()) {
-        model->loadContent(lineProposals);
-        proposal = new TextEditor::GenericProposal(linePos, model);
-    } else if (!roleProposals.isEmpty()) {
-        model->loadContent(roleProposals);
-        proposal = new TextEditor::GenericProposal(linePos + rolePos, model);
-    }
 
+    if (!snippetProposal.isEmpty()) {
+        model->loadContent(snippetProposal);
+        proposal = new TextEditor::GenericProposal(linePos, model);
+    }
     return proposal;
 }
 

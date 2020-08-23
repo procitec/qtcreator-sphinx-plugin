@@ -14,7 +14,7 @@ namespace qtcreator::plugin::sphinx {
 
 Core::Id CodeStylePreferencesFactory::languageId()
 {
-    return Constants::SettingsId;
+    return Constants::SettingsGeneralId;
 }
 
 QString CodeStylePreferencesFactory::displayName()

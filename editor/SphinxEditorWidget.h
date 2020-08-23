@@ -3,6 +3,7 @@
 #include "SphinxDocument.h"
 #include "SphinxFormatActions.h"
 #include "SphinxFormatter.h"
+#include "SphinxPreviewPage.h"
 #include <texteditor/tabsettings.h>
 #include <texteditor/textdocument.h>
 #include <texteditor/texteditor.h>
@@ -65,16 +66,26 @@ public Q_SLOTS:
 protected:
     void finalizeInitialization() override;
     void keyPressEvent(QKeyEvent *e) override;
+    void showEvent(QShowEvent *) override;
+    void hideEvent(QHideEvent *) override;
+
+private Q_SLOTS:
+    void onCustomContextMenu(const QPoint &pos);
+    void onUrlAction();
+    void onPreviewAction();
 
 private:
     void addToolBar();
 
     void readSettings();
+    void readFileSettings();
+    void saveFileSettings();
     void connectActions();
     void handleTabKeyRemove();
     void handleTabKeyInsert();
     void scheduleRstCheckUpdate();
     void updateRstCheck();
+    void updatePreview(bool show);
 
     int mAutoIndent = 0;
     bool mInsertSpaceForTab = true;
@@ -104,5 +115,9 @@ private:
     bool mUseReSTCheckHighlighter = false;
 
     QString mRealFileName;
+    PreviewPage *mPreview = nullptr;
+
+    QAction *mUrlAction = nullptr;
+    QAction *mPreviewAction = nullptr;
 };
 } // namespace qtcreator::plugin::sphinx

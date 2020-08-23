@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <directives>
+        <directive name="image" args="filename">
+            <options>
+                <option name="alt" type="text">
+                    <description xml:lang="en">Alternate text: a short description of the image, displayed by applications that cannot display images, or spoken by applications for visually impaired users
+                    </description>
+                </option>
+                <option name="height" type="length">
+                </option>
+                <option name="width" type="length or percentage of the current line width">
+                    <description xml:lang="en">The width of the image. Used to reserve space or scale the image horizontally. As with "height" above, when the "scale" option is also specified, they are combined.
+                    </description>
+                </option>
+            </options>
+        </directive>
+    </directives>
+</model>
+
+

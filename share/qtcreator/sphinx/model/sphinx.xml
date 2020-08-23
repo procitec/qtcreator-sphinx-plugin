@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <directives>
+        <directive name="toctree">
+        </directive>
+        <directive name="code-block" args="language" has_content="true">
+            <content><![CDATA[
+    $code$
+]]>
+            </content>
+        </directive>
+    </directives>
+    <roles>
+        <role name="ref"/>
+    </roles>
+</model>
+
+

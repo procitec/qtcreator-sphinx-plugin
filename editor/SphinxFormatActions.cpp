@@ -9,8 +9,11 @@
 namespace qtcreator::plugin::sphinx {
 
 FormatActions::FormatActions()
-    : mFormat(LAST_FORMAT), mSpacing(LAST_SPACING), mComment(LAST_COMMENT), mList(LAST_LIST),
-      mSection(LAST_SECTION)
+    : mFormat(LAST_FORMAT)
+    , mSpacing(LAST_SPACING)
+    , mComment(LAST_COMMENT)
+    , mList(LAST_LIST)
+    , mSection(LAST_SECTION)
 {
     QString actionID = "Sphinx Editor.Action.";
     QAction *action;

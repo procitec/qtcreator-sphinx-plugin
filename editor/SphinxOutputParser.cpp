@@ -6,40 +6,60 @@
 namespace qtcreator::plugin::sphinx {
 CustomParser::CustomParser()
 {
-    mSettings.displayName = tr("Parser for Sphinx toolchain");
-    mSettings.id = Constants::CustomParserId;
-    //mSettings.error.setPattern("aaa");
-    //    customParserSettings.error.setPattern(
-    //        data.value("ProjectExplorer.CustomToolChain.ErrorPattern").toString());
-    //    customParserSettings.error.setFileNameCap(
-    //        data.value("ProjectExplorer.CustomToolChain.ErrorLineNumberCap").toInt());
-    //    customParserSettings.error.setLineNumberCap(
-    //        data.value("ProjectExplorer.CustomToolChain.ErrorFileNameCap").toInt());
-    //    customParserSettings.error.setMessageCap(
-    //        data.value("ProjectExplorer.CustomToolChain.ErrorMessageCap").toInt());
-    //    customParserSettings.error.setChannel(
-    //        static_cast<Internal::CustomParserExpression::CustomParserChannel>(
-    //            data.value("ProjectExplorer.CustomToolChain.ErrorChannel").toInt()));
-    //    customParserSettings.error.setExample(
-    //        data.value("ProjectExplorer.CustomToolChain.ErrorExample").toString());
-    //    customParserSettings.warning.setPattern(
-    //        data.value("ProjectExplorer.CustomToolChain.WarningPattern").toString());
-    //    customParserSettings.warning.setFileNameCap(
-    //        data.value("ProjectExplorer.CustomToolChain.WarningLineNumberCap").toInt());
-    //    customParserSettings.warning.setLineNumberCap(
-    //        data.value("ProjectExplorer.CustomToolChain.WarningFileNameCap").toInt());
-    //    customParserSettings.warning.setMessageCap(
-    //        data.value("ProjectExplorer.CustomToolChain.WarningMessageCap").toInt());
-    //    customParserSettings.warning.setChannel(
-    //        static_cast<Internal::CustomParserExpression::CustomParserChannel>(
-    //            data.value("ProjectExplorer.CustomToolChain.WarningChannel").toInt()));
-    //    customParserSettings.warning.setExample(
-    //        data.value("ProjectExplorer.CustomToolChain.WarningExample").toString());
-    //        setOutputParserId(customParserSettings.id);
-    //        customParserSettings.displayName = tr("Parser for toolchain %1").arg(displayName());
-    QList<ProjectExplorer::Internal::CustomParserSettings>
+    mIssueWithoutLineNumber.displayName = tr("Sphinx Issue w/o line");
+    mIssueWithoutLineNumber.id = (QString(Constants::CustomParserId) + QString(".IssueWithoutLine"))
+                                     .toLatin1()
+                                     .constData();
+    mIssueWithoutLineNumber.warning.setPattern(R"-(([\S]+):\s+WARNING:\s+(.*))-");
+
+    mIssueWithLineNumber.displayName = tr("Sphinx Issue w line");
+    mIssueWithLineNumber.id = (QString(Constants::CustomParserId) + QString(".IssueWithLine"))
+                                  .toLatin1()
+                                  .constData();
+    mIssueWithLineNumber.warning.setPattern(R"-(([\S]+):(\\d+):\s+WARNING:\s+(.*))-");
+
+    //    QTest::newRow( "warning unkown directive" ) << "
+    //                                              << static_cast<int>( SphinxParser::Info::WARNING ) << "~tmp/sphinx-test/index.rst" << 13
+    //                                              << "Unknown directive type \"uml\". .. uml::";
+
+    mIssueWithoutLineNumber.warning.setFileNameCap(1);
+    mIssueWithoutLineNumber.warning.setLineNumberCap(100);
+    mIssueWithoutLineNumber.warning.setMessageCap(2);
+    mIssueWithoutLineNumber.warning.setChannel(
+        ProjectExplorer::CustomParserExpression::CustomParserChannel::ParseBothChannels);
+    mIssueWithLineNumber.warning.setExample(
+        "~/tmp/sphinx-test/free.rst: WARNING: document isn't included in any toctree\n");
+    mIssueWithoutLineNumber.error = mIssueWithoutLineNumber.warning;
+    mIssueWithoutLineNumber.error.setPattern(R"-(([\S]+):\s+ERROR:\s+(.*))-");
+
+    mIssueWithLineNumber.warning.setFileNameCap(1);
+    mIssueWithLineNumber.warning.setLineNumberCap(2);
+    mIssueWithLineNumber.warning.setMessageCap(3);
+    mIssueWithLineNumber.warning.setChannel(
+        ProjectExplorer::CustomParserExpression::CustomParserChannel::ParseBothChannels);
+    mIssueWithLineNumber.warning.setExample(
+        "~tmp/sphinx-test/index.rst:13: WARNING: Unknown directive type \"uml\". .. uml::\n");
+    mIssueWithLineNumber.error = mIssueWithoutLineNumber.warning;
+    mIssueWithLineNumber.error.setPattern(R"-(([\S]+):(\\d+):\s+ERROR:\s+(.*))-");
+
+    QList<ProjectExplorer::CustomParserSettings>
         settings = ProjectExplorer::ProjectExplorerPlugin::customParsers();
-    settings << mSettings;
-    ProjectExplorer::ProjectExplorerPlugin::setCustomParsers(settings);
+    bool foundIssueWithoutLineNumber = false;
+    bool foundIssueWithLineNumber = false;
+
+    for (auto setting : settings) {
+        if (setting.id == mIssueWithoutLineNumber.id) {
+            foundIssueWithoutLineNumber = true;
+        }
+        if (setting.id == mIssueWithLineNumber.id) {
+            foundIssueWithLineNumber = true;
+        }
+    }
+    if (!foundIssueWithoutLineNumber) {
+        ProjectExplorer::ProjectExplorerPlugin::addCustomParser(mIssueWithoutLineNumber);
+    }
+    if (!foundIssueWithLineNumber) {
+        ProjectExplorer::ProjectExplorerPlugin::addCustomParser(mIssueWithLineNumber);
+    }
 }
 } // namespace qtcreator::plugin::sphinx

@@ -13,11 +13,17 @@ isEmpty(IDE_BUILD_TREE):error(QTC_BUILD must be set)
 
 TEST=1
 
+
+#QT+= webengine
+
 # qtcreator-sphinx-plugin files
 
 SOURCES += \
-        editor/SphinxOutputParser.cpp \
+        editor/SphinxCodeModel.cpp \
         qtcreator-sphinx-plugin.cpp \
+        qtcreator-sphinx-plugin-projectsettings.cpp \
+        editor/SphinxOutputParser.cpp \
+        editor/SphinxPreviewPage.cpp \
         editor/SphinxDocument.cpp \
         editor/SphinxEditor.cpp \
         editor/SphinxEditorFactory.cpp \
@@ -41,10 +47,13 @@ equals( TEST, 1) {
 
 
 HEADERS += \
-        editor/SphinxOutputParser.h \
+    editor/SphinxCodeModel.h \
         qtcreator-sphinx-plugin.h \
         qtcreator-sphinx-plugin_global.h \
         qtcreator-sphinx-pluginconstants.h \
+        qtcreator-sphinx-plugin-projectsettings.h \
+        editor/SphinxOutputParser.h \
+        editor/SphinxPreviewPage.h \
         editor/SphinxDocument.h \
         editor/SphinxEditor.h \
         editor/SphinxEditorFactory.h \
@@ -102,6 +111,8 @@ QTC_PLUGIN_DEPENDS += \
 QTC_PLUGIN_RECOMMENDS += \
     # optional plugin dependencies. nothing here at this time
 
+QT += xmlpatterns
+
 ###### End _dependencies.pri contents ######
 
 include($$IDE_SOURCE_TREE/src/qtcreatorplugin.pri)
@@ -110,16 +121,21 @@ include($$IDE_SOURCE_TREE/src/qtcreatorplugin.pri)
 snippets.path = /share/qtcreator/snippets
 snippets.files += share/qtcreator/snippets/sphinx.xml \
 
-sphinx.path = /share/qtcreator/sphinx
-sphinx.files += share/qtcreator/sphinx/protocol_data_parser.py \
-                share/qtcreator/sphinx/rest_check.py \
+rstcheck.path = /share/qtcreator/sphinx/rstcheck
+rstcheck.files += share/qtcreator/sphinx/rstcheck/protocol_data_parser.py \
+                share/qtcreator/sphinx/rstcheck/rest_check.py \
 
-INSTALLS += snippets sphinx
+model.path = /share/qtcreator/sphinx/model
+model.files += share/qtcreator/sphinx/model/*.xml \
+                share/qtcreator/sphinx/model/*.xsd \
+
+INSTALLS += snippets rstcheck model
 
 OTHER_FILES = \
     share/qtcreator/snippets/sphinx.xml \
-    share/qtcreator/sphinx/rest_check.py \
-    share/qtcreator/sphinx/protocol_data_parser.py \
+    share/qtcreator/sphinx/rstcheck/rest_check.py \
+    share/qtcreator/sphinx/rstcheck/protocol_data_parser.py \
+    share/qtcreator/sphinx/model/sphinx.xml \
 
 
 

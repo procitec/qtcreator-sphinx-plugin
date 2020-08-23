@@ -56,7 +56,15 @@ void TestCompletion::testSimpleDirective_data()
     QTest::addColumn<QString>("text");
     QTest::addColumn<QString>("completion");
 
-    QTest::newRow("code-block") << QString(".. code") << QString(R"-(.. code-block::
+    QTest::newRow("code-block") << QString(".. code") << QString(R"-(.. code-block:: language
+
+    code
+
+)-");
+
+    QTest::newRow("code-block second line") << QString("normaltext\n\n.. code") << QString(R"-(normaltext
+
+.. code-block:: language
 
     code
 
@@ -89,6 +97,60 @@ void TestCompletion::testSimpleDirective()
 }
 
 void TestCompletion::testSimpleRole()
+{
+    QFETCH(QString, text);
+    QFETCH(QString, completion);
+
+    mEditor->insertPlainText(text);
+    qApp->processEvents();
+    QVERIFY(mEditor->autoCompleter());
+    auto tc = mEditor->textCursor();
+    mEditor->invokeAssist(TextEditor::Completion, nullptr);
+    QTest::qWait(20);
+    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+    QTest::qWait(20);
+    auto completed = mEditor->toPlainText();
+    QCOMPARE(completed, completion);
+}
+
+void TestCompletion::testSimpleSnippetDirective_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("completion");
+
+    QTest::newRow("code-block") << QString("__code") << QString(R"-(.. code-block::
+
+    code
+
+)-");
+}
+
+void TestCompletion::testSimpleSnippetRole_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("completion");
+
+    QTest::newRow("inline :ref:") << QString("inline _r") << QString("inline :ref:`label`");
+}
+
+void TestCompletion::testSimpleSnippetDirective()
+{
+    QFETCH(QString, text);
+    QFETCH(QString, completion);
+
+    mEditor->insertPlainText(text);
+    qApp->processEvents();
+    QVERIFY(mEditor->autoCompleter());
+    auto tc = mEditor->textCursor();
+    mEditor->invokeAssist(TextEditor::Completion, nullptr);
+    QTest::qWait(20);
+    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+    QTest::qWait(20);
+    auto completed = mEditor->toPlainText();
+    QCOMPARE(completed, completion);
+}
+
+void TestCompletion::testSimpleSnippetRole()
 {
     QFETCH(QString, text);
     QFETCH(QString, completion);

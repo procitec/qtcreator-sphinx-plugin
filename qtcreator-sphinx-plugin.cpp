@@ -79,7 +79,7 @@ void Plugin::initializeToolsSettings()
 
     // code style pool
     auto pool = new TextEditor::CodeStylePool(factory, this);
-    TextEditor::TextEditorSettings::registerCodeStylePool(Constants::SettingsId, pool);
+    TextEditor::TextEditorSettings::registerCodeStylePool(Constants::SettingsGeneralId, pool);
 
     // global code style settings
     auto globalCodeStyle = new TextEditor::SimpleCodeStylePreferences(this);
@@ -87,7 +87,7 @@ void Plugin::initializeToolsSettings()
     globalCodeStyle->setDisplayName(tr("Global", "Settings"));
     globalCodeStyle->setId("SphinxGlobal");
     pool->addCodeStyle(globalCodeStyle);
-    TextEditor::TextEditorSettings::registerCodeStyle(Constants::SettingsId, globalCodeStyle);
+    TextEditor::TextEditorSettings::registerCodeStyle(Constants::SettingsGeneralId, globalCodeStyle);
 
     // built-in settings
     // Sphinx style
@@ -109,11 +109,11 @@ void Plugin::initializeToolsSettings()
     pool->loadCustomCodeStyles();
 
     // load global settings (after built-in settings are added to the pool)
-    globalCodeStyle->fromSettings(Constants::SettingsId, Core::ICore::settings());
+    globalCodeStyle->fromSettings(Constants::SettingsGeneralId, Core::ICore::settings());
 
     // mimetypes to be handled
     TextEditor::TextEditorSettings::registerMimeTypeForLanguageId(Constants::MimeType,
-                                                                  Constants::SettingsId);
+                                                                  Constants::SettingsGeneralId);
 
     mOptionsPage = new OptionsPage(&mSettings, this);
 }

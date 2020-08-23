@@ -41,6 +41,7 @@ private:
     QTextCharFormat mInlineFormat;
     QTextCharFormat mBoldFormat;
     QTextCharFormat mItalicFormat;
+    QTextCharFormat mCodeFormat;
     QTextCharFormat mTodoFormat;
     QTextCharFormat mDefaultFormat;
     QTextCharFormat mTickFormat;
@@ -48,5 +49,10 @@ private:
     QRegularExpression mDirectiveRegEx;
     QRegularExpression mDirectiveOptionRegEx;
     QRegularExpression mTitleRegEx;
+    QRegularExpression mBoldRegEx;
+    QRegularExpression mItalicRegEx;
+    QRegularExpression mCodeRegEx;
+    QRegularExpression mRoleRegEx;
+    QRegularExpression mRoleContentRegEx;
 };
 } // namespace qtcreator::plugin::sphinx
