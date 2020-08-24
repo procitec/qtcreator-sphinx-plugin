@@ -276,7 +276,7 @@ jobs:
         message("start compressing artifact to ${artifact}")
 
         execute_process(COMMAND
-          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip -C $ENV{GITHUB_WORKSPACE}/install .
+          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip .
           WORKING_DIRECTORY $ENV{GITHUB_WORKSPACE}/install
         )
 
