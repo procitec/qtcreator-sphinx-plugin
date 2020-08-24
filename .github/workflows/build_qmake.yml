@@ -207,6 +207,7 @@ jobs:
         else()
           set(ENV{PATH} "${{ steps.qt.outputs.qt_dir }}/bin/:$ENV{PATH}")
           set(ENV{LD_LIBRARY_PATH} "qtcreator/lib/Qt/lib:$ENV{LD_LIBRARY_PATH}")
+          set(ENV{QT_QPA_PLATFORM} "minimal" )
         endif()
 
         include(ProcessorCount)
@@ -245,26 +246,30 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status of ${make_program} install")
         endif()
-
-        #execute_process(
-        #  COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/qtcreator"
-        #  RESULT_VARIABLE result
-        #)
-
-        #if (NOT result EQUAL 0)
-        #  message(FATAL_ERROR "Bad exit status of ${make_program} install subpackages for test")
-        #endif()
         
-        #execute_process(
-        #  COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
-        #  RESULT_VARIABLE result
-        #  OUTPUT_VARIABLE out_var
-        #  ERROR_VARIABLE out_var
-        #)
+        message("install subpackages to qtcreator for tests")
+
+        execute_process(
+          COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/qtcreator"
+          RESULT_VARIABLE result
+        )
+
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "Bad exit status of ${make_program} install subpackages for test")
+        endif()
         
-        #if (NOT result EQUAL 0)
-        #  message(FATAL_ERROR "${out_var}\ntest for plugin failed")
-        #endif()
+        message("start run qtcreator with plugin test")
+        
+        execute_process(
+          COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
+          RESULT_VARIABLE result
+          OUTPUT_VARIABLE out_var
+          ERROR_VARIABLE out_var
+        )
+        
+        if (NOT result EQUAL 0)
+          message(FATAL_ERROR "${out_var}\ntest for plugin failed")
+        endif()
         
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
         
@@ -272,6 +277,7 @@ jobs:
 
         execute_process(COMMAND
           ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip -C $ENV{GITHUB_WORKSPACE}/install .
+          WORKING_DIRECTORY $ENV{GITHUB_WORKSPACE}/install
         )
 
     - uses: actions/upload-artifact@v1
