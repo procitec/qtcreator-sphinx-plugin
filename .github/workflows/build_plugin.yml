@@ -300,7 +300,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
-        body_path: CHANGELOG.md
+        body_path: ${{ github.workspace }}/CHANGELOG.md
         draft: true
         prerelease: true
 
