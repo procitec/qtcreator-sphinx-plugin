@@ -78,8 +78,9 @@ equals( TEST, 1) {
 
 
 DISTFILES += \
-        .github/workflow/build_qmake.yml \
-        .github/workflow/README.md
+        .github/workflows/build_plugin.yml \
+        .github/workflows/README.md \
+        ReleaseNotes.md
 
 RESOURCES += \
     qtcreator-sphinx-plugin.qrc
