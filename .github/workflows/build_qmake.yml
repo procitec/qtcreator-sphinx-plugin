@@ -250,7 +250,7 @@ jobs:
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
 
         execute_process(COMMAND
-          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip "$ENV{GITHUB_WORKSPACE}/install/*"
+          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip "$ENV{GITHUB_WORKSPACE}/install/"
           WORKING_DIRECTORY "$ENV{GITHUB_WORKSPACE}/install"
         )
 
