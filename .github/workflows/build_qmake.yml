@@ -4,8 +4,8 @@ on: [push]
 
 env:
   QT_VERSION: 5.15.0
-  QT_CREATOR_VERSION: 4.13.0
-  QT_CREATOR_VERSION_HINT: -rc1
+  QT_CREATOR_VERSION: 4.14.0
+  QT_CREATOR_VERSION_HINT: -beta1
   QT_CREATOR_SNAPSHOT: latest
   PLUGIN_PRO: qtcreator-sphinx-plugin.pro
   PLUGIN_NAME: qtcreator-sphinx-plugin
