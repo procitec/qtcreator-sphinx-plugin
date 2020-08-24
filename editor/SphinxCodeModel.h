@@ -47,8 +47,9 @@ private:
     class Role
     {
     public:
-        QString mName;
-        QString mDescription;
+        QString mName = {};
+        QString mDescription = {};
+        QString mGroupId = {};
     };
 
     class Data

@@ -5,7 +5,7 @@
         </directive>
         <directive name="code-block" args="language" has_content="true">
             <content><![CDATA[
-    $code$
+    $$
 ]]>
             </content>
         </directive>

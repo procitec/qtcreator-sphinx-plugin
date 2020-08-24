@@ -38,8 +38,9 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     int startPosition = interface->position();
     const QString line = interface->textDocument()->findBlock(startPosition).text();
+    const int blockPos = interface->textDocument()->findBlock(startPosition).position();
     QString context;
-    int linePos = line.lastIndexOf(QRegExp(R"-(\s+)-"));
+    int linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
     if (0 < linePos) {
         linePos++; // the letter afther the space
         context = line.mid(linePos, startPosition);
@@ -60,25 +61,47 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     }
 
     if (snippetProposal.empty()) {
-        // load from code model, directives or roles
-        linePos = line.lastIndexOf(QRegExp(R"-(\s+)-"));
+        // load from code model, search for directives
+        linePos = line.lastIndexOf(QRegExp(R"-(^\s*\.{2}\s+)-"));
         if (0 <= linePos) {
+            linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
             linePos++;
             context = line.mid(linePos, startPosition);
-        } else {
-            context = line;
-            linePos = 0;
-        }
+            qWarning() << "found valid context for completion" << context;
 
-        for (const auto &snippet : CodeModel::instance()->collectDirectives()) {
-            if (snippet.trigger().startsWith(context)) {
-                auto item = new TextEditor::AssistProposalItem;
-                item->setText(snippet.trigger() + QLatin1Char(' ') + snippet.complement());
-                item->setData(snippet.content());
-                item->setDetail(snippet.generateTip());
-                //                item->setIcon(icon);
-                //                item->setOrder(order);
-                snippetProposal += item;
+            for (const auto &snippet : CodeModel::instance()->collectDirectives()) {
+                if (snippet.trigger().startsWith(context)) {
+                    auto item = new TextEditor::AssistProposalItem;
+                    item->setText(snippet.trigger() + QLatin1Char(' ') + snippet.complement());
+                    item->setData(snippet.content());
+                    item->setDetail(snippet.generateTip());
+                    //                item->setIcon(icon);
+                    //                item->setOrder(order);
+                    snippetProposal += item;
+                }
+            }
+        }
+    }
+
+    if (snippetProposal.empty()) {
+        // load from code model, search for roles
+        linePos = line.lastIndexOf(QRegExp(R"-(^\s*:|\s+:)-"));
+        if (0 <= linePos) {
+            linePos = line.lastIndexOf(QRegExp(R"-(:)-"));
+            linePos++;
+            context = line.mid(linePos, startPosition);
+            qWarning() << "found valid context for completion" << context;
+
+            for (const auto &snippet : CodeModel::instance()->collectRoles()) {
+                if (snippet.trigger().startsWith(context)) {
+                    auto item = new TextEditor::AssistProposalItem;
+                    item->setText(snippet.trigger() + QLatin1Char(' ') + snippet.complement());
+                    item->setData(snippet.content());
+                    item->setDetail(snippet.generateTip());
+                    //                item->setIcon(icon);
+                    //                item->setOrder(order);
+                    snippetProposal += item;
+                }
             }
         }
     }
@@ -91,7 +114,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     if (!snippetProposal.isEmpty()) {
         model->loadContent(snippetProposal);
-        proposal = new TextEditor::GenericProposal(linePos, model);
+        proposal = new TextEditor::GenericProposal(blockPos + linePos, model);
     }
     return proposal;
 }

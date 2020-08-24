@@ -58,7 +58,7 @@ void TestCompletion::testSimpleDirective_data()
 
     QTest::newRow("code-block") << QString(".. code") << QString(R"-(.. code-block:: language
 
-    code
+    
 
 )-");
 
@@ -66,7 +66,7 @@ void TestCompletion::testSimpleDirective_data()
 
 .. code-block:: language
 
-    code
+    
 
 )-");
 }
@@ -76,7 +76,9 @@ void TestCompletion::testSimpleRole_data()
     QTest::addColumn<QString>("text");
     QTest::addColumn<QString>("completion");
 
-    QTest::newRow("inline :ref:") << QString("inline :r") << QString("inline :ref:`label`");
+    QTest::newRow("inline :ref:") << QString("inline :r") << QString("inline :ref:``");
+    QTest::newRow("start of line :ref:") << QString("\n:r") << QString("\n:ref:``");
+    QTest::newRow("invalid:ref:") << QString("inline:r") << QString("inline:r");
 }
 
 void TestCompletion::testSimpleDirective()

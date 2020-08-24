@@ -77,126 +77,95 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
         QXmlStreamReader xml(&file);
         if (xml.readNextStartElement()) {
             if (xml.name() == "model") {
-                while (xml.readNextStartElement()) {
-                    if (xml.name() == "directives") {
-                        while (xml.readNextStartElement()) {
-                            if (xml.name() == "directive") {
-                                const QXmlStreamAttributes &atts = xml.attributes();
-                                assert(atts.hasAttribute("name"));
-                                const QString &id = atts.value("name").toString();
+                Directive directive;
+                DirectiveOption directiveOption;
+                Role role;
+                while (xml.readNext()) {
+                    if (xml.atEnd()) {
+                        break;
+                    } else if (xml.name() == "directive" && xml.isStartElement()) {
+                        const QXmlStreamAttributes &atts = xml.attributes();
+                        assert(atts.hasAttribute("name"));
+                        const QString &id = atts.value("name").toString();
 
-                                Directive directive;
-                                directive.mName = id;
-                                directive.mGroupId = snippetId;
+                        directive.mName = id;
+                        directive.mGroupId = snippetId;
 
-                                if (atts.hasAttribute("args")) {
-                                    directive.mArgs = atts.value("args").toString();
-                                }
-                                if (atts.hasAttribute("has_content")) {
-                                    directive.mHasContent = atts.value("has_content").toString().toLower()
-                                                                    == "true"
-                                                                ? true
-                                                                : false;
-                                }
-                                qWarning() << fileName << " found directive " << id
-                                           << xml.lineNumber() << xml.columnNumber();
-
-                                //                                        const QString &groupId = atts.value(kGroup).toString();
-                                //                                        const QString &trigger = atts.value(kTrigger).toString();
-                                //                                        if (!groupId.isEmpty()
-                                //                                            && (snippetId.isEmpty() || snippetId == id)) {
-                                //                                            TextEditor::Snippet snippet(groupId, id);
-                                //                                            snippet.setTrigger(trigger);
-                                //                                            snippet.setComplement(QCoreApplication::translate(
-                                //                                                "TextEditor::Internal::Snippets",
-                                //                                                atts.value(kComplement).toString().toLatin1(),
-                                //                                                atts.value(kId).toString().toLatin1()));
-                                //                                            snippet.setIsRemoved(
-                                //                                                toBool(atts.value(kRemoved).toString()));
-                                //                                            snippet.setIsModified(
-                                //                                                toBool(atts.value(kModified).toString()));
-
-                                //                                            QString content;
-                                //                                            while (!xml.atEnd()) {
-                                //                                                xml.readNext();
-                                //                                                if (xml.isCharacters()) {
-                                //                                                    content += xml.text();
-                                //                                                } else if (xml.isEndElement()) {
-                                //                                                    snippet.setContent(content);
-                                //                                                    snippets.append(snippet);
-                                //                                                    break;
-                                //                                                }
-                                //                                            }
-
-                                //                                        if (!snippetId.isEmpty())
-                                //                                            break;
-                                //                                    }
-                                while (xml.readNextStartElement()) {
-                                    if (xml.name() == "options") {
-                                        while (xml.readNextStartElement()) {
-                                            if (xml.name() == "option") {
-                                                const QXmlStreamAttributes &atts = xml.attributes();
-                                                const QString &name = atts.value("name").toString();
-                                                const QString &type = atts.value("type").toString();
-                                                DirectiveOption option;
-                                                option.mName = name;
-                                                option.mTypes = type;
-                                                qWarning()
-                                                    << fileName << " found options " << name << type
-                                                    << xml.lineNumber() << xml.columnNumber();
-
-                                                while (xml.readNextStartElement()) {
-                                                    if (xml.name() == "description") {
-                                                        auto desc = xml.readElementText();
-                                                        qWarning() << fileName << " found description "
-                                                                   << desc << xml.lineNumber()
-                                                                   << xml.columnNumber();
-                                                        option.mDescription = desc;
-                                                    } else {
-                                                        xml.skipCurrentElement();
-                                                    }
-                                                }
-                                                directive.mOptions.append(option);
-
-                                            } else {
-                                                xml.skipCurrentElement();
-                                            }
-                                        }
-                                    } else if (xml.name() == "description") {
-                                        auto desc = xml.readElementText();
-                                        qWarning() << fileName << " found description " << desc
-                                                   << xml.lineNumber() << xml.columnNumber();
-                                        directive.mDescription = desc;
-                                    } else if (xml.name() == "content") {
-                                        QString content;
-                                        while (!xml.atEnd()) {
-                                            xml.readNext();
-                                            if (xml.isCDATA()) {
-                                                content += xml.text();
-                                                break;
-                                            } else if (xml.isEndElement()) {
-                                                break;
-                                            }
-                                        }
-                                        qWarning() << fileName << " found content" << content
-                                                   << xml.lineNumber() << xml.columnNumber();
-                                        directive.mContent = content;
-                                    } else {
-                                        xml.skipCurrentElement();
-                                    }
-                                }
-                                mData.mDirectives.append(directive);
-                            } else {
-                                xml.skipCurrentElement();
+                        if (atts.hasAttribute("args")) {
+                            directive.mArgs = atts.value("args").toString();
+                        }
+                        if (atts.hasAttribute("has_content")) {
+                            directive.mHasContent = atts.value("has_content").toString().toLower()
+                                                            == "true"
+                                                        ? true
+                                                        : false;
+                        }
+                        qWarning() << fileName << " found directive " << id << xml.lineNumber()
+                                   << xml.columnNumber();
+                    } else if (xml.name() == "directive" && xml.isEndElement()) {
+                        mData.mDirectives.append(directive);
+                        directive = Directive();
+                    } else if (xml.name() == "option" && xml.isStartElement()
+                               && !directive.mName.isEmpty()) {
+                        const QXmlStreamAttributes &atts = xml.attributes();
+                        const QString &name = atts.value("name").toString();
+                        const QString &type = atts.value("type").toString();
+                        directiveOption.mName = name;
+                        directiveOption.mTypes = type;
+                        qWarning() << fileName << " found options " << name << type
+                                   << xml.lineNumber() << xml.columnNumber();
+                    } else if (xml.name() == "option" && xml.isEndElement()) {
+                        directive.mOptions.append(directiveOption);
+                        directiveOption = DirectiveOption();
+                    } else if (xml.name() == "description" && xml.isStartElement()
+                               && !directiveOption.mName.isEmpty()) {
+                        auto desc = xml.readElementText();
+                        qWarning() << fileName << " found directive option description " << desc
+                                   << xml.lineNumber() << xml.columnNumber();
+                        directiveOption.mDescription = desc;
+                    } else if (xml.name() == "description" && xml.isStartElement()
+                               && (directiveOption.mName.isEmpty() && !directive.mName.isEmpty())) {
+                        auto desc = xml.readElementText();
+                        qWarning() << fileName << " found directive description " << desc
+                                   << xml.lineNumber() << xml.columnNumber();
+                        directive.mDescription = desc;
+                    } else if (xml.name() == "content" && xml.isStartElement()
+                               && !directive.mName.isEmpty()) {
+                        QString content;
+                        while (!xml.atEnd()) {
+                            xml.readNext();
+                            if (xml.isCDATA()) {
+                                content += xml.text();
+                                break;
+                            } else if (xml.isEndElement()) {
+                                break;
                             }
                         }
-                    } else if (xml.name() == "roles") {
-                    } else {
-                        xml.skipCurrentElement();
+
+                        qWarning() << fileName << " found directive content" << content
+                                   << xml.lineNumber() << xml.columnNumber();
+                        directive.mContent = content;
+                    } else if (xml.name() == "role" && xml.isStartElement()) {
+                        const QXmlStreamAttributes &atts = xml.attributes();
+                        assert(atts.hasAttribute("name"));
+                        const QString &id = atts.value("name").toString();
+
+                        role.mName = id;
+                        role.mGroupId = snippetId;
+
+                        qWarning() << fileName << " found role " << id << xml.lineNumber()
+                                   << xml.columnNumber();
+                    } else if (xml.name() == "role" && xml.isEndElement()) {
+                        mData.mRoles.append(role);
+                        role = Role();
+                    } else if (xml.name() == "description" && xml.isStartElement()
+                               && !role.mName.isEmpty()) {
+                        auto desc = xml.readElementText();
+                        qWarning() << fileName << " found role description " << desc
+                                   << xml.lineNumber() << xml.columnNumber();
+                        role.mDescription = desc;
                     }
                 }
-            } else {
-                xml.skipCurrentElement();
             }
         }
         if (xml.hasError())
@@ -210,24 +179,6 @@ QList<TextEditor::Snippet> CodeModel::collectDirectives()
     QList<TextEditor::Snippet> snippets;
 
     for (const auto &directive : mData.mDirectives) {
-        //                                        const QString &groupId = atts.value(kGroup).toString();
-        //                                        const QString &trigger = atts.value(kTrigger).toString();
-        //                                        if (!groupId.isEmpty()
-        //                                            && (snippetId.isEmpty() || snippetId == id)) {
-        //                                            TextEditor::Snippet snippet(groupId, id);
-        //                                            snippet.setTrigger(trigger);
-        //                                            snippet.setComplement(QCoreApplication::translate(
-        //                                                "TextEditor::Internal::Snippets",
-        //                                                atts.value(kComplement).toString().toLatin1(),
-        //                                                atts.value(kId).toString().toLatin1()));
-        //                                            snippet.setIsRemoved(
-        //                                                toBool(atts.value(kRemoved).toString()));
-        //                                            snippet.setIsModified(
-        //                                                toBool(atts.value(kModified).toString()));
-
-        //                                            QString content;
-        //                                                    snippet.setContent(content);
-        //                                                    snippets.append(snippet);
         if (!directive.mGroupId.isEmpty()) {
             assert(!directive.mName.isEmpty());
             TextEditor::Snippet snippet(
@@ -242,7 +193,7 @@ QList<TextEditor::Snippet> CodeModel::collectDirectives()
                                                        : QString(" $%1$").arg(directive.mArgs);
 
             if (directive.mHasContent) {
-                QString content = directive.mContent.isEmpty() ? QStringLiteral("\n    $content$\n")
+                QString content = directive.mContent.isEmpty() ? QStringLiteral("\n    $$\n")
                                                                : directive.mContent;
                 snippet.setContent(
                     QString("%1::%2\n%3\n").arg(directive.mName).arg(option).arg(content));
@@ -261,6 +212,19 @@ QList<TextEditor::Snippet> CodeModel::collectRoles()
     QList<TextEditor::Snippet> snippets;
 
     for (const auto &role : mData.mRoles) {
+        if (!role.mGroupId.isEmpty()) {
+            assert(!role.mName.isEmpty());
+            TextEditor::Snippet snippet(
+                QString("%1.%2").arg(Constants::SnippetGroupId).arg(role.mGroupId),
+                QString("%1_%2").arg(role.mGroupId.toLower()).arg(role.mName.toLower()));
+            snippet.setTrigger(role.mName);
+            snippet.setComplement("");
+            snippet.setIsRemoved(false);
+            snippet.setIsModified(false);
+
+            snippet.setContent(QString("%1:`%2`").arg(role.mName).arg("$$"));
+            snippets += snippet;
+        }
     }
 
     return snippets;
