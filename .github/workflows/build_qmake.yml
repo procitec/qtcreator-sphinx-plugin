@@ -255,17 +255,16 @@ jobs:
           message(FATAL_ERROR "Bad exit status of ${make_program} install subpackages for test")
         endif()
         
-        execute_process(
-          COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
-          RESULT_VARIABLE result
-          OUTPUT_VARIABLE out_var
-          ERROR_VARIABLE out_var
-          
-        )
+        #execute_process(
+        #  COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
+        #  RESULT_VARIABLE result
+        #  OUTPUT_VARIABLE out_var
+        #  ERROR_VARIABLE out_var
+        #)
         
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "${out_var}\ntest for plugin failed")
-        endif()
+        #if (NOT result EQUAL 0)
+        #  message(FATAL_ERROR "${out_var}\ntest for plugin failed")
+        #endif()
         
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
 
