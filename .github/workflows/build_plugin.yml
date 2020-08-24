@@ -305,8 +305,8 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
         body_path: ${{ github.workspace }}/CHANGELOG.md
-        draft: true
-        prerelease: true
+        draft: false
+        prerelease: false
 
     - name: Store Release url
       run: |
