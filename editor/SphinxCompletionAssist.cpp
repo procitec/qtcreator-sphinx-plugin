@@ -67,7 +67,6 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
             linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
             linePos++;
             context = line.mid(linePos, startPosition);
-            qWarning() << "found valid context for completion" << context;
 
             for (const auto &snippet : CodeModel::instance()->collectDirectives()) {
                 if (snippet.trigger().startsWith(context)) {
@@ -90,7 +89,6 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
             linePos = line.lastIndexOf(QRegExp(R"-(:)-"));
             linePos++;
             context = line.mid(linePos, startPosition);
-            qWarning() << "found valid context for completion" << context;
 
             for (const auto &snippet : CodeModel::instance()->collectRoles()) {
                 if (snippet.trigger().startsWith(context)) {

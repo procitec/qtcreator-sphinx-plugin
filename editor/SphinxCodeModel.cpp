@@ -15,12 +15,12 @@ static CodeModel *theInstance = nullptr;
 CodeModel::CodeModel()
 {
     theInstance = this;
-    qWarning() << "start reading code model";
+    qDebug() << "start reading code model";
     mModelDir.setPath(Core::ICore::resourcePath() + "/sphinx/model");
     if (mModelDir.exists() && mModelDir.isReadable()) {
         mModelDir.setNameFilters(QStringList() << "*.xml");
         auto modelFiles = mModelDir.entryInfoList(QDir::Files | QDir::Readable);
-        qWarning() << "found model files: " << modelFiles.length();
+        qDebug() << "found model files: " << modelFiles.length();
 
         QFile file(mModelDir.absolutePath() + "/model.xsd");
         file.open(QIODevice::ReadOnly);
@@ -100,8 +100,8 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                                                         ? true
                                                         : false;
                         }
-                        qWarning() << fileName << " found directive " << id << xml.lineNumber()
-                                   << xml.columnNumber();
+                        qDebug() << fileName << " found directive " << id << xml.lineNumber()
+                                 << xml.columnNumber();
                     } else if (xml.name() == "directive" && xml.isEndElement()) {
                         mData.mDirectives.append(directive);
                         directive = Directive();
@@ -112,22 +112,22 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                         const QString &type = atts.value("type").toString();
                         directiveOption.mName = name;
                         directiveOption.mTypes = type;
-                        qWarning() << fileName << " found options " << name << type
-                                   << xml.lineNumber() << xml.columnNumber();
+                        qDebug() << fileName << " found options " << name << type
+                                 << xml.lineNumber() << xml.columnNumber();
                     } else if (xml.name() == "option" && xml.isEndElement()) {
                         directive.mOptions.append(directiveOption);
                         directiveOption = DirectiveOption();
                     } else if (xml.name() == "description" && xml.isStartElement()
                                && !directiveOption.mName.isEmpty()) {
                         auto desc = xml.readElementText();
-                        qWarning() << fileName << " found directive option description " << desc
-                                   << xml.lineNumber() << xml.columnNumber();
+                        qDebug() << fileName << " found directive option description " << desc
+                                 << xml.lineNumber() << xml.columnNumber();
                         directiveOption.mDescription = desc;
                     } else if (xml.name() == "description" && xml.isStartElement()
                                && (directiveOption.mName.isEmpty() && !directive.mName.isEmpty())) {
                         auto desc = xml.readElementText();
-                        qWarning() << fileName << " found directive description " << desc
-                                   << xml.lineNumber() << xml.columnNumber();
+                        qDebug() << fileName << " found directive description " << desc
+                                 << xml.lineNumber() << xml.columnNumber();
                         directive.mDescription = desc;
                     } else if (xml.name() == "content" && xml.isStartElement()
                                && !directive.mName.isEmpty()) {
@@ -142,8 +142,8 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                             }
                         }
 
-                        qWarning() << fileName << " found directive content" << content
-                                   << xml.lineNumber() << xml.columnNumber();
+                        qDebug() << fileName << " found directive content" << content
+                                 << xml.lineNumber() << xml.columnNumber();
                         directive.mContent = content;
                     } else if (xml.name() == "role" && xml.isStartElement()) {
                         const QXmlStreamAttributes &atts = xml.attributes();
@@ -153,16 +153,16 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                         role.mName = id;
                         role.mGroupId = snippetId;
 
-                        qWarning() << fileName << " found role " << id << xml.lineNumber()
-                                   << xml.columnNumber();
+                        qDebug() << fileName << " found role " << id << xml.lineNumber()
+                                 << xml.columnNumber();
                     } else if (xml.name() == "role" && xml.isEndElement()) {
                         mData.mRoles.append(role);
                         role = Role();
                     } else if (xml.name() == "description" && xml.isStartElement()
                                && !role.mName.isEmpty()) {
                         auto desc = xml.readElementText();
-                        qWarning() << fileName << " found role description " << desc
-                                   << xml.lineNumber() << xml.columnNumber();
+                        qDebug() << fileName << " found role description " << desc
+                                 << xml.lineNumber() << xml.columnNumber();
                         role.mDescription = desc;
                     }
                 }

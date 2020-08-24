@@ -238,7 +238,7 @@ jobs:
         
         # install plugin dependencies
         execute_process(
-          COMMAND ${make_program} install INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/install"
+          COMMAND ${make_program} install INSTALL_ROOT=$ENV{GITHUB_WORKSPACE}/install
           RESULT_VARIABLE result
         )
         
@@ -246,14 +246,14 @@ jobs:
           message(FATAL_ERROR "Bad exit status of ${make_program} install")
         endif()
 
-        execute_process(
-          COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/qtcreator"
-          RESULT_VARIABLE result
-        )
+        #execute_process(
+        #  COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/qtcreator"
+        #  RESULT_VARIABLE result
+        #)
 
-        if (NOT result EQUAL 0)
-          message(FATAL_ERROR "Bad exit status of ${make_program} install subpackages for test")
-        endif()
+        #if (NOT result EQUAL 0)
+        #  message(FATAL_ERROR "Bad exit status of ${make_program} install subpackages for test")
+        #endif()
         
         #execute_process(
         #  COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
@@ -267,10 +267,11 @@ jobs:
         #endif()
         
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
+        
+        message("start compressing artifact to ${artifact}")
 
         execute_process(COMMAND
-          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip "$ENV{GITHUB_WORKSPACE}/install/"
-          WORKING_DIRECTORY "$ENV{GITHUB_WORKSPACE}/install"
+          ${CMAKE_COMMAND} -E tar cvf ${artifact} --format=zip -C $ENV{GITHUB_WORKSPACE}/install .
         )
 
     - uses: actions/upload-artifact@v1
