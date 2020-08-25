@@ -289,7 +289,7 @@ jobs:
           WORKING_DIRECTORY $ENV{GITHUB_WORKSPACE}/install
         )
 
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
@@ -323,7 +323,7 @@ jobs:
       run: |
         echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
 
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v2
       with:
         path: ./upload_url
         name: upload_url
