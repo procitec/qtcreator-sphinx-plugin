@@ -17,7 +17,7 @@
 
 Q_LOGGING_CATEGORY(log, "qtc.sphinx.rstcheck");
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 static ReSTCheckHighLighter *theInstance = nullptr;
 
@@ -235,7 +235,7 @@ Offenses ReSTCheckHighLighter::processReSTCheckOutput()
     return result;
 }
 
-qtcreator::plugin::sphinx::Range ReSTCheckHighLighter::lineColumnLengthToRange(int line,
+qtc::plugin::sphinx::Range ReSTCheckHighLighter::lineColumnLengthToRange(int line,
                                                                                int column,
                                                                                int length)
 {
@@ -244,4 +244,4 @@ qtcreator::plugin::sphinx::Range ReSTCheckHighLighter::lineColumnLengthToRange(i
     return Range(line, pos, length);
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

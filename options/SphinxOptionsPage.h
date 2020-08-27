@@ -4,7 +4,7 @@
 
 #include "SphinxSettings.h"
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 class OptionsWidget;
 class OptionsPage : public Core::IOptionsPage
 {
@@ -22,4 +22,4 @@ private:
 
     OptionsWidget *mWidget = nullptr;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

@@ -3,7 +3,7 @@
 #include <projectexplorer/customparser.h>
 #include <projectexplorer/projectexplorer.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 CustomParser::CustomParser()
 {
     mIssueWithoutLineNumber.displayName = tr("Sphinx Issue w/o line");
@@ -62,4 +62,4 @@ CustomParser::CustomParser()
         ProjectExplorer::ProjectExplorerPlugin::addCustomParser(mIssueWithLineNumber);
     }
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

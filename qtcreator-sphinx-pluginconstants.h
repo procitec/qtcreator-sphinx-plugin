@@ -1,5 +1,5 @@
 #pragma once
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 namespace Constants {
 
 const char ACTION_ID[] = "Sphinx Editor.Action";
@@ -17,4 +17,4 @@ const char MimeType[] = "text/x-rst";
 //const char ProjectMimeType[] = "text/x-sphinx-project";
 
 } // namespace Constants
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

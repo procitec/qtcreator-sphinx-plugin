@@ -4,7 +4,7 @@
 
 #include <coreplugin/icore.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 Settings::Settings() {}
 
 void Settings::load()
@@ -30,4 +30,4 @@ void Settings::save()
     s->setValue(SettingsIds::PythonFilePath, mPythonFilePath);
     s->endGroup();
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

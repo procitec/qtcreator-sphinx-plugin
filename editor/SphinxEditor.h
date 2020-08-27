@@ -4,7 +4,7 @@
 
 #include <QObject>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class Editor : public TextEditor::BaseTextEditor
 {
@@ -12,4 +12,4 @@ class Editor : public TextEditor::BaseTextEditor
 public:
     Editor();
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

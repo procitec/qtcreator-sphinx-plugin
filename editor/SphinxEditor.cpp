@@ -2,9 +2,9 @@
 
 #include "../qtcreator-sphinx-pluginconstants.h"
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 Editor::Editor()
 {
     addContext(Constants::LangSphinx);
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

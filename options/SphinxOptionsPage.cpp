@@ -2,7 +2,7 @@
 #include "../qtcreator-sphinx-pluginconstants.h"
 #include "SphinxOptionsWidget.h"
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 OptionsPage::OptionsPage(Settings *settings, QObject *parent)
     : IOptionsPage(parent)
     , mSettings(settings)
@@ -40,4 +40,4 @@ void OptionsPage::finish()
     mWidget = nullptr;
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

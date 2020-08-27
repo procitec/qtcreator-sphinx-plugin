@@ -10,7 +10,7 @@
 #include "qtcreator-sphinx-plugin_global.h"
 #include <extensionsystem/iplugin.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 namespace Internal {
 
 class PluginPrivate
@@ -49,4 +49,4 @@ private:
     OptionsPage *mOptionsPage;
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

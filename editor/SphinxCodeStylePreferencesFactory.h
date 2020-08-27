@@ -2,7 +2,7 @@
 #include <coreplugin/icore.h>
 #include <texteditor/icodestylepreferencesfactory.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class CodeStylePreferencesFactory : public TextEditor::ICodeStylePreferencesFactory
 {
@@ -17,4 +17,4 @@ public:
     QString previewText() const override;
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

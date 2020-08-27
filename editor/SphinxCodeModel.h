@@ -6,7 +6,7 @@
 
 class QXmlSchema;
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class CodeModel
 {
@@ -62,4 +62,4 @@ private:
     QDir mModelDir;
     Data mData;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

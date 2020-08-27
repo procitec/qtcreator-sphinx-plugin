@@ -16,7 +16,7 @@
 
 #include <QCoreApplication>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 EditorFactory::EditorFactory()
 {
@@ -58,4 +58,4 @@ void EditorFactory::decorateEditor(TextEditor::TextEditorWidget *editor)
     }
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

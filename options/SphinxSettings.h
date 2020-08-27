@@ -2,7 +2,7 @@
 
 #include <QtCore/QString>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 namespace SettingsIds {
 const QString CustomHighlighter = "CustomHighlighter";
@@ -50,4 +50,4 @@ inline bool Settings::operator!=(const Settings &other) const
 {
     return !(*this == other);
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

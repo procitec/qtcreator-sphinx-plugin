@@ -13,7 +13,7 @@
 #include <QTextDocument>
 #include <QtCore/QRegularExpression>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 TextEditor::IAssistProcessor *CompletionAssistProvider::createProcessor() const
 {
@@ -117,4 +117,4 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     return proposal;
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

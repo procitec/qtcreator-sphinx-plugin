@@ -2,7 +2,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QWidget>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class PreviewPage : public QWidget
 {
@@ -25,4 +25,4 @@ protected:
     QLineEdit *mHtml = nullptr;
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

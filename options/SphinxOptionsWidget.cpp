@@ -7,7 +7,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 OptionsWidget::OptionsWidget(const Settings *settings)
 {
@@ -79,7 +79,7 @@ OptionsWidget::OptionsWidget(const Settings *settings)
     layout->addWidget(reSTCheckHighlighter);
 
     layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-} // namespace qtcreator::plugin::sphinx
+}
 
 Settings OptionsWidget::settings() const
 {
@@ -98,4 +98,4 @@ Settings OptionsWidget::settings() const
     return settings;
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

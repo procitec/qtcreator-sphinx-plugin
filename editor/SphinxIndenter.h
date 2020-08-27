@@ -2,7 +2,7 @@
 #include <texteditor/textindenter.h>
 #include <QStringList>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class Indenter : public TextEditor::TextIndenter
 {
@@ -44,4 +44,4 @@ public:
     }
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

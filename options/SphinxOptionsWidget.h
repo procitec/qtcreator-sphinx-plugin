@@ -5,7 +5,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QWidget>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 class OptionsWidget : public QWidget
 {
     Q_OBJECT
@@ -19,4 +19,4 @@ private:
     QCheckBox mUseReSTCheckHighlighter;
     QLineEdit mReSTCheckFilePath;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

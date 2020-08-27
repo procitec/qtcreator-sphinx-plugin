@@ -28,10 +28,10 @@
 #include <QtTest/QTest>
 
 #ifdef WITH_TESTS
-QTEST_APPLESS_MAIN(qtcreator::plugin::sphinx::Plugin)
+QTEST_APPLESS_MAIN(qtc::plugin::sphinx::Plugin)
 #endif
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 Plugin::Plugin()
 {
@@ -212,4 +212,4 @@ void Plugin::triggerAction()
         }
     }
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

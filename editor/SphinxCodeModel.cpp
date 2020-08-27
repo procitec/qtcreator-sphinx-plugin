@@ -8,7 +8,7 @@
 #include <QtXmlPatterns/QXmlSchema>
 #include <QtXmlPatterns/QXmlSchemaValidator>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 static CodeModel *theInstance = nullptr;
 
@@ -230,4 +230,4 @@ QList<TextEditor::Snippet> CodeModel::collectRoles()
     return snippets;
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

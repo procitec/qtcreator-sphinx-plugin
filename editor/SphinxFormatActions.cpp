@@ -6,7 +6,7 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QToolButton>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 FormatActions::FormatActions()
     : mFormat(LAST_FORMAT)
@@ -185,4 +185,4 @@ void FormatActions::toToolBar(QToolBar *fmtToolBar)
 
     fmtToolBar->addWidget(sectionBtn);
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

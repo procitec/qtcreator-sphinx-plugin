@@ -10,7 +10,7 @@
 
 #include <QLabel>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 Core::Id CodeStylePreferencesFactory::languageId()
 {
@@ -60,4 +60,4 @@ QString CodeStylePreferencesFactory::previewText() const
                           "\n");
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

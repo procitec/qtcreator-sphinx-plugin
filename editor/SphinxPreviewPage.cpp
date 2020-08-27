@@ -6,7 +6,7 @@
 
 #include <QtWidgets/QFileDialog>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 PreviewPage::PreviewPage(QWidget *parent)
     : QWidget(parent)
@@ -83,4 +83,4 @@ void PreviewPage::setUrl(const QUrl &url)
     //mView->loadUrl()
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

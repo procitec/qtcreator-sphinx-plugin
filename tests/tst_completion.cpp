@@ -37,8 +37,8 @@ void TestCompletion::cleanup()
 void TestCompletion::createEditor()
 {
     mIEditor = Core::EditorManager::openEditorWithContents(
-        qtcreator::plugin::sphinx::Constants::EditorId);
-    mEditor = static_cast<qtcreator::plugin::sphinx::EditorWidget *>(mIEditor->widget());
+        qtc::plugin::sphinx::Constants::EditorId);
+    mEditor = static_cast<qtc::plugin::sphinx::EditorWidget *>(mIEditor->widget());
     QVERIFY(TextEditor::TabSettings::SpacesOnlyTabPolicy
             == mEditor->textDocument()->tabSettings().m_tabPolicy);
 

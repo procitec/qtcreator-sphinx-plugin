@@ -2,7 +2,7 @@
 
 #include <texteditor/textdocument.h>
 #include <QObject>
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class EditorDocument : public TextEditor::TextDocument
 {
@@ -11,4 +11,4 @@ public:
     EditorDocument();
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

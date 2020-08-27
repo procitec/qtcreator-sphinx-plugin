@@ -7,25 +7,8 @@
 
 #include <cassert>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 Formatter::Formatter() {}
-
-//void Formatter::onActiveEditor( TextEditIfc* editor )
-//{
-//  if ( editor )
-//  {
-//    disconnect( static_cast<QWidget*>( editor ), 0, this, 0 );
-//  }
-//  editor = editor;
-
-//  if ( editor )
-//  {
-//    connect( static_cast<QWidget*>( editor ), SIGNAL( insertTextAtBlockStart( const QString& ) ), this,
-//             SLOT( onInsertTextAtBlockStart( const QString& ) ) );
-//    connect( static_cast<QWidget*>( editor ), SIGNAL( removeTextAtBlockStart( const QString& ) ), this,
-//             SLOT( onRemoveTextAtBlockStart( const QString& ) ) );
-//  }
-//}
 
 void Formatter::insertAt(EditorWidget *editor,
                          const QString &text,
@@ -631,109 +614,6 @@ void Formatter::removeAroundCursor(EditorWidget *editor,
     }
 }
 
-//void Formatter::onBold()
-//{
-//  insertAroundCursor( "**", QTextCursor::WordUnderCursor );
-//}
-
-//void Formatter::onItalic()
-//{
-//  insertAroundCursor( "*", QTextCursor::WordUnderCursor );
-//}
-
-//void Formatter::onCode()
-//{
-//  insertAroundCursor( "``", QTextCursor::WordUnderCursor );
-//}
-
-//void Formatter::onDoubleParaSpacing()
-//{
-//    assert(editor);
-//    editor->doubleParagraphSpacing();
-//}
-
-//void Formatter::onNormalParaSpacing()
-//{
-//    assert(editor);
-//    editor->normalParagraphSpacing();
-//}
-
-//void Formatter::onIncreaseIndent()
-//{
-//    assert(editor);
-//    editor->increaseIndent();
-//    insertAt(QString().fill(' ', editor->indent()), QTextCursor::BlockUnderCursor);
-//}
-
-//void Formatter::onDecreaseIndent()
-//{
-//    assert(editor);
-//    auto indent = editor->indent();
-//    if (0 < indent) {
-//        removeAt(QString().fill(' ', editor->indent()), QTextCursor::BlockUnderCursor);
-//        editor->decreaseIndent();
-//    }
-//}
-
-//void Formatter::onBulletedList()
-//{
-//  // insertBeforeCursor( "* ", QTextCursor::LineUnderCursor );
-//}
-
-//void Formatter::onAutoNumberedList()
-//{
-//  // insertBeforeCursor( "#. ", QTextCursor::LineUnderCursor );
-//}
-
-//void Formatter::onNumberedList() {}
-
-//void Formatter::onBlockQuote()
-//{
-//  // insertBeforeCursor( "| ", QTextCursor::LineUnderCursor );
-//}
-
-//void Formatter::onAddComment()
-//{
-//  insertBeforeBlock( "..", true, true );
-//}
-
-//void Formatter::onRemoveComment()
-//{
-//  removeBeforeBlock( "..", true, true );
-//}
-
-//void Formatter::onRemoveSection()
-//{
-//  removeHeading();
-//}
-
-//void Formatter::onPart()
-//{
-//  insertHeading( mParts.at( 0 ), mPartsOverline );
-//}
-//void Formatter::onChapter()
-//{
-//  insertHeading( mChapters.at( 0 ), mPartsOverline );
-//}
-
-//void Formatter::onSection()
-//{
-//  insertHeading( mSections.at( 0 ), mSectionsOverline );
-//}
-
-//void Formatter::onSubSection()
-//{
-//  insertHeading( mSubSections.at( 0 ), mSubSectionsOverline );
-//}
-//void Formatter::onSubSubSection()
-//{
-//  insertHeading( mSubSubSections.at( 0 ), mSubSubSectionsOverline );
-//}
-//void Formatter::onParagraphs()
-//{
-//  insertHeading( mParagraphs.at( 0 ), mParagraphsOverline );
-//}
-
 void Formatter::removeTextAtBlockStart(EditorWidget *editor, const QString &text)
 {
     assert(editor);
@@ -818,4 +698,4 @@ void Formatter::insertLineTextAtBlockStart(EditorWidget *editor, const QString &
     tc.endEditBlock();
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

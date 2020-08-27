@@ -6,7 +6,7 @@
 
 #include <QIcon>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class CodeModel;
 
@@ -29,4 +29,4 @@ private:
     TextEditor::SnippetAssistCollector m_SphinxSnippetCollector;
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

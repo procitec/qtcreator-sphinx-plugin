@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QTextCursor>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class EditorWidget;
 
@@ -96,4 +96,4 @@ private:
 
     //  TextEditIfc* mEditor = nullptr;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

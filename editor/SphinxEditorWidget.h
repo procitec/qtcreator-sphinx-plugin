@@ -12,7 +12,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 class EditorWidget : public TextEditor::TextEditorWidget
 {
     Q_OBJECT
@@ -120,4 +120,4 @@ private:
     QAction *mUrlAction = nullptr;
     QAction *mPreviewAction = nullptr;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

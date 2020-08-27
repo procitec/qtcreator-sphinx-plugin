@@ -29,7 +29,7 @@
 
 #include <utils/fileutils.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 namespace Internal {
 
 class LinkedPreview
@@ -79,6 +79,6 @@ private:
 };
 
 } // namespace Internal
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx
 
-Q_DECLARE_METATYPE(QSharedPointer<qtcreator::plugin::sphinx::Internal::ProjectSettings>)
+Q_DECLARE_METATYPE(QSharedPointer<qtc::plugin::sphinx::Internal::ProjectSettings>)

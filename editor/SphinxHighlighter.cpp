@@ -9,7 +9,7 @@
 #include <QtCore/QRegularExpression>
 #include <QtGui/QTextDocument>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 Highlighter::Highlighter(QObject *parent)
     : TextEditor::SyntaxHighlighter(parent)
@@ -171,4 +171,4 @@ void Highlighter::highlightBlock(const QString &text)
 
     TextEditor::TextDocumentLayout::setFoldingIndent(currentBlock(), foldingIndent);
 }
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

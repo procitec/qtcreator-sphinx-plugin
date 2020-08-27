@@ -10,7 +10,7 @@
 #include "projectexplorer/project.h"
 #include "projectexplorer/session.h"
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 const int RSTCHECK_UPDATE_INTERVAL = 300;
 
@@ -415,4 +415,4 @@ void EditorWidget::updatePreview(bool show)
     }
 }
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

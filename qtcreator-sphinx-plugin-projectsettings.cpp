@@ -29,7 +29,7 @@
 #include <utils/algorithm.h>
 #include <utils/qtcassert.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 namespace Internal {
 
 static const char SETTINGS_KEY_MAIN[] = "Sphinx";
@@ -123,4 +123,4 @@ ProjectSettings::ProjectSettingsPtr ProjectSettings::getSettings(ProjectExplorer
 }
 
 } // namespace Internal
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

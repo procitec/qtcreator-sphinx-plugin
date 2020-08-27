@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 Indenter::Indenter(QTextDocument *doc) : TextEditor::TextIndenter(doc) {}
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

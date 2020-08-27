@@ -35,9 +35,8 @@ void TestFormatter::cleanup()
 
 void TestFormatter::createEditor()
 {
-    mIEditor = Core::EditorManager::openEditorWithContents(
-        qtcreator::plugin::sphinx::Constants::EditorId);
-    mEditor = static_cast<qtcreator::plugin::sphinx::EditorWidget *>(mIEditor->widget());
+    mIEditor = Core::EditorManager::openEditorWithContents(qtc::plugin::sphinx::Constants::EditorId);
+    mEditor = static_cast<qtc::plugin::sphinx::EditorWidget *>(mIEditor->widget());
     QVERIFY(TextEditor::TabSettings::SpacesOnlyTabPolicy
             == mEditor->textDocument()->tabSettings().m_tabPolicy);
     mIndentStr = QString().fill(' ', mEditor->indentSize());

@@ -5,7 +5,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QToolBar>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class FormatActions : public QWidget
 {
@@ -72,4 +72,4 @@ private:
     QVector<QAction *> mBlock;
     QVector<QAction *> mLink;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

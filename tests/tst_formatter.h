@@ -58,7 +58,7 @@ private slots:
     void testInsertLineText_data();
 
 public:
-    qtcreator::plugin::sphinx::EditorWidget *mEditor = nullptr;
+    qtc::plugin::sphinx::EditorWidget *mEditor = nullptr;
     Core::IEditor *mIEditor = nullptr;
     int mIndentSize = 0;
     QString mIndentStr;

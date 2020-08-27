@@ -20,7 +20,7 @@ namespace TextEditor {
 class TextDocument;
 }
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class TextMark;
 
@@ -106,4 +106,4 @@ private:
     QString mEndSeq = ">!>$>%";
     QString mRstCheckEndSeq = "---\n";
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

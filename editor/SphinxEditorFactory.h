@@ -3,7 +3,7 @@
 
 #include <texteditor/texteditor.h>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 
 class EditorFactory : public TextEditor::TextEditorFactory
 {
@@ -13,4 +13,4 @@ public:
     static void decorateEditor(TextEditor::TextEditorWidget *editor);
 };
 
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx

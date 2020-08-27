@@ -5,7 +5,7 @@
 #include <QtGui/QSyntaxHighlighter>
 #include <QtGui/QTextCursor>
 
-namespace qtcreator::plugin::sphinx {
+namespace qtc::plugin::sphinx {
 class Highlighter : public TextEditor::SyntaxHighlighter
 {
     Q_OBJECT
@@ -55,4 +55,4 @@ private:
     QRegularExpression mRoleRegEx;
     QRegularExpression mRoleContentRegEx;
 };
-} // namespace qtcreator::plugin::sphinx
+} // namespace qtc::plugin::sphinx
