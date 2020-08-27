@@ -9,59 +9,74 @@ class EditorWidget;
 
 class Formatter : public QObject
 {
-  class CursorInfo;
-  Q_OBJECT
-  public:
-  Formatter();
-  virtual ~Formatter() {}
+    class CursorInfo;
+    Q_OBJECT
+public:
+    Formatter();
+    virtual ~Formatter() {}
 
-  public Q_SLOTS:
-  void removeTextAtBlockStart(EditorWidget *editor, const QString &);
-  void insertTextAtBlockStart(EditorWidget *editor, const QString &);
+public Q_SLOTS:
+    void removeTextAtBlockStart(EditorWidget *editor, const QString &);
+    void insertTextAtBlockStart(EditorWidget *editor, const QString &);
 
-  void insertAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
-  void removeAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
-  void removeAt(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
-  void insertBeforeBlock(EditorWidget *editor,
-                         const QString &text,
-                         bool indentBlock = true,
-                         bool wrapBlockWithSpacing = true);
-  void removeBeforeBlock(EditorWidget *editor,
-                         const QString &text,
-                         bool unindentBlock = true,
-                         bool unwrapBlockSpacing = true);
-  void insertHeading(EditorWidget *editor, const QChar &, bool overLine);
-  void removeHeading(EditorWidget *editor);
-  void insertAt(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
+    void insertAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
+    void removeAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
+    void removeAt(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
+    void insertBeforeBlock(EditorWidget *editor,
+                           const QString &text,
+                           bool indentBlock = true,
+                           bool wrapBlockWithSpacing = true);
+    void removeBeforeBlock(EditorWidget *editor,
+                           const QString &text,
+                           bool unindentBlock = true,
+                           bool unwrapBlockSpacing = true);
+    void insertHeading(EditorWidget *editor, const QChar &, bool overLine);
+    void removeHeading(EditorWidget *editor);
+    void insertAt(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
 
-  private:
-  int blockNumberOfPos(QTextCursor &, int pos) const;
-  bool isBlockEmpty(QTextCursor &);
-  int removeBlock(QTextCursor &);
-  CursorInfo currentCursorAndSel(const QTextCursor &) const;
-  void restorCursorAndSel(QTextCursor &, const CursorInfo &, int offset);
-  int removeTextAtBlockStart(
-      int start, int end, QTextCursor &, const QString &text, int selectionOffset);
-  int insertTextAtBlockStart(
-      int start, int end, QTextCursor &, const QString &text, int selectionOffset);
+private:
+    int blockNumberOfPos(QTextCursor &, int pos) const;
+    bool isBlockEmpty(QTextCursor &);
+    int removeBlock(QTextCursor &);
+    CursorInfo currentCursorAndSel(const QTextCursor &) const;
+    void restoreCursorAndSel(QTextCursor &, const CursorInfo &);
+    CursorInfo removeTextAtBlockStart(QTextCursor &, const CursorInfo &, const QString &text);
+    CursorInfo insertTextAtBlockStart(QTextCursor &, const CursorInfo &info, const QString &text);
 
-  private:
-  class CursorInfo
-  {
-  public:
-    CursorInfo( int start, int end, bool hasSelection )
-      : mInfo( std::make_tuple( start, end, hasSelection ) )
+private:
+    class CursorInfo
     {
-    }
-    int  start() const { return std::get<0>( mInfo ); }
-    int  end() const { return std::get<1>( mInfo ); }
-    bool hasSelection() const { return std::get<2>( mInfo ); }
+    public:
+        CursorInfo(int start, int end, bool hasSelection)
+            : mInfo(std::make_tuple(start, end, hasSelection))
+        {}
+        void incr(int len = 1)
+        {
+            std::get<0>(mInfo) += len;
+            std::get<1>(mInfo) += len;
+        }
 
-  private:
-    CursorInfo();
-    std::tuple<int, int, bool> mInfo;
-  };
+        void decr(int len = 1) { incr(-1 * len); }
 
-  //  TextEditIfc* mEditor = nullptr;
+        void incrEnd(int len)
+        {
+            std::get<1>(mInfo) += len;
+            if (!hasSelection()) {
+                std::get<0>(mInfo) += len;
+            }
+        }
+
+        void decrEnd(int len) { incrEnd(-1 * len); }
+
+        int start() const { return std::get<0>(mInfo); }
+        int end() const { return std::get<1>(mInfo); }
+        bool hasSelection() const { return std::get<2>(mInfo); }
+
+    private:
+        CursorInfo();
+        std::tuple<int, int, bool> mInfo;
+    };
+
+    //  TextEditIfc* mEditor = nullptr;
 };
 } // namespace qtcreator::plugin::sphinx

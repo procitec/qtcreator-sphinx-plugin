@@ -142,22 +142,22 @@ void Formatter::insertBeforeBlock(EditorWidget *editor,
 
     auto curInfo = currentCursorAndSel(tc);
 
-    auto selOffset = 0;
-
     tc.setPosition(curInfo.start());
     tc.movePosition(QTextCursor::StartOfBlock);
     if (0 < tc.blockNumber() && wrapBlockWithSpacing) {
         tc.insertBlock();
-        selOffset++;
+        curInfo.incr();
     }
     tc.insertText(text);
-    selOffset += text.length();
+    curInfo.incr(text.length());
     tc.insertBlock();
-    selOffset++;
+    curInfo.incr();
+
+    auto newCurInfo = curInfo;
 
     if (indentBlock) {
         auto indent = QString().fill(' ', editor->indentSize());
-        selOffset = insertTextAtBlockStart(curInfo.start(), curInfo.end(), tc, indent, selOffset);
+        newCurInfo = insertTextAtBlockStart(tc, curInfo, indent);
     }
 
     if (wrapBlockWithSpacing) {
@@ -165,7 +165,7 @@ void Formatter::insertBeforeBlock(EditorWidget *editor,
     }
     editor->setTextCursor(tc);
 
-    restorCursorAndSel(tc, curInfo, selOffset);
+    restoreCursorAndSel(tc, newCurInfo);
 
     tc.endEditBlock();
     editor->setTextCursor(tc);
@@ -179,13 +179,11 @@ Formatter::CursorInfo Formatter::currentCursorAndSel(const QTextCursor &tc) cons
     return CursorInfo(start, end, hasSelection);
 }
 
-void Formatter::restorCursorAndSel(QTextCursor &tc, const CursorInfo &inf, int offset)
+void Formatter::restoreCursorAndSel(QTextCursor &tc, const CursorInfo &inf)
 {
+    tc.setPosition(inf.start());
     if (inf.hasSelection()) {
-        tc.setPosition(inf.start() + offset);
-        tc.setPosition(inf.end() + offset, QTextCursor::KeepAnchor);
-    } else {
-        tc.setPosition(inf.start() + offset);
+        tc.setPosition(inf.end(), QTextCursor::KeepAnchor);
     }
 }
 
@@ -207,10 +205,10 @@ void Formatter::removeBeforeBlock(EditorWidget *editor,
 
     auto curInf = currentCursorAndSel(tc);
 
-    auto selOffset = text.length();
-
     tc.setPosition(curInf.start());
     tc.movePosition(QTextCursor::StartOfBlock);
+
+    curInf.incr(text.length());
 
     // find the first occurence of text in this or previous blocks until an complete empty line occurs
     bool doBreak = false;
@@ -234,9 +232,9 @@ void Formatter::removeBeforeBlock(EditorWidget *editor,
     }
 
     if (tc.hasSelection()) {
-        selOffset -= removeBlock(tc);
+        curInf.decr(removeBlock(tc));
         if (unwrapBlockSpacing && isBlockEmpty(tc)) {
-            selOffset -= removeBlock(tc);
+            curInf.decr(removeBlock(tc));
         }
     }
 
@@ -251,7 +249,7 @@ void Formatter::removeBeforeBlock(EditorWidget *editor,
                 || tc.selectedText().startsWith(indent)) {
                 tc.movePosition(QTextCursor::StartOfBlock);
                 tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, editor->indentSize());
-                selOffset -= tc.selectedText().length();
+                curInf.decr(tc.selectedText().length());
                 tc.removeSelectedText();
                 tc.movePosition(QTextCursor::NextBlock);
                 prepareToBreak = false;
@@ -276,13 +274,13 @@ void Formatter::removeBeforeBlock(EditorWidget *editor,
         }
 
         if (isBlockEmpty(tc)) {
-            selOffset -= removeBlock(tc);
+            curInf.decr(removeBlock(tc));
         }
     }
 
     editor->setTextCursor(tc);
 
-    restorCursorAndSel(tc, curInf, selOffset);
+    restoreCursorAndSel(tc, curInf);
 
     tc.endEditBlock();
     editor->setTextCursor(tc);
@@ -378,30 +376,29 @@ void Formatter::insertHeading(EditorWidget *editor, const QChar &text, bool over
 
     auto curInfo = currentCursorAndSel(tc);
 
-    auto selOffset = 0;
-
+    // got to begin of selection or current position
     tc.setPosition(curInfo.start());
     if (overLine) {
         auto blockLen = tc.block().text().length();
         tc.movePosition(QTextCursor::StartOfBlock);
         if (0 < tc.blockNumber()) {
             tc.insertBlock();
-            selOffset++;
+            curInfo.incr();
         }
         tc.insertText(QString().fill(text, blockLen));
-        selOffset += blockLen;
+        curInfo.incr(blockLen);
         tc.insertBlock();
-        selOffset++;
+        curInfo.incr();
     }
 
-    tc.setPosition(curInfo.end() + selOffset);
+    tc.setPosition(curInfo.end());
     auto blockLen = tc.block().text().length();
     tc.movePosition(QTextCursor::EndOfBlock);
     tc.insertBlock();
     tc.insertText(QString().fill(text, blockLen));
     tc.insertBlock();
 
-    restorCursorAndSel(tc, curInfo, selOffset);
+    restoreCursorAndSel(tc, curInfo);
 
     tc.endEditBlock();
 
@@ -421,8 +418,6 @@ void Formatter::removeHeading(EditorWidget *editor)
     tc.beginEditBlock();
 
     auto curInfo = currentCursorAndSel(tc);
-
-    auto selOffset = 0;
 
     tc.setPosition(curInfo.start());
     tc.movePosition(QTextCursor::EndOfBlock);
@@ -454,58 +449,93 @@ void Formatter::removeHeading(EditorWidget *editor)
             if (text.length() == text.count(pattern)) {
                 tc.removeSelectedText();
                 tc.deleteChar();
-                selOffset -= text.length();
-                selOffset -= 1;
+                curInfo.decr(text.length());
+                curInfo.decr();
             }
         }
         editor->setTextCursor(tc);
         tc = editor->textCursor();
     }
 
-    restorCursorAndSel(tc, curInfo, selOffset);
+    restoreCursorAndSel(tc, curInfo);
     editor->setTextCursor(tc);
     tc = editor->textCursor();
 
     tc.endEditBlock();
 }
 
-int Formatter::insertTextAtBlockStart(
-    int start, int end, QTextCursor &tc, const QString &text, int selectionOffset)
+Formatter::CursorInfo Formatter::insertTextAtBlockStart(QTextCursor &tc,
+                                                        const CursorInfo &info,
+                                                        const QString &text)
 {
-    auto blockStart = blockNumberOfPos(tc, start + selectionOffset);
-    auto blockEnd = blockNumberOfPos(tc, end + selectionOffset);
+    auto blockStart = blockNumberOfPos(tc, info.start());
+    auto blockEnd = blockNumberOfPos(tc, info.end());
+
+    tc.setPosition(info.start());
+
+    auto newCurInfo = info;
 
     for (auto block = blockStart; block <= blockEnd; block++) {
         tc.movePosition(QTextCursor::StartOfBlock);
         tc.insertText(text);
-        selectionOffset += text.length();
+        newCurInfo.incr(text.length());
         auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
         if (!nextBlock) {
             tc.movePosition(QTextCursor::End);
         }
     }
 
-    return selectionOffset;
+    return newCurInfo;
 }
 
-int Formatter::removeTextAtBlockStart(
-    int start, int end, QTextCursor &tc, const QString &text, int selectionOffset)
+Formatter::CursorInfo Formatter::removeTextAtBlockStart(QTextCursor &tc,
+                                                        const CursorInfo &curInfo,
+                                                        const QString &text)
 {
-    auto blockStart = blockNumberOfPos(tc, start + selectionOffset);
-    auto blockEnd = blockNumberOfPos(tc, end + selectionOffset);
+    auto blockStart = blockNumberOfPos(tc, curInfo.start());
+    auto blockEnd = blockNumberOfPos(tc, curInfo.end());
+
+    auto newCurInfo = curInfo;
+
+    bool canRemove = true;
+
+    tc.setPosition(curInfo.start());
 
     for (auto block = blockStart; block <= blockEnd; block++) {
         tc.movePosition(QTextCursor::StartOfBlock);
         tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, text.length());
-        tc.removeSelectedText();
-        selectionOffset -= text.length();
+        if (!(tc.selectedText() == text)) {
+            canRemove = false;
+            break;
+        }
         auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
         if (!nextBlock) {
             tc.movePosition(QTextCursor::End);
         }
     }
 
-    return selectionOffset;
+    // restore Position
+    tc.setPosition(curInfo.start());
+
+    if (canRemove) {
+        for (auto block = blockStart; block <= blockEnd; block++) {
+            tc.movePosition(QTextCursor::StartOfBlock);
+            tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, text.length());
+            auto curPos = tc.position();
+            tc.removeSelectedText();
+            if (newCurInfo.start() >= curPos) {
+                newCurInfo.decr(text.length());
+            } else if (newCurInfo.end() >= curPos) {
+                newCurInfo.decrEnd(text.length());
+            }
+            auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
+            if (!nextBlock) {
+                tc.movePosition(QTextCursor::End);
+            }
+        }
+    }
+
+    return newCurInfo;
 }
 
 void Formatter::removeAroundCursor(EditorWidget *editor,
@@ -638,13 +668,9 @@ void Formatter::removeTextAtBlockStart(EditorWidget *editor, const QString &text
 
     auto curInfo = currentCursorAndSel(tc);
 
-    auto selOffset = 0;
+    auto newCursorInfo = removeTextAtBlockStart(tc, curInfo, text);
 
-    tc.setPosition(curInfo.start());
-
-    selOffset = removeTextAtBlockStart(curInfo.start(), curInfo.end(), tc, text, selOffset);
-
-    restorCursorAndSel(tc, curInfo, selOffset);
+    restoreCursorAndSel(tc, newCursorInfo);
 
     tc.endEditBlock();
 }
@@ -663,13 +689,9 @@ void Formatter::insertTextAtBlockStart(EditorWidget *editor, const QString &text
 
     auto curInfo = currentCursorAndSel(tc);
 
-    auto selOffset = 0;
+    auto newCursorInfo = insertTextAtBlockStart(tc, curInfo, text);
 
-    tc.setPosition(curInfo.start());
-
-    selOffset = insertTextAtBlockStart(curInfo.start(), curInfo.end(), tc, text, selOffset);
-
-    restorCursorAndSel(tc, curInfo, selOffset);
+    restoreCursorAndSel(tc, newCursorInfo);
 
     tc.endEditBlock();
 }

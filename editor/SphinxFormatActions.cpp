@@ -32,15 +32,15 @@ FormatActions::FormatActions()
     action->setIcon(QIcon::fromTheme("format-text-code"));
     mFormat[FORMAT::CODE] = action;
 
-    action = new QAction(tr("Double Paragraph Spacing"), this);
-    action->setObjectName(QString("%1.Double Paragraph Spacing").arg(actionID));
-    action->setIcon(QIcon::fromTheme("format-line-spacing-double"));
-    mSpacing[SPACING::DOUBLE_PARAGRAPH] = action;
+    //    action = new QAction(tr("Double Paragraph Spacing"), this);
+    //    action->setObjectName(QString("%1.Double Paragraph Spacing").arg(actionID));
+    //    action->setIcon(QIcon::fromTheme("format-line-spacing-double"));
+    //    mSpacing[SPACING::DOUBLE_PARAGRAPH] = action;
 
-    action = new QAction(tr("Normal Paragraph Spacing"), this);
-    action->setObjectName(QString("%1.Normal Paragraph Spacing").arg(actionID));
-    action->setIcon(QIcon::fromTheme("format-line-spacing-normal"));
-    mSpacing[SPACING::NORMAL_PARAGRAPH] = action;
+    //    action = new QAction(tr("Normal Paragraph Spacing"), this);
+    //    action->setObjectName(QString("%1.Normal Paragraph Spacing").arg(actionID));
+    //    action->setIcon(QIcon::fromTheme("format-line-spacing-normal"));
+    //    mSpacing[SPACING::NORMAL_PARAGRAPH] = action;
 
     action = new QAction(tr("Increase Indent"), this);
     action->setObjectName(QString("%1.Increase Indent").arg(actionID));

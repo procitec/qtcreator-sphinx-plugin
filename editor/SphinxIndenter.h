@@ -18,6 +18,7 @@ public:
         Q_UNUSED(typedChar)
         Q_UNUSED(settings)
         Q_UNUSED(cursorPositionInEditor)
+        //  TextEditor::TextIndenter::indentBlock(block, typedChar, settings, cursorPositionInEditor);
     }
 
     void indent(const QTextCursor &cursor,
@@ -29,6 +30,7 @@ public:
         Q_UNUSED(typedChar)
         Q_UNUSED(tabSettings)
         Q_UNUSED(cursorPositionInEditor)
+        //  TextEditor::TextIndenter::indent(cursor, typedChar, tabSettings, cursorPositionInEditor);
     }
 
     void reindent(const QTextCursor &cursor,
@@ -38,6 +40,7 @@ public:
         Q_UNUSED(cursor)
         Q_UNUSED(tabSettings)
         Q_UNUSED(cursorPositionInEditor)
+        // TextEditor::TextIndenter::reindent(cursor, tabSettings, cursorPositionInEditor);
     }
 };
 

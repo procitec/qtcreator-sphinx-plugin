@@ -71,16 +71,6 @@ void TestCompletion::testSimpleDirective_data()
 )-");
 }
 
-void TestCompletion::testSimpleRole_data()
-{
-    QTest::addColumn<QString>("text");
-    QTest::addColumn<QString>("completion");
-
-    QTest::newRow("inline :ref:") << QString("inline :r") << QString("inline :ref:``");
-    QTest::newRow("start of line :ref:") << QString("\n:r") << QString("\n:ref:``");
-    QTest::newRow("invalid:ref:") << QString("inline:r") << QString("inline:r");
-}
-
 void TestCompletion::testSimpleDirective()
 {
     QFETCH(QString, text);
@@ -98,10 +88,22 @@ void TestCompletion::testSimpleDirective()
     QCOMPARE(completed, completion);
 }
 
+void TestCompletion::testSimpleRole_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("completion");
+    QTest::addColumn<bool>("shouldComplete");
+
+    QTest::newRow("inline :ref:") << QString("inline :r") << QString("inline :ref:``") << true;
+    QTest::newRow("start of line :ref:") << QString("\n:r") << QString("\n:ref:``") << true;
+    QTest::newRow("invalid:ref:") << QString("inline:r") << QString("inline:r") << false;
+}
+
 void TestCompletion::testSimpleRole()
 {
     QFETCH(QString, text);
     QFETCH(QString, completion);
+    QFETCH(bool, shouldComplete);
 
     mEditor->insertPlainText(text);
     qApp->processEvents();
@@ -109,8 +111,10 @@ void TestCompletion::testSimpleRole()
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(20);
-    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-    QTest::qWait(20);
+    if (shouldComplete) {
+        QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+        QTest::qWait(20);
+    }
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
 }

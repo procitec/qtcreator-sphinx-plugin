@@ -39,6 +39,8 @@ private slots:
     void testSingleLineHeadingSelection_data();
     void testInsertTextAtBlockStart();
     void testInsertTextAtBlockStart_data();
+    void testRemoveTextAtBlockStart();
+    void testRemoveTextAtBlockStart_data();
     void testSingleLineIndent();
     void testSingleLineIndent_data();
     void testSingleLineSelectIndent();

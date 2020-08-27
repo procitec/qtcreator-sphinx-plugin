@@ -319,10 +319,10 @@ void TestFormatter::testInsertTextAtBlockStart_data()
                                    << QString("    ") << QString("");
     QTest::newRow("space_no_selection_text") << 0 << 0 << QString("abc") << QString("")
                                              << QString("    ") << QString("    abc") << QString("");
-    QTest::newRow("space_selection_text") << 0 << 1 << QString("abc") << QString("a")
-                                          << QString("    ") << QString("    abc") << QString("a");
-    QTest::newRow("space_selection_text") << 1 << 2 << QString("abc") << QString("b")
-                                          << QString("    ") << QString("    abc") << QString("b");
+    QTest::newRow("space_selection_text a") << 0 << 1 << QString("abc") << QString("a")
+                                            << QString("    ") << QString("    abc") << QString("a");
+    QTest::newRow("space_selection_text b") << 1 << 2 << QString("abc") << QString("b")
+                                            << QString("    ") << QString("    abc") << QString("b");
 
     QTest::newRow("space_no_selection_text_multiline")
         << 0 << 0 << QString("abc\ndef\ngeh") << QString("") << QString("    ")
@@ -361,6 +361,81 @@ void TestFormatter::testInsertTextAtBlockStart()
 
     st = selectedText();
     QCOMPARE(st, selected_text);
+}
+
+void TestFormatter::testRemoveTextAtBlockStart_data()
+{
+    QTest::addColumn<int>("start");
+    QTest::addColumn<int>("end");
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("selected_text");
+    QTest::addColumn<QString>("remove");
+    QTest::addColumn<QString>("text_after_remove");
+    QTest::addColumn<QString>("selected_text_after_remove");
+
+    QTest::newRow("space_selection_text_a") << 4 << 5 << QString("    abc") << QString("a")
+                                            << QString("    ") << QString("abc") << QString("a");
+
+    QTest::newRow("remove_not_exisiting")
+        << 0 << 0 << QString("") << QString("") << QString("    ") << QString("") << QString("");
+
+    QTest::newRow("remove_spaces") << 0 << 0 << QString("    ") << QString("") << QString("    ")
+                                   << QString("") << QString("");
+
+    QTest::newRow("space_no_selection_text") << 0 << 0 << QString("    abc") << QString("")
+                                             << QString("    ") << QString("abc") << QString("");
+    QTest::newRow("space_selection_text_b") << 5 << 6 << QString("    abc") << QString("b")
+                                            << QString("    ") << QString("abc") << QString("b");
+
+    QTest::newRow("space_no_selection_text_multiline_same_indent")
+        << 0 << 0 << QString("    abc\n    def\n    geh") << QString("") << QString("    ")
+        << QString("abc\n    def\n    geh") << QString("");
+
+    QTest::newRow("space_selection_text_multiline_same_indent")
+        << 0 << 23 << QString("    abc\n    def\n    geh")
+        << QString("    abc\u2029    def\u2029    geh") << QString("    ")
+        << QString("abc\ndef\ngeh") << QString("abc\u2029def\u2029geh");
+
+    QTest::newRow("space_no_selection_text_multiline_different_indent")
+        << 0 << 0 << QString("        abc\n    def\n    geh") << QString("") << QString("    ")
+        << QString("    abc\n    def\n    geh") << QString("");
+
+    QTest::newRow("space_selection_text_multiline_different_indent")
+        << 0 << 27 << QString("        abc\n    def\n    geh")
+        << QString("        abc\u2029    def\u2029    geh") << QString("    ")
+        << QString("    abc\ndef\ngeh") << QString("    abc\u2029def\u2029geh");
+
+    QTest::newRow("space_no_selection_text_multiline_different_indent_lesser")
+        << 0 << 0 << QString("    abc\n  def\n    geh") << QString("") << QString("    ")
+        << QString("abc\n  def\n    geh") << QString("");
+
+    QTest::newRow("space_selection_text_multiline_different_indent_lesser")
+        << 0 << 21 << QString("    abc\n  def\n    geh")
+        << QString("    abc\u2029  def\u2029    geh") << QString("    ")
+        << QString("    abc\n  def\n    geh") << QString("    abc\u2029  def\u2029    geh");
+}
+
+void TestFormatter::testRemoveTextAtBlockStart()
+{
+    QFETCH(int, start);
+    QFETCH(int, end);
+    QFETCH(QString, text);
+    QFETCH(QString, selected_text);
+    QFETCH(QString, remove);
+    QFETCH(QString, text_after_remove);
+    QFETCH(QString, selected_text_after_remove);
+
+    mEditor->insertPlainText(text);
+    selectText(start, end);
+    auto st = selectedText();
+    QCOMPARE(st, selected_text);
+
+    mEditor->formatter().removeTextAtBlockStart(mEditor, remove);
+    auto content = mEditor->toPlainText();
+    QCOMPARE(content, text_after_remove);
+
+    st = selectedText();
+    QCOMPARE(st, selected_text_after_remove);
 }
 
 void TestFormatter::testSingleLineIndent_data()

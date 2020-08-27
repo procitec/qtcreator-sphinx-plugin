@@ -80,14 +80,14 @@ void EditorWidget::connectActions()
     connect(formatActions[FormatActions::CODE], SIGNAL(triggered(bool)), this, SLOT(onCode()));
 
     const auto &spaceActions = mFormatActions.spaceActions();
-    connect(spaceActions[FormatActions::DOUBLE_PARAGRAPH],
-            SIGNAL(triggered(bool)),
-            this,
-            SLOT(onDoubleParaSpacing()));
-    connect(spaceActions[FormatActions::NORMAL_PARAGRAPH],
-            SIGNAL(triggered(bool)),
-            this,
-            SLOT(onNormalParaSpacing()));
+    //    connect(spaceActions[FormatActions::DOUBLE_PARAGRAPH],
+    //            SIGNAL(triggered(bool)),
+    //            this,
+    //            SLOT(onDoubleParaSpacing()));
+    //    connect(spaceActions[FormatActions::NORMAL_PARAGRAPH],
+    //            SIGNAL(triggered(bool)),
+    //            this,
+    //            SLOT(onNormalParaSpacing()));
     connect(spaceActions[FormatActions::INCREASE_INDENT],
             SIGNAL(triggered(bool)),
             this,
@@ -361,10 +361,11 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
         }
 
         forwardToBase = false;
-        if (0 < mAutoIndent) {
-            auto tc = textCursor();
-            tc.insertText(QString().fill(' ', indent()));
-        }
+        //textDocumentPtr()->autoIndent(textCursor());
+        //        if (0 < mAutoIndent) {
+        //            auto tc = textCursor();
+        //            tc.insertText(QString().fill(' ', indent()));
+        //        }
     }
 
     if (forwardToBase) {

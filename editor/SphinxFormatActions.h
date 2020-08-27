@@ -17,8 +17,8 @@ public:
     enum FORMAT { BOLD, ITALIC, CODE, LAST_FORMAT };
 
     enum SPACING {
-        DOUBLE_PARAGRAPH,
-        NORMAL_PARAGRAPH,
+        //        DOUBLE_PARAGRAPH,
+        //        NORMAL_PARAGRAPH,
         INCREASE_INDENT,
         DECREASE_INDENT,
         LAST_SPACING
