@@ -179,7 +179,7 @@ Formatter::CursorInfo Formatter::currentCursorAndSel(const QTextCursor &tc) cons
     return CursorInfo(start, end, hasSelection);
 }
 
-void Formatter::restoreCursorAndSel(QTextCursor &tc, const CursorInfo &inf)
+void Formatter::restoreCursorAndSel(QTextCursor &tc, const CursorInfo &inf) const
 {
     tc.setPosition(inf.start());
     if (inf.hasSelection()) {
@@ -286,7 +286,7 @@ void Formatter::removeBeforeBlock(EditorWidget *editor,
     editor->setTextCursor(tc);
 }
 
-int Formatter::removeBlock(QTextCursor &tc)
+int Formatter::removeBlock(QTextCursor &tc) const
 {
     int offset = 0;
     tc.select(QTextCursor::BlockUnderCursor);
@@ -309,7 +309,7 @@ int Formatter::removeBlock(QTextCursor &tc)
     return offset;
 }
 
-bool Formatter::isBlockEmpty(QTextCursor &tc)
+bool Formatter::isBlockEmpty(QTextCursor &tc) const
 {
     tc.select(QTextCursor::BlockUnderCursor);
     return (tc.selectedText().isEmpty());
@@ -488,6 +488,35 @@ Formatter::CursorInfo Formatter::insertTextAtBlockStart(QTextCursor &tc,
     return newCurInfo;
 }
 
+Formatter::CursorInfo Formatter::insertLineTextAtBlockStart(QTextCursor &tc,
+                                                            const CursorInfo &info,
+                                                            const QString &text,
+                                                            int lineOffset)
+{
+    auto blockStart = blockNumberOfPos(tc, info.start());
+    auto blockEnd = blockNumberOfPos(tc, info.end());
+
+    tc.setPosition(info.start());
+
+    auto newCurInfo = info;
+
+    auto line = lineOffset;
+
+    for (auto block = blockStart; block <= blockEnd; block++) {
+        auto lineText = QString(text).arg(line);
+        tc.movePosition(QTextCursor::StartOfBlock);
+        tc.insertText(lineText);
+        newCurInfo.incr(lineText.length());
+        auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
+        if (!nextBlock) {
+            tc.movePosition(QTextCursor::End);
+        }
+        line++;
+    }
+
+    return newCurInfo;
+}
+
 Formatter::CursorInfo Formatter::removeTextAtBlockStart(QTextCursor &tc,
                                                         const CursorInfo &curInfo,
                                                         const QString &text)
@@ -497,25 +526,7 @@ Formatter::CursorInfo Formatter::removeTextAtBlockStart(QTextCursor &tc,
 
     auto newCurInfo = curInfo;
 
-    bool canRemove = true;
-
-    tc.setPosition(curInfo.start());
-
-    for (auto block = blockStart; block <= blockEnd; block++) {
-        tc.movePosition(QTextCursor::StartOfBlock);
-        tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, text.length());
-        if (!(tc.selectedText() == text)) {
-            canRemove = false;
-            break;
-        }
-        auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
-        if (!nextBlock) {
-            tc.movePosition(QTextCursor::End);
-        }
-    }
-
-    // restore Position
-    tc.setPosition(curInfo.start());
+    bool canRemove = checkCompareTextAtBlockStart(tc, curInfo, text, -1);
 
     if (canRemove) {
         for (auto block = blockStart; block <= blockEnd; block++) {
@@ -532,6 +543,75 @@ Formatter::CursorInfo Formatter::removeTextAtBlockStart(QTextCursor &tc,
             if (!nextBlock) {
                 tc.movePosition(QTextCursor::End);
             }
+        }
+    }
+
+    return newCurInfo;
+}
+
+bool Formatter::checkCompareTextAtBlockStart(QTextCursor &tc,
+                                             const CursorInfo &cursorInfo,
+                                             const QString &text,
+                                             int lineOffset)
+{
+    auto blockStart = blockNumberOfPos(tc, cursorInfo.start());
+    auto blockEnd = blockNumberOfPos(tc, cursorInfo.end());
+
+    bool isComparedText = true;
+
+    tc.setPosition(cursorInfo.start());
+    int line = lineOffset;
+
+    for (auto block = blockStart; block <= blockEnd; block++) {
+        auto lineText = (-1 < lineOffset) ? QString(text).arg(line) : text;
+        tc.movePosition(QTextCursor::StartOfBlock);
+        tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, lineText.length());
+        if (!(tc.selectedText() == lineText)) {
+            isComparedText = false;
+            break;
+        }
+        auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
+        if (!nextBlock) {
+            tc.movePosition(QTextCursor::End);
+        }
+        line++;
+    }
+
+    // restore Position
+    tc.setPosition(cursorInfo.start());
+    return isComparedText;
+}
+
+Formatter::CursorInfo Formatter::removeLineTextAtBlockStart(QTextCursor &tc,
+                                                            const CursorInfo &curInfo,
+                                                            const QString &text,
+                                                            int lineOffset)
+{
+    auto blockStart = blockNumberOfPos(tc, curInfo.start());
+    auto blockEnd = blockNumberOfPos(tc, curInfo.end());
+
+    auto newCurInfo = curInfo;
+
+    bool canRemove = checkCompareTextAtBlockStart(tc, curInfo, text, lineOffset);
+    if (canRemove) {
+        int line = lineOffset;
+        for (auto block = blockStart; block <= blockEnd; block++) {
+            auto lineText = QString(text).arg(line);
+
+            tc.movePosition(QTextCursor::StartOfBlock);
+            tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, lineText.length());
+            auto curPos = tc.position();
+            tc.removeSelectedText();
+            if (newCurInfo.start() >= curPos) {
+                newCurInfo.decr(lineText.length());
+            } else if (newCurInfo.end() >= curPos) {
+                newCurInfo.decrEnd(lineText.length());
+            }
+            auto nextBlock = tc.movePosition(QTextCursor::NextBlock);
+            if (!nextBlock) {
+                tc.movePosition(QTextCursor::End);
+            }
+            line++;
         }
     }
 
@@ -675,6 +755,27 @@ void Formatter::removeTextAtBlockStart(EditorWidget *editor, const QString &text
     tc.endEditBlock();
 }
 
+void Formatter::removeLineTextAtBlockStart(EditorWidget *editor, const QString &text, int lineOffset)
+{
+    assert(editor);
+
+    if (!editor) {
+        return;
+    }
+
+    auto tc = editor->textCursor();
+
+    tc.beginEditBlock();
+
+    auto curInfo = currentCursorAndSel(tc);
+
+    auto newCursorInfo = removeLineTextAtBlockStart(tc, curInfo, text, lineOffset);
+
+    restoreCursorAndSel(tc, newCursorInfo);
+
+    tc.endEditBlock();
+}
+
 void Formatter::insertTextAtBlockStart(EditorWidget *editor, const QString &text)
 {
     assert(editor);
@@ -695,4 +796,26 @@ void Formatter::insertTextAtBlockStart(EditorWidget *editor, const QString &text
 
     tc.endEditBlock();
 }
+
+void Formatter::insertLineTextAtBlockStart(EditorWidget *editor, const QString &text, int lineOffset)
+{
+    assert(editor);
+
+    if (!editor) {
+        return;
+    }
+
+    auto tc = editor->textCursor();
+
+    tc.beginEditBlock();
+
+    auto curInfo = currentCursorAndSel(tc);
+
+    auto newCursorInfo = insertLineTextAtBlockStart(tc, curInfo, text, lineOffset);
+
+    restoreCursorAndSel(tc, newCursorInfo);
+
+    tc.endEditBlock();
+}
+
 } // namespace qtcreator::plugin::sphinx

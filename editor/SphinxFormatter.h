@@ -17,7 +17,9 @@ public:
 
 public Q_SLOTS:
     void removeTextAtBlockStart(EditorWidget *editor, const QString &);
+    void removeLineTextAtBlockStart(EditorWidget *editor, const QString &, int lineOffset = 1);
     void insertTextAtBlockStart(EditorWidget *editor, const QString &);
+    void insertLineTextAtBlockStart(EditorWidget *editor, const QString &, int lineOffset = 1);
 
     void insertAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
     void removeAroundCursor(EditorWidget *editor, const QString &text, QTextCursor::SelectionType);
@@ -36,12 +38,27 @@ public Q_SLOTS:
 
 private:
     int blockNumberOfPos(QTextCursor &, int pos) const;
-    bool isBlockEmpty(QTextCursor &);
-    int removeBlock(QTextCursor &);
+    bool isBlockEmpty(QTextCursor &) const;
+    int removeBlock(QTextCursor &) const;
     CursorInfo currentCursorAndSel(const QTextCursor &) const;
-    void restoreCursorAndSel(QTextCursor &, const CursorInfo &);
+    void restoreCursorAndSel(QTextCursor &, const CursorInfo &) const;
+
+    bool checkCompareTextAtBlockStart(QTextCursor &tc,
+                                      const CursorInfo &cursorInfo,
+                                      const QString &text,
+                                      int lineOffset = -1);
+
     CursorInfo removeTextAtBlockStart(QTextCursor &, const CursorInfo &, const QString &text);
+    CursorInfo removeLineTextAtBlockStart(QTextCursor &,
+                                          const CursorInfo &,
+                                          const QString &text,
+                                          int lineOffset);
+
     CursorInfo insertTextAtBlockStart(QTextCursor &, const CursorInfo &info, const QString &text);
+    CursorInfo insertLineTextAtBlockStart(QTextCursor &,
+                                          const CursorInfo &info,
+                                          const QString &text,
+                                          int lineOffset);
 
 private:
     class CursorInfo

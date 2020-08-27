@@ -25,8 +25,8 @@ public:
 
     void increaseIndent() { mAutoIndent++; }
     void decreaseIndent() { mAutoIndent = (0 < mAutoIndent) ? mAutoIndent - 1 : 0; }
-    void doubleParagraphSpacing() { mParagraphSpacing = 2; }
-    void normalParagraphSpacing() { mParagraphSpacing = 1; }
+    //    void doubleParagraphSpacing() { mParagraphSpacing = 2; }
+    //    void normalParagraphSpacing() { mParagraphSpacing = 1; }
     int indent() const { return mAutoIndent * indentSize(); }
     int indentSize() const
     {
@@ -44,8 +44,8 @@ public Q_SLOTS:
     // spacing
     void onIncreaseIndent();
     void onDecreaseIndent();
-    void onNormalParaSpacing();
-    void onDoubleParaSpacing();
+    //    void onNormalParaSpacing();
+    //    void onDoubleParaSpacing();
 
     void onBulletedList();
     void onAutoNumberedList();

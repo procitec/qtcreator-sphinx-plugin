@@ -2,5 +2,7 @@
 
 ### Features
 
+* Format lists and Literal Blocks via Toolbar
+
 
 ### Issues

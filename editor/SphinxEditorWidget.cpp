@@ -244,50 +244,45 @@ void EditorWidget::onCode()
     mFormatter.insertAroundCursor(this, "``", QTextCursor::WordUnderCursor);
 }
 
-void EditorWidget::onDoubleParaSpacing()
-{
-    // editor->doubleParagraphSpacing();
-}
+//void EditorWidget::onDoubleParaSpacing()
+//{
+//    // editor->doubleParagraphSpacing();
+//}
 
-void EditorWidget::onNormalParaSpacing()
-{
-    //  assert(editor);
-    //  editor->normalParagraphSpacing();
-}
+//void EditorWidget::onNormalParaSpacing()
+//{
+//    //  assert(editor);
+//    //  editor->normalParagraphSpacing();
+//}
 
 void EditorWidget::onIncreaseIndent()
 {
-    //   assert(editor);
-    //    editor->increaseIndent();
-    //    insertAt(QString().fill(' ', editor->indent()),
-    //    QTextCursor::BlockUnderCursor);
+    mFormatter.insertTextAtBlockStart(this, QString().fill(' ', indentSize()));
 }
 
 void EditorWidget::onDecreaseIndent()
 {
-    //    assert(editor);
-    //    auto indent = editor->indent();
-    //    if (0 < indent) {
-    //        removeAt(QString().fill(' ', editor->indent()),
-    //        QTextCursor::BlockUnderCursor); editor->decreaseIndent();
-    //    }
+    mFormatter.removeTextAtBlockStart(this, QString().fill(' ', indentSize()));
 }
 
 void EditorWidget::onBulletedList()
 {
-    // mFormatter.insertBeforeCursor(this, "* ", QTextCursor::LineUnderCursor);
+    mFormatter.insertTextAtBlockStart(this, QStringLiteral("* "));
 }
 
 void EditorWidget::onAutoNumberedList()
 {
-    // mFormatter.insertBeforeCursor(this, "#. ", QTextCursor::LineUnderCursor);
+    mFormatter.insertTextAtBlockStart(this, QStringLiteral("#. "));
 }
 
-void EditorWidget::onNumberedList() {}
+void EditorWidget::onNumberedList()
+{
+    mFormatter.insertLineTextAtBlockStart(this, QStringLiteral("%1. "));
+}
 
 void EditorWidget::onBlockQuote()
 {
-    // mFormatter.insertBeforeCursor(this, "| ", QTextCursor::LineUnderCursor);
+    mFormatter.insertTextAtBlockStart(this, QString("| "));
 }
 
 void EditorWidget::onAddComment()
@@ -362,10 +357,10 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
 
         forwardToBase = false;
         //textDocumentPtr()->autoIndent(textCursor());
-        //        if (0 < mAutoIndent) {
-        //            auto tc = textCursor();
-        //            tc.insertText(QString().fill(' ', indent()));
-        //        }
+        if (0 < mAutoIndent) {
+            auto tc = textCursor();
+            tc.insertText(QString().fill(' ', indent()));
+        }
     }
 
     if (forwardToBase) {

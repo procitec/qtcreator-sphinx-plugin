@@ -92,7 +92,7 @@ void TestFormatter::testCommentInEmptyDocument()
 {
     mEditor->onAddComment();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("..\n%1\n").arg(mIndentStr));
+    QCOMPARE(content, QString("..\n%1\n").arg(mIndentStr));
 
     mEditor->onRemoveComment();
     content = mEditor->toPlainText();
@@ -104,11 +104,11 @@ void TestFormatter::testSingleLineComment()
     mEditor->insertPlainText("abc");
     mEditor->onAddComment();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("..\n%1abc\n").arg(mIndentStr));
+    QCOMPARE(content, QString("..\n%1abc\n").arg(mIndentStr));
 
     mEditor->onRemoveComment();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
 }
 
 void TestFormatter::testSingleLineCommentCursorPos_data()
@@ -131,14 +131,14 @@ void TestFormatter::testSingleLineCommentCursorPos()
     QCOMPARE(ps, pos);
     mEditor->onAddComment();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("..\n%1abc\n").arg(mIndentStr));
+    QCOMPARE(content, QString("..\n%1abc\n").arg(mIndentStr));
 
     ps = cursorPos();
     QCOMPARE(ps, pos + QStringLiteral("..\n%1").arg(mIndentStr).length());
 
     mEditor->onRemoveComment();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
     ps = cursorPos();
     QCOMPARE(ps, pos);
 }
@@ -169,14 +169,14 @@ void TestFormatter::testSingleLineCommentSelection()
 
     mEditor->onAddComment();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("..\n%1abc\n").arg(mIndentStr));
+    QCOMPARE(content, QString("..\n%1abc\n").arg(mIndentStr));
 
     st = selectedText();
     QCOMPARE(st, expected);
 
     mEditor->onRemoveComment();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
     st = selectedText();
     QCOMPARE(st, expected);
 }
@@ -186,37 +186,37 @@ void TestFormatter::testSingleLineHeading()
     mEditor->insertPlainText("abc");
     mEditor->onPart();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("###\nabc\n###\n"));
+    QCOMPARE(content, QString("###\nabc\n###\n"));
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
 
     mEditor->onChapter();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("***\nabc\n***\n"));
+    QCOMPARE(content, QString("***\nabc\n***\n"));
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
 
     mEditor->onSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc\n===\n"));
+    QCOMPARE(content, QString("abc\n===\n"));
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
 
     mEditor->onParagraphs();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String(R"-(abc
+    QCOMPARE(content, QString(R"-(abc
 """
 )-"));
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
 }
 
 void TestFormatter::testSingleLineHeadingCursorPos_data()
@@ -239,20 +239,20 @@ void TestFormatter::testSingleLineHeadingCursorPos()
     QCOMPARE(ps, pos);
     mEditor->onPart();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("###\nabc\n###\n"));
+    QCOMPARE(content, QString("###\nabc\n###\n"));
 
     ps = cursorPos();
     QCOMPARE(ps, pos + QStringLiteral("###\n").length());
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
     ps = cursorPos();
     QCOMPARE(ps, pos);
 
     mEditor->onSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc\n===\n"));
+    QCOMPARE(content, QString("abc\n===\n"));
 
     ps = cursorPos();
     QCOMPARE(ps, pos);
@@ -284,14 +284,14 @@ void TestFormatter::testSingleLineHeadingSelection()
 
     mEditor->onPart();
     auto content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("###\nabc\n###\n"));
+    QCOMPARE(content, QString("###\nabc\n###\n"));
 
     st = selectedText();
     QCOMPARE(st, expected);
 
     mEditor->onRemoveSection();
     content = mEditor->toPlainText();
-    QCOMPARE(content, QLatin1String("abc"));
+    QCOMPARE(content, QString("abc"));
     st = selectedText();
     QCOMPARE(st, expected);
 }
@@ -436,6 +436,60 @@ void TestFormatter::testRemoveTextAtBlockStart()
 
     st = selectedText();
     QCOMPARE(st, selected_text_after_remove);
+}
+
+void TestFormatter::testInsertLineText_data()
+{
+    QTest::addColumn<int>("start");
+    QTest::addColumn<int>("end");
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("selected_text");
+    QTest::addColumn<QString>("text_after_insert");
+    QTest::addColumn<QString>("selected_text_after_insert");
+
+    QTest::newRow("no_text") << 0 << 0 << QString("") << QString("") << QString("1. ") << QString("");
+    QTest::newRow("no_selection_text")
+        << 0 << 0 << QString("abc") << QString("") << QString("1. abc") << QString("");
+    QTest::newRow("selection_text_a")
+        << 0 << 1 << QString("abc") << QString("a") << QString("1. abc") << QString("a");
+    QTest::newRow("selection_text_b")
+        << 1 << 2 << QString("abc") << QString("b") << QString("1. abc") << QString("b");
+
+    QTest::newRow("no_selection_text_multiline") << 0 << 0 << QString("abc\ndef\ngeh") << QString("")
+                                                 << QString("1. abc\ndef\ngeh") << QString("");
+
+    QTest::newRow("space_selection_text_multiline")
+        << 0 << 9 << QString("abc\ndef\ngeh") << QString("abc\u2029def\u2029g")
+        << QString("1. abc\n2. def\n3. geh") << QString("abc\u20292. def\u20293. g");
+}
+
+void TestFormatter::testInsertLineText()
+{
+    QFETCH(int, start);
+    QFETCH(int, end);
+    QFETCH(QString, text);
+    QFETCH(QString, selected_text);
+    QFETCH(QString, text_after_insert);
+    QFETCH(QString, selected_text_after_insert);
+
+    mEditor->insertPlainText(text);
+    selectText(start, end);
+    auto st = selectedText();
+    QCOMPARE(st, selected_text);
+
+    mEditor->formatter().insertLineTextAtBlockStart(mEditor, QString("%1. "), 1);
+    auto content = mEditor->toPlainText();
+    QCOMPARE(content, text_after_insert);
+
+    st = selectedText();
+    QCOMPARE(st, selected_text_after_insert);
+
+    mEditor->formatter().removeLineTextAtBlockStart(mEditor, QString("%1. "));
+    content = mEditor->toPlainText();
+    QCOMPARE(content, text);
+
+    st = selectedText();
+    QCOMPARE(st, selected_text);
 }
 
 void TestFormatter::testSingleLineIndent_data()
