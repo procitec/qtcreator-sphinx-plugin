@@ -9,6 +9,8 @@ env:
   QT_CREATOR_SNAPSHOT: latest
   PLUGIN_PRO: qtcreator-sphinx-plugin.pro
   PLUGIN_NAME: qtcreator-sphinx-plugin
+  CMAKE_VERSION: 3.17.0
+  NINJA_VERSION: 1.10.0
 
 jobs:
   build:
@@ -32,7 +34,7 @@ jobs:
         #  }
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Installing system libs
       shell: cmake -P {0}
@@ -40,6 +42,46 @@ jobs:
         if ("${{ runner.os }}" STREQUAL "Linux")
           execute_process(
             COMMAND sudo apt install libgl1-mesa-dev
+          )
+        endif()
+
+    - name: Download Ninja and CMake
+      id: cmake_and_ninja
+      shell: cmake -P {0}
+      run: |
+        set(cmake_version "$ENV{CMAKE_VERSION}")
+        set(ninja_version "$ENV{NINJA_VERSION}")
+
+        if ("${{ runner.os }}" STREQUAL "Windows")
+          set(ninja_suffix "win.zip")
+          set(cmake_suffix "win64-x64.zip")
+          set(cmake_dir "cmake-${cmake_version}-win64-x64/bin")
+        elseif ("${{ runner.os }}" STREQUAL "Linux")
+          set(ninja_suffix "linux.zip")
+          set(cmake_suffix "Linux-x86_64.tar.gz")
+          set(cmake_dir "cmake-${cmake_version}-Linux-x86_64/bin")
+        elseif ("${{ runner.os }}" STREQUAL "macOS")
+          set(ninja_suffix "mac.zip")
+          set(cmake_suffix "Darwin-x86_64.tar.gz")
+          set(cmake_dir "cmake-${cmake_version}-Darwin-x86_64/CMake.app/Contents/bin")
+        endif()
+
+        set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
+        file(DOWNLOAD "${ninja_url}" ./ninja.zip SHOW_PROGRESS)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ninja.zip)
+
+        set(cmake_url "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}")
+        file(DOWNLOAD "${cmake_url}" ./cmake.zip SHOW_PROGRESS)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./cmake.zip)
+
+        # Save the path for other steps
+        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/${cmake_dir}" cmake_dir)
+        message("::set-output name=cmake_dir::${cmake_dir}")
+
+        if (NOT "${{ runner.os }}" STREQUAL "Windows")
+          execute_process(
+            COMMAND chmod +x ninja
+            COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
 
@@ -183,6 +225,12 @@ jobs:
 
         set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
 
+        set(path_separator ":")
+        if ("${{ runner.os }}" STREQUAL "Windows")
+            set(path_separator ";")
+        endif()
+        set(ENV{PATH} "${{ steps.cmake_and_ninja.outputs.cmake_dir }}${path_separator}${path_separator}$ENV{PATH}")
+
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/qtcreator" qtcreator_dir)
 
         set( qt_version ${{ steps.qt.outputs.qt_version }} )
@@ -209,10 +257,15 @@ jobs:
     - name: Build
       shell: cmake -P {0}
       run: |
+        set(path_separator ":")
         if ("${{ runner.os }}" STREQUAL "Windows")
-          set(ENV{PATH} "${{ steps.qt.outputs.qt_dir }}/bin/;$ENV{PATH}")
+            set(path_separator ";")
+        endif()
+
+        set(ENV{PATH} "${{ steps.cmake_and_ninja.outputs.cmake_dir }}${path_separator}${{ steps.qt.outputs.qt_dir }}/bin/${path_separator}${path_separator}$ENV{PATH}")
+
+        if ("${{ runner.os }}" STREQUAL "Windows")
         else()
-          set(ENV{PATH} "${{ steps.qt.outputs.qt_dir }}/bin/:$ENV{PATH}")
           set(ENV{LD_LIBRARY_PATH} "qtcreator/lib/Qt/lib:$ENV{LD_LIBRARY_PATH}")
           set(ENV{QT_QPA_PLATFORM} "minimal" )
         endif()
@@ -275,7 +328,7 @@ jobs:
     needs: build
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Create Release
       id: create_release
