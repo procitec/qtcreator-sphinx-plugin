@@ -16,7 +16,7 @@ public:
 
     enum FORMAT { BOLD, ITALIC, CODE, LAST_FORMAT };
 
-    enum SPACING {
+    enum SPACINGS {
         //        DOUBLE_PARAGRAPH,
         //        NORMAL_PARAGRAPH,
         INCREASE_INDENT,
@@ -24,7 +24,7 @@ public:
         LAST_SPACING
     };
 
-    enum LIST {
+    enum LISTS {
         BULLETED,
         AUTONUMBERED,
         NUMBERED,
@@ -33,22 +33,22 @@ public:
         LAST_LIST
     };
 
-    enum COMMENT { COMMENT, UNCOMMENT, LAST_COMMENT };
+    enum COMMENTS { COMMENTS, UNCOMMENT, LAST_COMMENT };
 
-    enum SECTION {
+    enum SECTIONS {
         DEFAULT,
         PART,
         CHAPTER,
-        SECTION,
+        SECTIONS,
         SUBSECTION,
         SUBSUBSECTION,
         PARAGRAPHS,
         LAST_SECTION
     };
 
-    enum BLOCK { LITERAL, LAST_BLOCK };
+    enum BLOCKS { LITERAL, LAST_BLOCK };
 
-    enum LINK {
+    enum LINKS {
         WEBLINK_INLINE, // `Link text <https://domain.invalid/>`_
         WEBLINK_DEF,    // This is a paragraph that contains `a link`_.
                         //    .. _a link: https://domain.invalid/

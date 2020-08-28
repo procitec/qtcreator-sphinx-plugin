@@ -45,64 +45,64 @@ FormatActions::FormatActions()
     action = new QAction(tr("Increase Indent"), this);
     action->setObjectName(QString("%1.Increase Indent").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-indent-more"));
-    mSpacing[SPACING::INCREASE_INDENT] = action;
+    mSpacing[SPACINGS::INCREASE_INDENT] = action;
 
     action = new QAction(tr("Decrease Indent"), this);
     action->setObjectName(QString("%1.Decrease Indent").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-indent-less"));
-    mSpacing[SPACING::DECREASE_INDENT] = action;
+    mSpacing[SPACINGS::DECREASE_INDENT] = action;
 
     action = new QAction(tr("Bulleted List"), this);
     action->setObjectName(QString("%1.Bulleted List").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-list-unordered"));
-    mList[LIST::BULLETED] = action;
+    mList[LISTS::BULLETED] = action;
 
     action = new QAction(tr("Numbered List"), this);
     action->setObjectName(QString("%1.Numbered List").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-list-ordered"));
-    mList[LIST::NUMBERED] = action;
+    mList[LISTS::NUMBERED] = action;
 
     action = new QAction(tr("Auto Numbered List"), this);
     action->setObjectName(QString("%1.Auto Numbered List").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-list-ordered"));
-    mList[LIST::AUTONUMBERED] = action;
+    mList[LISTS::AUTONUMBERED] = action;
 
     action = new QAction(tr("Block Quote"), this);
     action->setObjectName(QString("%1.Block Quote").arg(actionID));
     action->setIcon(QIcon::fromTheme("format-text-blockquote"));
-    mList[LIST::BLOCKQUOTE] = action;
+    mList[LISTS::BLOCKQUOTE] = action;
 
     action = new QAction(tr("Comment selection"), this);
     action->setObjectName(QString("%1.Comment selection").arg(actionID));
     action->setIcon(QIcon::fromTheme("edit-comment"));
-    mComment[COMMENT::COMMENT] = action;
+    mComment[COMMENTS::COMMENTS] = action;
 
     action = new QAction(tr("Uncomment selection"), this);
     action->setObjectName(QString("%1.Uncomment selection").arg(actionID));
     action->setIcon(QIcon::fromTheme("delete-comment"));
-    mComment[COMMENT::UNCOMMENT] = action;
+    mComment[COMMENTS::UNCOMMENT] = action;
 
     action = new QAction(tr("Default"), this);
     action->setObjectName(QString("%1.Default").arg(actionID));
-    mSection[SECTION::DEFAULT] = action;
+    mSection[SECTIONS::DEFAULT] = action;
     action = new QAction(tr("Part"), this);
     action->setObjectName(QString("%1.Part").arg(actionID));
-    mSection[SECTION::PART] = action;
+    mSection[SECTIONS::PART] = action;
     action = new QAction(tr("Chapter"), this);
     action->setObjectName(QString("%1.Chapter").arg(actionID));
-    mSection[SECTION::CHAPTER] = action;
+    mSection[SECTIONS::CHAPTER] = action;
     action = new QAction(tr("Section"), this);
     action->setObjectName(QString("%1.Section").arg(actionID));
-    mSection[SECTION::SECTION] = action;
+    mSection[SECTIONS::SECTIONS] = action;
     action = new QAction(tr("SubSection"), this);
     action->setObjectName(QString("%1.SubSection").arg(actionID));
-    mSection[SECTION::SUBSECTION] = action;
+    mSection[SECTIONS::SUBSECTION] = action;
     action = new QAction(tr("SubSubSection"), this);
     action->setObjectName(QString("%1.SubSubSection").arg(actionID));
-    mSection[SECTION::SUBSUBSECTION] = action;
+    mSection[SECTIONS::SUBSUBSECTION] = action;
     action = new QAction(tr("Paragraphs"), this);
     action->setObjectName(QString("%1.Paragraphs").arg(actionID));
-    mSection[SECTION::PARAGRAPHS] = action;
+    mSection[SECTIONS::PARAGRAPHS] = action;
 }
 
 void FormatActions::toMenu(QMenu *menu) const
@@ -115,23 +115,23 @@ void FormatActions::toMenu(QMenu *menu) const
 
     auto *spacingMenu = menu->addMenu(tr("Spacing"));
 
-    for (int idx = 0; idx < SPACING::LAST_SPACING; idx++) {
+    for (int idx = 0; idx < SPACINGS::LAST_SPACING; idx++) {
         spacingMenu->addAction(mSpacing[idx]);
     }
 
     auto *listsMenu = menu->addMenu(tr("Lists"));
 
-    for (int idx = 0; idx < LIST::LAST_LIST; idx++) {
+    for (int idx = 0; idx < LISTS::LAST_LIST; idx++) {
         listsMenu->addAction(mList[idx]);
     }
 
     auto *sectionsMenu = menu->addMenu(tr("Sections"));
-    for (int idx = 0; idx < SECTION::LAST_SECTION; idx++) {
+    for (int idx = 0; idx < SECTIONS::LAST_SECTION; idx++) {
         sectionsMenu->addAction(mSection[idx]);
     }
 
     menu->addSeparator();
-    for (int idx = 0; idx < COMMENT::LAST_COMMENT; idx++) {
+    for (int idx = 0; idx < COMMENTS::LAST_COMMENT; idx++) {
         menu->addAction(mComment[idx]);
     }
     menu->addSeparator();
@@ -154,21 +154,21 @@ void FormatActions::toToolBar(QToolBar *fmtToolBar)
     }
     fmtToolBar->addSeparator();
 
-    for (int idx = 0; idx < COMMENT::LAST_COMMENT; idx++) {
+    for (int idx = 0; idx < COMMENTS::LAST_COMMENT; idx++) {
         auto *action = mComment[idx];
         action->setIcon(QIcon(toDarkName(action)));
         fmtToolBar->addAction(action);
     }
 
     fmtToolBar->addSeparator();
-    for (int idx = 0; idx < SPACING::LAST_SPACING; idx++) {
+    for (int idx = 0; idx < SPACINGS::LAST_SPACING; idx++) {
         auto *action = mSpacing[idx];
         action->setIcon(QIcon(toDarkName(action)));
         fmtToolBar->addAction(action);
     }
 
     fmtToolBar->addSeparator();
-    for (int idx = 0; idx < LIST::LAST_LIST; idx++) {
+    for (int idx = 0; idx < LISTS::LAST_LIST; idx++) {
         auto *action = mList[idx];
         action->setIcon(QIcon(toDarkName(action)));
         fmtToolBar->addAction(action);
@@ -178,7 +178,7 @@ void FormatActions::toToolBar(QToolBar *fmtToolBar)
     sectionBtn->setText(tr("Sections"));
     sectionBtn->setPopupMode(QToolButton::InstantPopup);
     QMenu *sectionMenu = new QMenu(sectionBtn);
-    for (int idx = 0; idx < SECTION::LAST_SECTION; idx++) {
+    for (int idx = 0; idx < SECTIONS::LAST_SECTION; idx++) {
         sectionMenu->addAction(mSection[idx]);
     }
     sectionBtn->setMenu(sectionMenu);

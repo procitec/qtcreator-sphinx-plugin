@@ -167,7 +167,7 @@ void Plugin::createActions()
     menu->addSeparator();
 
     const auto &commentActions = mFormatActions.commentActions();
-    for (int idx = 0; idx < FormatActions::COMMENT::LAST_COMMENT; idx++) {
+    for (int idx = 0; idx < FormatActions::COMMENTS::LAST_COMMENT; idx++) {
         action = commentActions[idx];
         cmd = Core::ActionManager::registerAction(action,
                                                   qPrintable(action->objectName()),
@@ -181,7 +181,7 @@ void Plugin::createActions()
 
     //    const auto &spaceActions = mFormatActions.spaceActions();
     const auto &sectionActions = mFormatActions.sectionActions();
-    for (int idx = 0; idx < FormatActions::SECTION::LAST_SECTION; idx++) {
+    for (int idx = 0; idx < FormatActions::SECTIONS::LAST_SECTION; idx++) {
         action = sectionActions[idx];
         cmd = Core::ActionManager::registerAction(action,
                                                   qPrintable(action->objectName()),
