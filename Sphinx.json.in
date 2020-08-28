@@ -1,13 +1,14 @@
 {
     \"Name\" : \"Sphinx\",
-    \"Version\" : \"1.0.0\",
-    \"CompatVersion\" : \"1.0.0\",
+    \"Version\" : \"0.2.0\",
+    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"PROCITEC GmbH \",
     \"Copyright\" : \"(C) PROCITEC GmbH \",
     \"License\" : \"GNU Lesser General Public License v2.1\",
     \"Category\" : \"Other Languages\",
     \"Description\" : \"Sphinx language support\",
     \"Url\" : \"https://github.com/procitec/qtcreator-sphinx-plugin\",
+    \"QtCreator Version\": \"$$QTCREATOR_VERSION\",
     $$dependencyList,
 
     \"Mimetypes\" : [

@@ -181,7 +181,7 @@ jobs:
           endforeach()
         endif()
 
-        set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}"
+        set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
 
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/qtcreator" qtcreator_dir)
 
@@ -201,6 +201,7 @@ jobs:
 
           RESULT_VARIABLE result
         )
+
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
