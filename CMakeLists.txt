@@ -115,5 +115,5 @@ target_sources( Sphinx PRIVATE
     ${SOURCES}
 )
 
-INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator/sphinx" )
+INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" )
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "share/qtcreator/snippets" )

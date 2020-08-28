@@ -245,7 +245,7 @@ jobs:
         execute_process(
           COMMAND cmake
             -G "Ninja"
-            -D"CMAKE_BUILD_TYPE=Release"
+            -DCMAKE_BUILD_TYPE=Release
             -DIDE_SOURCE_TREE=${qtcreator_dir}
             -DIDE_BUILD_TREE=${qtcreator_dir}
             ..
