@@ -33,13 +33,13 @@ public:
         LAST_LIST
     };
 
-    enum COMMENTS { COMMENTS, UNCOMMENT, LAST_COMMENT };
+    enum COMMENTS { COMMENT, UNCOMMENT, LAST_COMMENT };
 
     enum SECTIONS {
         DEFAULT,
         PART,
         CHAPTER,
-        SECTIONS,
+        SECTION,
         SUBSECTION,
         SUBSUBSECTION,
         PARAGRAPHS,

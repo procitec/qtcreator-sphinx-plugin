@@ -75,7 +75,7 @@ FormatActions::FormatActions()
     action = new QAction(tr("Comment selection"), this);
     action->setObjectName(QString("%1.Comment selection").arg(actionID));
     action->setIcon(QIcon::fromTheme("edit-comment"));
-    mComment[COMMENTS::COMMENTS] = action;
+    mComment[COMMENTS::COMMENT] = action;
 
     action = new QAction(tr("Uncomment selection"), this);
     action->setObjectName(QString("%1.Uncomment selection").arg(actionID));
@@ -93,7 +93,7 @@ FormatActions::FormatActions()
     mSection[SECTIONS::CHAPTER] = action;
     action = new QAction(tr("Section"), this);
     action->setObjectName(QString("%1.Section").arg(actionID));
-    mSection[SECTIONS::SECTIONS] = action;
+    mSection[SECTIONS::SECTION] = action;
     action = new QAction(tr("SubSection"), this);
     action->setObjectName(QString("%1.SubSection").arg(actionID));
     mSection[SECTIONS::SUBSECTION] = action;

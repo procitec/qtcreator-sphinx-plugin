@@ -109,7 +109,7 @@ void EditorWidget::connectActions()
 
     const auto &commentActions = mFormatActions.commentActions();
 
-    connect(commentActions[FormatActions::COMMENTS], SIGNAL(triggered(bool)), this, SLOT(onAddComment()));
+    connect(commentActions[FormatActions::COMMENT], SIGNAL(triggered(bool)), this, SLOT(onAddComment()));
     connect(commentActions[FormatActions::UNCOMMENT],
             SIGNAL(triggered(bool)),
             this,
@@ -122,7 +122,7 @@ void EditorWidget::connectActions()
             SLOT(onRemoveSection()));
     connect(sectionActions[FormatActions::PART], SIGNAL(triggered(bool)), this, SLOT(onPart()));
     connect(sectionActions[FormatActions::CHAPTER], SIGNAL(triggered(bool)), this, SLOT(onChapter()));
-    connect(sectionActions[FormatActions::SECTIONS], SIGNAL(triggered(bool)), this, SLOT(onSection()));
+    connect(sectionActions[FormatActions::SECTION], SIGNAL(triggered(bool)), this, SLOT(onSection()));
     connect(sectionActions[FormatActions::SUBSECTION],
             SIGNAL(triggered(bool)),
             this,
