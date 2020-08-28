@@ -240,7 +240,7 @@ jobs:
 
         configure_file( RELEASEINFO.md.in RELEASEINFO.md @ONLY )
 
-        execute_process( COMMAND cmake -E create_directory "build" )
+        execute_process( COMMAND cmake -E make_directory "build" )
 
         execute_process(
           COMMAND cmake
