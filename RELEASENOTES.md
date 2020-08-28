@@ -3,6 +3,6 @@
 ### Features
 
 * Format lists and Literal Blocks via Toolbar
-
+* CMake build support due to latest snapshots
 
 ### Issues
