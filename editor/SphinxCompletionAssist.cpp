@@ -50,7 +50,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     }
 
     QString myTyping = interface->textAt(startPosition, interface->position() - startPosition);
-    const QString fileName = interface->fileName();
+    //auto fileName = interface->filePath();
 
     QList<TextEditor::AssistProposalItemInterface *> snippetProposal;
 
