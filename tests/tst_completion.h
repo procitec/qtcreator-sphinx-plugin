@@ -30,6 +30,9 @@ private slots:
     void testSimpleDirective();
     void testSimpleDirective_data();
 
+    void testSimpleDirectiveOption();
+    void testSimpleDirectiveOption_data();
+
     void testSimpleRole();
     void testSimpleRole_data();
 

@@ -18,17 +18,15 @@ set( QTC_PLUGIN_NAME Sphinx )
 set( QTC_PLUGIN_REVISION ${PROJECT_VERSION})
 
 
-## Add paths to check for cmake modules:
-list(APPEND CMAKE_MODULE_PATH "${IDE_SOURCE_TREE}/lib/cmake/QtCreator")
+option(WITH_TESTS "Build Tests" ON)
+option(WITH_DEBUG_CMAKE "Enabled CMake project debugging functionality (e.g. source file disk checking)" OFF)
+option(BUILD_WITH_PCH "Build with precompiled headers" OFF)
 
 # Force C++ standard, do not fall back, do not use compiler extensions
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(WITH_TESTS "Build Tests" ON)
-option(WITH_DEBUG_CMAKE "Enabled CMake project debugging functionality (e.g. source file disk checking)" OFF)
-option(BUILD_WITH_PCH "Build with precompiled headers" OFF)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -37,12 +35,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+## Add paths to check for cmake modules:
 
-
-set(CMAKE_INSTALL_PREFIX "" )
-
+list(APPEND CMAKE_MODULE_PATH "${IDE_SOURCE_TREE}/lib/cmake/QtCreator")
 include(QtCreatorConfig)
 
+set(CMAKE_INSTALL_PREFIX "" )
 
 find_dependency(Qt5
   COMPONENTS Test XmlPatterns REQUIRED
@@ -105,9 +103,12 @@ set( SOURCES
             editor/SphinxCodeStylePreferencesFactory.h
             editor/SphinxCompletionAssist.h
             editor/SphinxRstcheckHighlighter.h
+            editor/SphinxRegularExpressions.h
+            editor/SphinxRegularExpressions.cpp
             options/SphinxOptionsPage.h
             options/SphinxOptionsWidget.h
             options/SphinxSettings.h
+
             ${QRCS}
 )
 
@@ -125,5 +126,5 @@ target_sources( Sphinx PRIVATE
     ${SOURCES}
 )
 
-INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" )
+INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" PATTERN "__pycache__" EXCLUDE  )
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "share/qtcreator/snippets" )

@@ -3,11 +3,46 @@
     <directives>
         <directive name="toctree">
         </directive>
-        <directive name="code-block" args="language" has_content="true">
+        <directive name="code-block" args="language">
             <content><![CDATA[
     $$
 ]]>
             </content>
+        </directive>
+<!--
+        <directive name="">
+        <content><![CDATA[
+$$
+]]>
+        </content>
+        </directive>
+-->
+        <directive name="note">
+            <content><![CDATA[
+    $$
+]]>
+            </content>
+        </directive>
+        <directive name="warning">
+            <content><![CDATA[
+    $$
+]]>
+            </content>
+        </directive>
+        <directive name="versionadded" args="version">
+        <explanation><![CDATA[   $$
+]]>
+        </explanation>
+        </directive>
+        <directive name="versionchanged" args="version">
+        <explanation><![CDATA[   $$
+]]>
+        </explanation>
+        </directive>
+        <directive name="deprecated" args="version">
+        <explanation><![CDATA[   $$
+]]>
+        </explanation>
         </directive>
     </directives>
     <roles>

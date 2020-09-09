@@ -45,14 +45,5 @@ private:
     QTextCharFormat mTodoFormat;
     QTextCharFormat mDefaultFormat;
     QTextCharFormat mTickFormat;
-
-    QRegularExpression mDirectiveRegEx;
-    QRegularExpression mDirectiveOptionRegEx;
-    QRegularExpression mTitleRegEx;
-    QRegularExpression mBoldRegEx;
-    QRegularExpression mItalicRegEx;
-    QRegularExpression mCodeRegEx;
-    QRegularExpression mRoleRegEx;
-    QRegularExpression mRoleContentRegEx;
 };
 } // namespace qtc::plugin::sphinx

@@ -36,8 +36,7 @@ void TestCompletion::cleanup()
 
 void TestCompletion::createEditor()
 {
-    mIEditor = Core::EditorManager::openEditorWithContents(
-        qtc::plugin::sphinx::Constants::EditorId);
+    mIEditor = Core::EditorManager::openEditorWithContents(qtc::plugin::sphinx::Constants::EditorId);
     mEditor = static_cast<qtc::plugin::sphinx::EditorWidget *>(mIEditor->widget());
     QVERIFY(TextEditor::TabSettings::SpacesOnlyTabPolicy
             == mEditor->textDocument()->tabSettings().m_tabPolicy);
@@ -72,6 +71,41 @@ void TestCompletion::testSimpleDirective_data()
 }
 
 void TestCompletion::testSimpleDirective()
+{
+    QFETCH(QString, text);
+    QFETCH(QString, completion);
+
+    mEditor->insertPlainText(text);
+    qApp->processEvents();
+    QVERIFY(mEditor->autoCompleter());
+    auto tc = mEditor->textCursor();
+    mEditor->invokeAssist(TextEditor::Completion, nullptr);
+    QTest::qWait(20);
+    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+    QTest::qWait(20);
+    auto completed = mEditor->toPlainText();
+    QCOMPARE(completed, completion);
+}
+
+void TestCompletion::testSimpleDirectiveOption_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("completion");
+
+    QTest::newRow("image option height") << QString(R"-(.. image:: filename.png
+   :h)-") << QString(R"-(.. image:: filename.png
+   :height: length
+)-");
+
+    QTest::newRow("image option second options") << QString(R"-(.. image:: filename.png
+   :height: 100
+   :w)-") << QString(R"-(.. image:: filename.png
+   :height: 100
+   :width: length or percentage of the current line width
+)-");
+}
+
+void TestCompletion::testSimpleDirectiveOption()
 {
     QFETCH(QString, text);
     QFETCH(QString, completion);

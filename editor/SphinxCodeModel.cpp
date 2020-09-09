@@ -94,12 +94,6 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                         if (atts.hasAttribute("args")) {
                             directive.mArgs = atts.value("args").toString();
                         }
-                        if (atts.hasAttribute("has_content")) {
-                            directive.mHasContent = atts.value("has_content").toString().toLower()
-                                                            == "true"
-                                                        ? true
-                                                        : false;
-                        }
                         qDebug() << fileName << " found directive " << id << xml.lineNumber()
                                  << xml.columnNumber();
                     } else if (xml.name() == "directive" && xml.isEndElement()) {
@@ -145,6 +139,22 @@ void CodeModel::readXML(const QString &fileName, const QString &snippetId)
                         qDebug() << fileName << " found directive content" << content
                                  << xml.lineNumber() << xml.columnNumber();
                         directive.mContent = content;
+                    } else if (xml.name() == "explanation" && xml.isStartElement()
+                               && !directive.mName.isEmpty()) {
+                        QString explanation;
+                        while (!xml.atEnd()) {
+                            xml.readNext();
+                            if (xml.isCDATA()) {
+                                explanation += xml.text();
+                                break;
+                            } else if (xml.isEndElement()) {
+                                break;
+                            }
+                        }
+
+                        qDebug() << fileName << " found directive explanation" << explanation
+                                 << xml.lineNumber() << xml.columnNumber();
+                        directive.mContent = explanation;
                     } else if (xml.name() == "role" && xml.isStartElement()) {
                         const QXmlStreamAttributes &atts = xml.attributes();
                         assert(atts.hasAttribute("name"));
@@ -192,15 +202,46 @@ QList<TextEditor::Snippet> CodeModel::collectDirectives()
             QString option = directive.mArgs.isEmpty() ? QString()
                                                        : QString(" $%1$").arg(directive.mArgs);
 
-            if (directive.mHasContent) {
-                QString content = directive.mContent.isEmpty() ? QStringLiteral("\n    $$\n")
-                                                               : directive.mContent;
+            if (!directive.mContent.isEmpty()) {
                 snippet.setContent(
-                    QString("%1::%2\n%3\n").arg(directive.mName).arg(option).arg(content));
+                    QString("%1::%2\n%3\n").arg(directive.mName).arg(option).arg(directive.mContent));
             } else {
                 snippet.setContent(QString("%1::%2\n\n").arg(directive.mName).arg(option));
             }
             snippets += snippet;
+        }
+    }
+
+    return snippets;
+}
+
+QList<TextEditor::Snippet> CodeModel::collectDirectiveOptions(const QString &directiveName)
+{
+    QList<TextEditor::Snippet> snippets;
+
+    for (const auto &directive : mData.mDirectives) {
+        if (!directive.mGroupId.isEmpty()) {
+            assert(!directive.mName.isEmpty());
+            if (directive.mName == directiveName) {
+                for (const auto &option : directive.mOptions) {
+                    TextEditor::Snippet snippet(
+                        QString("%1.%2").arg(Constants::SnippetGroupId).arg(directive.mGroupId),
+                        QString("%1_%2_%3")
+                            .arg(directive.mGroupId.toLower())
+                            .arg(directive.mName.toLower())
+                            .arg(option.mName.toLower()));
+                    snippet.setTrigger(option.mName);
+                    snippet.setComplement("");
+                    snippet.setIsRemoved(false);
+                    snippet.setIsModified(false);
+
+                    QString typeInfo = option.mTypes.isEmpty() ? QString()
+                                                               : QString(" $%1$").arg(option.mTypes);
+
+                    snippet.setContent(QString("%1:%2\n").arg(option.mName).arg(typeInfo));
+                    snippets += snippet;
+                }
+            }
         }
     }
 

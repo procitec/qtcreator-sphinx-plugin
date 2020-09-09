@@ -1,4 +1,6 @@
 ﻿#include "SphinxHighlighter.h"
+#include "SphinxRegularExpressions.h"
+
 #include <texteditor/colorscheme.h>
 #include <texteditor/fontsettings.h>
 #include <texteditor/textdocumentlayout.h>
@@ -13,14 +15,6 @@ namespace qtc::plugin::sphinx {
 
 Highlighter::Highlighter(QObject *parent)
     : TextEditor::SyntaxHighlighter(parent)
-    , mDirectiveRegEx("^\\.\\.\\s+[\\w\\-_]+::\\s*")
-    , mDirectiveOptionRegEx("\\s+:[A-Za-z-]+:")
-    , mTitleRegEx("^[=|\\*|#|\\^|\\-]+")
-    , mBoldRegEx("[\\s+]\\*{2,}\\w+\\*{2,}|^\\*{2,}\\w+\\*{2,}")
-    , mItalicRegEx("[\\s+]\\*{1,1}\\w+\\*{1,1}|^\\*{1,1}\\w+\\*{1,1}")
-    , mCodeRegEx("[\\s+]`{2,2}[^`]+`{2,2}")
-    , mRoleRegEx("\\s+:\\w+:")
-    , mRoleContentRegEx(":`[^`]+`")
 {
     auto colorScheme = fontSettings().colorScheme();
 
@@ -73,7 +67,7 @@ void Highlighter::highlightBlock(const QString &text)
 
     TextEditor::TextDocumentLayout::userData(currentBlock())->setFoldingStartIncluded(false);
 
-    if (text.startsWith("..") && (0 != text.indexOf(mDirectiveRegEx))) {
+    if (text.startsWith("..") && (0 != text.indexOf(SphinxRegularExpressions::DirectiveRegEx))) {
         // beginn of a comment
         setFormat(0, text.length(), mCommentFormat);
         setCurrentBlockState(COMMENT);
@@ -97,7 +91,7 @@ void Highlighter::highlightBlock(const QString &text)
                 setFormat(0, text.length(), mCommentFormat);
             }
         }
-    } else if (0 == text.indexOf(QRegularExpression(mDirectiveRegEx))) {
+    } else if (0 == text.indexOf(QRegularExpression(SphinxRegularExpressions::DirectiveRegEx))) {
         if (text.contains("todo")) {
             setFormat(0, text.length(), mTodoFormat);
         } else {
@@ -106,7 +100,8 @@ void Highlighter::highlightBlock(const QString &text)
         foldingIndent = 0;
         setCurrentBlockState(DIRECTIVE | BLOCK_BEGIN);
 
-    } else if ((0 == text.indexOf(mTitleRegEx) && text.count(text.at(0)) == text.length())
+    } else if ((0 == text.indexOf(SphinxRegularExpressions::TitleRegEx)
+                && text.count(text.at(0)) == text.length())
                || (currentBlockState() & TITLE)) {
         setCurrentBlockState(TITLE);
         setFormat(0, text.length(), mTitleFormat);
@@ -115,7 +110,7 @@ void Highlighter::highlightBlock(const QString &text)
     } else if (!text.isEmpty()
                && ((prevBlockState & DIRECTIVE) || (prevBlockState & DIRECTIVEOPTION)
                    || (prevBlockState & DIRECTIVECONTENT))) {
-        QRegularExpression expression(mDirectiveOptionRegEx);
+        QRegularExpression expression(SphinxRegularExpressions::DirectiveOptionRegEx);
         QRegularExpressionMatchIterator i = expression.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
@@ -136,31 +131,31 @@ void Highlighter::highlightBlock(const QString &text)
         }
 
         // now we do inline matching
-        QRegularExpressionMatchIterator i = mBoldRegEx.globalMatch(text);
+        QRegularExpressionMatchIterator i = SphinxRegularExpressions::BoldRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mBoldFormat);
         }
 
-        i = mItalicRegEx.globalMatch(text);
+        i = SphinxRegularExpressions::ItalicRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mItalicFormat);
         }
 
-        i = mRoleRegEx.globalMatch(text);
+        i = SphinxRegularExpressions::RoleRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mInlineFormat);
         }
 
-        i = mCodeRegEx.globalMatch(text);
+        i = SphinxRegularExpressions::CodeRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart(), match.capturedLength(), mCodeFormat);
         }
 
-        i = mRoleContentRegEx.globalMatch(text);
+        i = SphinxRegularExpressions::RoleContentRegEx.globalMatch(text);
         while (i.hasNext()) {
             QRegularExpressionMatch match = i.next();
             setFormat(match.capturedStart() + 1, match.capturedLength() - 1, mTickFormat);

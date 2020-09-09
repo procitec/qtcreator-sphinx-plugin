@@ -1,6 +1,7 @@
 #include "SphinxCompletionAssist.h"
 #include "../qtcreator-sphinx-pluginconstants.h"
 #include "SphinxCodeModel.h"
+#include "SphinxRegularExpressions.h"
 
 #include <coreplugin/id.h>
 #include <texteditor/codeassist/assistinterface.h>
@@ -83,6 +84,48 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     }
 
     if (snippetProposal.empty()) {
+        // load from code model, search for directive options
+        linePos = line.lastIndexOf(QRegExp(R"-(^\s+:)-"));
+        if (0 <= linePos) {
+            // this could be a role or an option. We have to look if we are in context of a directive
+            for (auto block = interface->textDocument()->findBlock(startPosition).blockNumber() - 1;
+                 block >= 0;
+                 block--) {
+                auto l = interface->textDocument()->findBlockByNumber(block).text();
+                if (0 == l.indexOf(SphinxRegularExpressions::DirectiveRegEx)) {
+                    // found directive, complete the options
+                    // determine directive name
+                    auto match = SphinxRegularExpressions::DirectiveCaptureRegEx.match(l);
+                    if (match.hasMatch()) {
+                        auto directive = match.captured(1);
+
+                        linePos = line.lastIndexOf(QRegExp(R"-(:)-"));
+                        linePos++;
+                        context = line.mid(linePos, startPosition);
+
+                        for (const auto &snippet :
+                             CodeModel::instance()->collectDirectiveOptions(directive)) {
+                            if (snippet.trigger().startsWith(context)) {
+                                auto item = new TextEditor::AssistProposalItem;
+                                item->setText(snippet.trigger() + QLatin1Char(' ')
+                                              + snippet.complement());
+                                item->setData(snippet.content());
+                                item->setDetail(snippet.generateTip());
+                                //                item->setIcon(icon);
+                                //                item->setOrder(order);
+                                snippetProposal += item;
+                            }
+                        }
+                    }
+
+                    break;
+                } else if (-1 == l.indexOf(SphinxRegularExpressions::DirectiveOptionRegEx))
+                    break;
+            }
+        }
+    }
+
+    if (snippetProposal.empty()) {
         // load from code model, search for roles
         linePos = line.lastIndexOf(QRegExp(R"-(^\s*:|\s+:)-"));
         if (0 <= linePos) {
@@ -115,6 +158,6 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
         proposal = new TextEditor::GenericProposal(blockPos + linePos, model);
     }
     return proposal;
-}
+} // namespace qtc::plugin::sphinx
 
 } // namespace qtc::plugin::sphinx

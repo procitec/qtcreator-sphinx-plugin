@@ -36,10 +36,11 @@
   </xsd:element>
   <xsd:element name="content" minOccurs="0" maxOccurs="unbounded" type="xsd:string">
   </xsd:element>
+  <xsd:element name="explanation" minOccurs="0" maxOccurs="unbounded" type="xsd:string">
+  </xsd:element>
   </xsd:sequence>
   <xsd:attribute name="name" type="xsd:string" use="required"/>
   <xsd:attribute name="args" type="xsd:string" use="optional"/>
-  <xsd:attribute name="has_content" type="xsd:boolean" use="optional"/>
 </xsd:complexType>
 
 

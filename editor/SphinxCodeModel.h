@@ -16,6 +16,7 @@ public:
 
     static CodeModel *instance();
     QList<TextEditor::Snippet> collectDirectives();
+    QList<TextEditor::Snippet> collectDirectiveOptions(const QString &directive);
     QList<TextEditor::Snippet> collectRoles();
 
 private:
