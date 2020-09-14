@@ -41,6 +41,7 @@ list(APPEND CMAKE_MODULE_PATH "${IDE_SOURCE_TREE}/lib/cmake/QtCreator")
 include(QtCreatorConfig)
 
 set(CMAKE_INSTALL_PREFIX "" )
+set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
 find_dependency(Qt5
   COMPONENTS Test XmlPatterns REQUIRED

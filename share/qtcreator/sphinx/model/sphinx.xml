@@ -1,53 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <directives>
-        <directive name="toctree">
-        </directive>
-        <directive name="code-block" args="language">
-            <content><![CDATA[
+  <directives>
+    <directive name="toctree"></directive>
+    <directive name="code-block" args="language">
+      <content>
+<![CDATA[
     $$
 ]]>
-            </content>
-        </directive>
-<!--
-        <directive name="">
-        <content><![CDATA[
-$$
-]]>
-        </content>
-        </directive>
--->
-        <directive name="note">
-            <content><![CDATA[
+      </content>
+    </directive>
+    <directive name="note">
+      <content>
+<![CDATA[
     $$
 ]]>
-            </content>
-        </directive>
-        <directive name="warning">
-            <content><![CDATA[
+      </content>
+    </directive>
+    <directive name="warning">
+      <content>
+<![CDATA[
     $$
 ]]>
-            </content>
-        </directive>
-        <directive name="versionadded" args="version">
-        <explanation><![CDATA[   $$
+      </content>
+    </directive>
+    <directive name="versionadded" args="version">
+      <content>
+<![CDATA[   $$
 ]]>
-        </explanation>
-        </directive>
-        <directive name="versionchanged" args="version">
-        <explanation><![CDATA[   $$
+      </content>
+    </directive>
+    <directive name="versionchanged" args="version">
+      <content>
+<![CDATA[   $$
 ]]>
-        </explanation>
-        </directive>
-        <directive name="deprecated" args="version">
-        <explanation><![CDATA[   $$
+      </content>
+    </directive>
+    <directive name="deprecated" args="version">
+      <content>
+<![CDATA[   $$
 ]]>
-        </explanation>
-        </directive>
-    </directives>
-    <roles>
-        <role name="ref"/>
-    </roles>
+      </content>
+    </directive>
+  </directives>
+  <roles>
+    <role name="ref" />
+  </roles>
 </model>
-
-

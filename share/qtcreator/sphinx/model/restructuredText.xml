@@ -1,21 +1,797 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <directives>
-        <directive name="image" args="filename">
-            <options>
-                <option name="alt" type="text">
-                    <description xml:lang="en">Alternate text: a short description of the image, displayed by applications that cannot display images, or spoken by applications for visually impaired users
-                    </description>
-                </option>
-                <option name="height" type="length">
-                </option>
-                <option name="width" type="length or percentage of the current line width">
-                    <description xml:lang="en">The width of the image. Used to reserve space or scale the image horizontally. As with "height" above, when the "scale" option is also specified, they are combined.
-                    </description>
-                </option>
-            </options>
-        </directive>
-    </directives>
+  <directives>
+    <!--
+  Images
+-->
+    <directive name="image" args="filename">
+      <options>
+        <option name="alt" type="text">
+          <description xml:lang="en">Alternate text: a short
+          description of the image, displayed by applications that
+          cannot display images, or spoken by applications for
+          visually impaired users</description>
+        </option>
+        <option name="height" type="length"></option>
+        <option name="width"
+        type="length or percentage of the current line width">
+          <description xml:lang="en">The width of the image. Used
+          to reserve space or scale the image horizontally. As with
+          "height" above, when the "scale" option is also
+          specified, they are combined.</description>
+        </option>
+        <option name="scale" type="integer percentage"></option>
+        <option name="align"
+        type="'top', 'middle', 'bottom', 'left', 'center', 'right'">
+        </option>
+        <option name="target" type="text (URI or reference name)">
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+    </directive>
+    <directive name="figure" args="filename">
+      <options>
+        <option name="alt" type="text">
+          <description xml:lang="en">Alternate text: a short
+          description of the image, displayed by applications that
+          cannot display images, or spoken by applications for
+          visually impaired users</description>
+        </option>
+        <option name="height" type="length"></option>
+        <option name="width"
+        type="length or percentage of the current line width">
+          <description xml:lang="en">The width of the image. Used
+          to reserve space or scale the image horizontally. As with
+          "height" above, when the "scale" option is also
+          specified, they are combined.</description>
+        </option>
+        <option name="scale" type="integer percentage"></option>
+        <option name="align" type="'left', 'center', 'right'">
+        </option>
+        <option name="target" type="text (URI or reference name)">
+        </option>
+        <option name="figwidth"
+        type="'image', length or percentage"></option>
+        <option name="figclass" type="text"></option>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the image element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $caption$
+
+    $legend$
+]]>
+      </content>
+    </directive>
+    <!--
+  Admonitions (Specific)
+-->
+    <directive name="attention">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="caution">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="danger">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="error">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="hint">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="important">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="note">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="tip">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="warning">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <!--
+  Admonitions (Generic)
+-->
+    <directive name="admonition">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">Overrides the computed classes
+          attribute value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the admonition element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <!--
+  Body Elements
+-->
+    <directive name="topic" args="title">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="sidebar" args="title">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+        <option name="subtitle" type="text">
+          <description xml:lang="en">The sidebars
+          subtitle</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="parsed-literal">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="code" args="language">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+        <option name="number-lines" type="start line number">
+          <description xml:lang="en">Precede every line with a line
+          number</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="math">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="rubric" args="rubric text">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+    </directive>
+    <directive name="epigraph">
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="highlights">
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="pull-quote">
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="compound">
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <directive name="container" args="class names">
+      <options>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+    $$
+]]>
+      </content>
+    </directive>
+    <!--
+  Tables
+-->
+    <directive name="table" args="title">
+      <options>
+        <option name="align" type="'left', 'center', 'right'">
+          <description xml:lang="en">The horizontal alignment of
+          the table</description>
+        </option>
+        <option name="widths"
+        type="auto, grid or a list of integers">
+          <description xml:lang="en">Special values 'auto' or
+          'grid' or a comma or space separated list of colum
+          widths</description>
+        </option>
+        <option name="width" type="length or percentage">
+          <description xml:lang="en">forced width or percentage of
+          the line width</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+   $====  ====
+     A      B
+    ====  ====
+     a      b
+    ====  ====$
+]]>
+      </content>
+    </directive>
+    <directive name="csv-table" args="title">
+      <options>
+        <option name="align" type="'left', 'center', 'right'">
+          <description xml:lang="en">The horizontal alignment of
+          the table</description>
+        </option>
+        <option name="widths" type="auto or a list of integers">
+          <description xml:lang="en">Special values 'auto' or a
+          comma or space separated list of colum
+          widths</description>
+        </option>
+        <option name="width" type="length or percentage">
+          <description xml:lang="en">forced width or percentage of
+          the line width</description>
+        </option>
+        <option name="header-rows" type="integer">
+          <description xml:lang="en">The number of rows to use in
+          the table header</description>
+        </option>
+        <option name="stub-columns" type="integer">
+          <description xml:lang="en">The number of table colums to
+          use as row titles on the left</description>
+        </option>
+        <option name="header" type="csv data">
+          <description xml:lang="en">Supplemental data for the
+          table header</description>
+        </option>
+        <option name="file" type="string">
+          <description xml:lang="en">The local system path to a csv
+          data file</description>
+        </option>
+        <option name="url" type="string">
+          <description xml:lang="en">An URL to a csv data
+          file</description>
+        </option>
+        <option name="encoding" type="name of encoding">
+          <description xml:lang="en">The text encoding of the
+          external CSV data (url or file).</description>
+        </option>
+        <option name="delim" type="char or 'tab' or 'space'">
+          <description xml:lang="en">A one character string used to
+          separate fields. Defaults to comma (,).</description>
+        </option>
+        <option name="quote" type="char">
+          <description xml:lang="en">A one character string used to
+          quote elements containing the delimiter or which start
+          with the quote character. Default to "
+          (quote)</description>
+        </option>
+        <option name="keepspace" type="flag">
+          <description xml:lang="en">Treat whitespace immediately
+          following the delimiter as significant. The default is to
+          ignore such whitespace</description>
+        </option>
+        <option name="escape" type="char">
+          <description xml:lang="en">A one character string used to
+          escape the delimiter or quote characters. The default is
+          to double up the character.</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <directive name="list-table" args="title">
+      <options>
+        <option name="align" type="'left', 'center', 'right'">
+          <description xml:lang="en">The horizontal alignment of
+          the table</description>
+        </option>
+        <option name="widths" type="auto or a list of integers">
+          <description xml:lang="en">Special values 'auto' or a
+          comma or space separated list of colum
+          widths</description>
+        </option>
+        <option name="width" type="length or percentage">
+          <description xml:lang="en">forced width or percentage of
+          the line width</description>
+        </option>
+        <option name="header-rows" type="integer">
+          <description xml:lang="en">The number of rows to use in
+          the table header</description>
+        </option>
+        <option name="stub-columns" type="integer">
+          <description xml:lang="en">The number of table colums to
+          use as row titles on the left</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+   $* -
+      -
+    * -
+      -
+   $
+]]>
+      </content>
+    </directive>
+    <!--
+  Document Parts
+-->
+    <directive name="contents" args="title">
+      <description xml:lang="en">The "contents" directive generates
+      a table of contents (TOC) in a topic.</description>
+      <options>
+        <option name="depth" type="integer">
+          <description xml:lang="en">The number of sections levels
+          that are collected int he table of contents. The default
+          is unlimited depth</description>
+        </option>
+        <option name="local" type="flag">
+          <description xml:lang="en">Generate a local table of
+          contents. Entries will only include subsections o f the
+          section in which the directive is given.</description>
+        </option>
+        <option name="backlinks" type="'entry' or 'top' or 'none'">
+          <description xml:lang="en">Generate links from section
+          headers back to the table of contents entries, the table
+          of contents itself or generate no
+          backlinks.</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+      </options>
+    </directive>
+    <directive name="section-numbering">
+      <options>
+        <option name="depth" type="integer">
+          <description xml:lang="en">The number of sections levels
+          that are numbered by this directive. The default is
+          unlimited depth</description>
+        </option>
+        <option name="prefix" type="string">
+          <description xml:lang="en">An arbitrary string that is
+          prefixed to the automatically generated section
+          numbers.</description>
+        </option>
+        <option name="suffix" type="string">
+          <description xml:lang="en">An arbitrary string that is
+          appended to the automatically generated section
+          numbers.</description>
+        </option>
+        <option name="start" type="integer">
+          <description xml:lang="en">The value that will be used
+          for the first section number.</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+      </options>
+    </directive>
+    <directive name="header">
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <directive name="footer">
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <!--
+  References
+-->
+    <directive name="target-notes">
+      <description xml:lang="en">The directive creates a footnote
+      for each external target in the text.</description>
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute
+          value</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element</description>
+        </option>
+      </options>
+    </directive>
+    <!--
+  HTML specific
+-->
+    <directive name="meta">
+      <description xml:lang="en">The "meta" directive is used to
+      specify HTML metadata stored in HTML META tags. The tags are
+      given as REST options in the directive block</description>
+      <content>
+<![CDATA[   $:description:$
+]]>
+      </content>
+    </directive>
+    <!--
+  Directives for Substituion Definitions
+
+  todo: ugly, cause the current "directive" regular expressions won't fit....
+
+-->
+    <!--
+  Miscellaneous
+-->
+    <directive name="include" args="file">
+      <description xml:lang="en">Directly include a text
+      file.</description>
+      <options>
+        <option name="start-line" type="integer">
+          <description xml:lang="en">Only the content starting from
+          this line will be included.</description>
+        </option>
+        <option name="end-line" type="integer">
+          <description xml:lang="en">Only the content starting up
+          to (but excluding) this line will be
+          included.</description>
+        </option>
+        <option name="start-after" type="text to find">
+          <description xml:lang="en">Only the content after the
+          first occurence of the specified text will be
+          included.</description>
+        </option>
+        <option name="end-before" type="text to find">
+          <description xml:lang="en">Only the content before the
+          first occurence of the specified text (but after any
+          "after" text) will be included.</description>
+        </option>
+        <option name="literal" type="flag">
+          <description xml:lang="en">The entire included text is
+          inserted into the document als a single literal
+          block.</description>
+        </option>
+        <option name="code" type="formal language">
+          <description xml:lang="en">The argument and the content
+          of the included file are passed to the code directive
+          (useful for program listings).</description>
+        </option>
+        <option name="number-lines" type="start line number">
+          <description xml:lang="en">Precede every line with a line
+          number (only on 'code' or 'literal'
+          include)</description>
+        </option>
+        <option name="encoding" type="name of encoding">
+          <description xml:lang="en">The text encoding of the
+          external data file</description>
+        </option>
+        <option name="tab-width" type="integer">
+          <description xml:lang="en">Number of spaces for hard tab
+          expansion. A negative value prevents expansion of hard
+          tabs. Defaults to the tab_width configuration
+          setting</description>
+        </option>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute value (only
+          on 'code' or 'literal' include)</description>
+        </option>
+        <option name="name" type="text">
+          <description xml:lang="en">Add text to the names
+          attribute of the element (only on 'code' or 'literal'
+          include)</description>
+        </option>
+      </options>
+    </directive>
+    <directive name="raw" args="output format type">
+      <description xml:lang="en">The "raw" directive indicates
+      non-reStructuredText data that is to be passed untouched to
+      the Writer. Use with caution!</description>
+      <options>
+        <option name="file" type="string">
+          <description xml:lang="en">The local filesystem path of a
+          raw data file to be included</description>
+        </option>
+        <option name="url" type="string">
+          <description xml:lang="en">An Internet URL reference to a
+          raw data file to be included.</description>
+        </option>
+        <option name="encoding" type="encoding name">
+          <description xml:lang="en">The text encoding of the
+          external ras data (file or URL).</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <directive name="class" args="class names / attribute values">
+      <description xml:lang="en">The "class" directive sets the
+      "classes" attribute value on its content or on the first
+      immediately following non-comment element.</description>
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <directive name="role" args="role name (base role name)">
+      <description xml:lang="en">The "role" directive dynamically
+      creates a custom interpreted text role and registers it with
+      the parser.</description>
+      <options>
+        <option name="class" type="text">
+          <description xml:lang="en">classes attribute value (only
+          on 'code' or 'literal' include)</description>
+        </option>
+      </options>
+      <content>
+<![CDATA[
+   $$
+]]>
+      </content>
+    </directive>
+    <directive name="default-role" args="default role name">
+      <description xml:lang="en">The "default-role" directive sets
+      the default interpreted text role, the role that is used for
+      interpreted text without an explicit role</description>
+    </directive>
+    <directive name="title" args="title text">
+      <description xml:lang="en">The "title" directive specifies
+      the document title as metadata, which does not become part of
+      the document body.</description>
+    </directive>
+  </directives>
 </model>
-
-

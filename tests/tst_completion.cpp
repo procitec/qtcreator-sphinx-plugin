@@ -55,13 +55,14 @@ void TestCompletion::testSimpleDirective_data()
     QTest::addColumn<QString>("text");
     QTest::addColumn<QString>("completion");
 
-    QTest::newRow("code-block") << QString(".. code") << QString(R"-(.. code-block:: language
+    QTest::newRow("code-block") << QString(".. code-") << QString(R"-(.. code-block:: language
 
     
 
 )-");
 
-    QTest::newRow("code-block second line") << QString("normaltext\n\n.. code") << QString(R"-(normaltext
+    QTest::newRow("code-block second line")
+        << QString("normaltext\n\n.. code-") << QString(R"-(normaltext
 
 .. code-block:: language
 
@@ -69,6 +70,11 @@ void TestCompletion::testSimpleDirective_data()
 
 )-");
 }
+
+// TODO Add test for replacement directives like
+// .. |date| date::
+// .. |rest| replace:: long text
+// .. _Python: http://.....
 
 void TestCompletion::testSimpleDirective()
 {

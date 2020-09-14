@@ -32,11 +32,13 @@
 
 <xsd:complexType name="directiveType">
   <xsd:sequence>
+  <xsd:element name="description" minOccurs="0" maxOccurs="1" type="descriptionType">
+  </xsd:element>
+  <xsd:element name="url" minOccurs="0" maxOccurs="1" type="xsd:string">
+  </xsd:element>
   <xsd:element name="options" minOccurs="0" maxOccurs="unbounded" type="optionsType">
   </xsd:element>
   <xsd:element name="content" minOccurs="0" maxOccurs="unbounded" type="xsd:string">
-  </xsd:element>
-  <xsd:element name="explanation" minOccurs="0" maxOccurs="unbounded" type="xsd:string">
   </xsd:element>
   </xsd:sequence>
   <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -58,7 +60,7 @@
 
 <xsd:complexType name="optionType">
   <xsd:sequence>
-  <xsd:element name="description" minOccurs="0" maxOccurs="unbounded" type="descriptionType">
+  <xsd:element name="description" minOccurs="0" maxOccurs="1" type="descriptionType">
   </xsd:element>
   </xsd:sequence>
   <xsd:attribute name="name" type="xsd:string" use="required"/>

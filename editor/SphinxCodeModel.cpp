@@ -22,19 +22,18 @@ CodeModel::CodeModel()
         auto modelFiles = mModelDir.entryInfoList(QDir::Files | QDir::Readable);
         qDebug() << "found model files: " << modelFiles.length();
 
-        QFile file(mModelDir.absolutePath() + "/model.xsd");
-        file.open(QIODevice::ReadOnly);
-        if (file.isOpen()) {
-            QXmlSchema schema;
-            bool loaded = schema.load(&file, QUrl::fromLocalFile(file.fileName()));
-            if (loaded) {
-                qDebug() << "sucessfully loaded schema" << schema.documentUri();
-            }
-            file.close();
+        QFileInfo file(mModelDir.absolutePath() + "/model.xsd");
+        QXmlSchema schema;
+        bool loaded = schema.load(QUrl::fromLocalFile(file.absoluteFilePath()));
+        if (loaded) {
+            qDebug() << "sucessfully loaded schema" << schema.documentUri();
+        }
 
-            for (const auto &file : modelFiles) {
-                if (verifyXML(file.absoluteFilePath(), schema)) {
-                    readXML(file.absoluteFilePath(), file.baseName());
+        assert(schema.isValid());
+        if (schema.isValid()) {
+            for (const auto &model : modelFiles) {
+                if (verifyXML(model.absoluteFilePath(), schema)) {
+                    readXML(model.absoluteFilePath(), model.baseName());
                 }
             }
         }
@@ -57,13 +56,14 @@ bool CodeModel::verifyXML(const QString &fileName, const QXmlSchema &schema) con
     bool ok = false;
 
     if (schema.isValid()) {
-        QFile file(fileName);
-        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+        QFileInfo file(fileName);
+        if (file.exists()) {
             QXmlSchemaValidator validator(schema);
-            if (validator.validate(&file, QUrl::fromLocalFile(file.fileName()))) {
+            assert(validator.validate(QUrl::fromLocalFile(file.absoluteFilePath())));
+            if (validator.validate(QUrl::fromLocalFile(file.absoluteFilePath()))) {
                 ok = true;
+                qDebug() << "sucessfully loaded file " << file.absoluteFilePath();
             }
-            file.close();
         }
     }
 
