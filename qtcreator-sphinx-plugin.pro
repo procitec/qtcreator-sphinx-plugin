@@ -151,6 +151,8 @@ QTC_PLUGIN_RECOMMENDS += \
 
 QT += xmlpatterns
 
+CONFIG += c++1z
+
 ###### End _dependencies.pri contents ######
 
 include($$IDE_SOURCE_TREE/src/qtcreatorplugin.pri)
