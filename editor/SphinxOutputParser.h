@@ -4,6 +4,7 @@
 
 #include <projectexplorer/customparser.h>
 
+#ifdef WITH_OUTPUT_PARSER
 namespace qtc::plugin::sphinx {
 class CustomParser : public QObject
 {
@@ -16,3 +17,4 @@ private:
     ProjectExplorer::CustomParserSettings mIssueWithoutLineNumber;
 };
 } // namespace qtc::plugin::sphinx
+#endif

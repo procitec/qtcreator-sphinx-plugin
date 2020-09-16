@@ -1,7 +1,7 @@
 {
     \"Name\" : \"Sphinx\",
-    \"Version\" : \"$$QTC_PLUGIN_REVISION\",
-    \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
+    \"Version\" : \"0.1.0\",
+    \"CompatVersion\" : \"4.13.0\",
     \"Vendor\" : \"PROCITEC GmbH \",
     \"Copyright\" : \"(C) PROCITEC GmbH \",
     \"License\" : \"GNU Lesser General Public License v2.1\",

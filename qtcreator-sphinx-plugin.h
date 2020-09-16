@@ -18,7 +18,9 @@ class PluginPrivate
 public:
     EditorFactory editorFactory;
     ReSTCheckHighLighter highlighter;
+#ifdef WITH_OUTPUT_PARSER
     CustomParser parser;
+#endif
     CodeModel codeModel;
 };
 } // namespace Internal
