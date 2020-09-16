@@ -320,7 +320,6 @@ jobs:
         body_path: ${{ github.workspace }}/RELEASENOTES.md
         draft: false
         prerelease: false
-        allowUpdates: true
 
   publish:
     if: contains(github.ref, 'tags/v')
