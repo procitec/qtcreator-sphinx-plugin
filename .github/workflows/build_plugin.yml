@@ -247,8 +247,10 @@ jobs:
         #endif()
         
         # install plugin dependencies
+        file(TO_NATIVE_PATH "$ENV{GITHUB_WORKSPACE}/install" install_dir)
+
         execute_process(
-          COMMAND ${make_program} install INSTALL_ROOT=$ENV{GITHUB_WORKSPACE}/install
+          COMMAND ${make_program} install INSTALL_ROOT=${install_dir}
           RESULT_VARIABLE result
         )
         
@@ -259,7 +261,7 @@ jobs:
         #message("install subpackages to qtcreator for tests")
 
         #execute_process(
-        #  COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="$ENV{GITHUB_WORKSPACE}/qtcreator"
+        #  COMMAND ${make_program} install_snippets install_rstcheck install_model INSTALL_ROOT="${install_dir}"
         #  RESULT_VARIABLE result
         #)
 
@@ -336,18 +338,18 @@ jobs:
     strategy:
       matrix:
         config:
-        #- {
-        #    name: "Windows Latest x64", artifact: "Windows-x64.zip",
-        #    os: windows-latest
-        #  }
+        - {
+            name: "Windows Latest x64", artifact: "Windows-x64.zip",
+            os: windows-latest
+          }
         - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-latest
           }
-        #- {
-        #    name: "macOS Latest x64", artifact: "macOS-x64.zip",
-        #    os: macos-latest
-        #  }
+        - {
+            name: "macOS Latest x64", artifact: "macOS-x64.zip",
+            os: macos-latest
+          }
     needs: release
 
     steps:
