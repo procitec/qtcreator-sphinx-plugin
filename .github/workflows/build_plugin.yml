@@ -320,15 +320,7 @@ jobs:
         body_path: ${{ github.workspace }}/RELEASENOTES.md
         draft: false
         prerelease: false
-
-    - name: Store Release url
-      run: |
-        echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
-
-    - uses: actions/upload-artifact@v2
-      with:
-        path: ./upload_url
-        name: upload_url
+        allowUpdates: true
 
   publish:
     if: contains(github.ref, 'tags/v')
@@ -338,18 +330,18 @@ jobs:
     strategy:
       matrix:
         config:
-#        - {
-#            name: "Windows Latest x64", artifact: "Windows-x64.zip",
-#            os: windows-latest
-#          }
+        - {
+            name: "Windows Latest x64", artifact: "Windows-x64.zip",
+            os: windows-latest
+          }
         - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-latest
           }
- #       - {
- #           name: "macOS Latest x64", artifact: "macOS-x64.zip",
- #           os: macos-latest
- #         }
+        - {
+            name: "macOS Latest x64", artifact: "macOS-x64.zip",
+            os: macos-latest
+          }
     needs: release
 
     steps:
@@ -359,23 +351,13 @@ jobs:
         name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         path: ./
 
-    - name: Download URL
-      uses: actions/download-artifact@v1
-      with:
-        name: upload_url
-        path: ./
-    - id: set_upload_url
-      run: |
-        upload_url=`cat ./upload_url`
-        echo ::set-output name=upload_url::$upload_url
-
     - name: Upload to Release
       id: upload_to_release
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         asset_path: ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_content_type: application/zip
