@@ -253,11 +253,15 @@ jobs:
           COMMAND ${make_program} install INSTALL_ROOT=${install_dir}
           RESULT_VARIABLE result
         )
-        
+
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status of ${make_program} install")
         endif()
-        
+
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E copy RELEASEINFO.md "$ENV{GITHUB_WORKSPACE}/install/qtc-sphinx-plugin-releaseinfo.md"
+        )
+
         #message("install subpackages to qtcreator for tests")
 
         #execute_process(
@@ -297,7 +301,6 @@ jobs:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         path: |
             ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
-            ./RELEASEINFO.md
 
   release:
     if: contains(github.ref, 'tags/v')
