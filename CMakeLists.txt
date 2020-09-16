@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(qtcreator-plugin-sphinx VERSION "0.2.0")
+project(qtcreator-plugin-sphinx VERSION "0.2.1")
 
 set( IDE_SOURCE_TREE $ENV{QTC_SOURCE} CACHE PATH "QTC Source Tree" )
 set( IDE_BUILD_TREE  $ENV{QTC_BUILD} CACHE PATH "QTC Build Tree" )
@@ -54,7 +54,7 @@ if (WITH_TESTS)
   set(IMPLICIT_DEPENDS Qt5::Test)
 endif()
 
-add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer DEPENDS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::XmlPatterns)
+add_qtc_plugin( Sphinx VERSION ${PROJECT_VERSION} PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer DEPENDS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::XmlPatterns)
 
 qt5_add_resources( QRCS ${CMAKE_CURRENT_LIST_DIR}/qtcreator-sphinx-plugin.qrc )
 
