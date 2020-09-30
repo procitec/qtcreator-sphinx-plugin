@@ -3,7 +3,6 @@
 #include "SphinxCodeModel.h"
 #include "SphinxRegularExpressions.h"
 
-#include <coreplugin/id.h>
 #include <texteditor/codeassist/assistinterface.h>
 #include <texteditor/codeassist/assistproposalitem.h>
 #include <texteditor/codeassist/genericproposal.h>

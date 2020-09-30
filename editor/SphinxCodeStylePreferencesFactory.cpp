@@ -2,9 +2,9 @@
 #include "../qtcreator-sphinx-pluginconstants.h"
 #include "SphinxIndenter.h"
 
-#include <coreplugin/id.h>
 #include <texteditor/simplecodestylepreferences.h>
 #include <texteditor/snippets/snippetprovider.h>
+#include <utils/id.h>
 
 #include <extensionsystem/pluginmanager.h>
 
@@ -12,7 +12,7 @@
 
 namespace qtc::plugin::sphinx {
 
-Core::Id CodeStylePreferencesFactory::languageId()
+Utils::Id CodeStylePreferencesFactory::languageId()
 {
     return Constants::SettingsGeneralId;
 }
