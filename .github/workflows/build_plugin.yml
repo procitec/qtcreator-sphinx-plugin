@@ -1,9 +1,13 @@
 name: Build Sphinx Plugin
 
-on: [push]
+# Trigger the workflow on push or pull request,
+# but only for the main branch
+push:
+    branches:
+        - master
 
 env:
-  QT_VERSION: 5.15.0
+  QT_VERSION: 5.15.1
   QT_CREATOR_VERSION: 4.14.0
   QT_CREATOR_VERSION_HINT: -beta1
   QT_CREATOR_SNAPSHOT: latest
@@ -298,6 +302,11 @@ jobs:
           message(FATAL_ERROR "Bad exit status of ninja install")
         endif()
 
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E copy "$ENV{GITHUB_WORKSPACE}/build/RELEASEINFO.md" "$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md"
+        )
+
+
         #message("start run qtcreator with plugin test")
         
         #execute_process(
@@ -326,12 +335,13 @@ jobs:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         path: |
             ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
-            ./RELEASEINFO.md
 
   release:
     if: contains(github.ref, 'tags/v')
     runs-on: ubuntu-latest
     needs: build
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
     - uses: actions/checkout@v2
@@ -339,8 +349,6 @@ jobs:
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
-
-
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -350,15 +358,6 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Store Release url
-      run: |
-        echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
-
-    - uses: actions/upload-artifact@v2
-      with:
-        path: ./upload_url
-        name: upload_url
-
   publish:
     if: contains(github.ref, 'tags/v')
 
@@ -367,18 +366,18 @@ jobs:
     strategy:
       matrix:
         config:
-        #- {
-        #    name: "Windows Latest x64", artifact: "Windows-x64.zip",
-        #    os: windows-latest
-        #  }
+        - {
+            name: "Windows Latest x64", artifact: "Windows-x64.zip",
+            os: windows-latest
+          }
         - {
             name: "Linux Latest x64", artifact: "Linux-x64.zip",
             os: ubuntu-latest
           }
-        #- {
-        #    name: "macOS Latest x64", artifact: "macOS-x64.zip",
-        #    os: macos-latest
-        #  }
+        - {
+            name: "macOS Latest x64", artifact: "macOS-x64.zip",
+            os: macos-latest
+          }
     needs: release
 
     steps:
@@ -388,23 +387,13 @@ jobs:
         name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         path: ./
 
-    - name: Download URL
-      uses: actions/download-artifact@v1
-      with:
-        name: upload_url
-        path: ./
-    - id: set_upload_url
-      run: |
-        upload_url=`cat ./upload_url`
-        echo ::set-output name=upload_url::$upload_url
-
     - name: Upload to Release
       id: upload_to_release
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
+        upload_url: ${{ needs.release.outputs.upload_url }}
         asset_path: ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_content_type: application/zip
