@@ -2,6 +2,8 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QWidget>
 
+#include <qlitehtmlwidget.h>
+
 namespace qtc::plugin::sphinx {
 
 class PreviewPage : public QWidget
@@ -19,9 +21,12 @@ public Q_SLOTS:
 protected Q_SLOTS:
     void onChangedHtml(const QString &);
 
-protected:
+private:
+    void setSourceInternal(const QUrl &url);
+
+private:
     //QWebEngineView *mView;
-    QWidget *mView = nullptr;
+    QLiteHtmlWidget *mView = nullptr;
     QLineEdit *mHtml = nullptr;
 };
 
