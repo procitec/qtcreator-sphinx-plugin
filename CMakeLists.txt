@@ -49,11 +49,6 @@ find_dependency(Qt5
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-if (WITH_TESTS)
-  set(QT_TEST_COMPONENT Test)
-  set(IMPLICIT_DEPENDS Qt5::Test)
-endif()
-
 add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer DEPENDS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::XmlPatterns QtCreator::qlitehtml
     SOURCES
     editor/SphinxCodeModel.cpp
@@ -109,6 +104,7 @@ extend_qtc_plugin(Sphinx
       tests/tst_completion.cpp
       tests/tst_formatter.h
       tests/tst_completion.h
+  DEPENDS Qt5::Test
 )
 
 

@@ -325,18 +325,24 @@ jobs:
           COMMAND ${CMAKE_COMMAND} -E copy "$ENV{GITHUB_WORKSPACE}/RELEASEINFO.md" "$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md"
         )
 
-        #message("start run qtcreator with plugin test")
+        message("start run qtcreator with plugin test")
+
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E env "DESTDIR=${qtcreator_dir}" ninja install
+          RESULT_VARIABLE result
+          WORKING_DIRECTORY build
+        )
+
+        execute_process(
+          COMMAND ${qtcreator_dir}/bin/qtcreator -test Sphinx
+          RESULT_VARIABLE result
+          OUTPUT_VARIABLE out_var
+          ERROR_VARIABLE out_var
+        )
         
-        #execute_process(
-        #  COMMAND $ENV{GITHUB_WORKSPACE}/qtcreator/bin/qtcreator -test Sphinx
-        #  RESULT_VARIABLE result
-        #  OUTPUT_VARIABLE out_var
-        #  ERROR_VARIABLE out_var
-        #)
-        
-        #if (NOT result EQUAL 0)
-        #  message(FATAL_ERROR "${out_var}\ntest for plugin failed")
-        #endif()
+        if (NOT result EQUAL 0)
+          message(WARNING "${out_var}\n\ntest for plugin failed\n")
+        endif()
         
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
         
