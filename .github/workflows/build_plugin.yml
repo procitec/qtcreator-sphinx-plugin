@@ -321,6 +321,10 @@ jobs:
           message(FATAL_ERROR "Bad exit status of ninja install")
         endif()
 
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E copy "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/RELEASEINFO.md>" "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md>"
+        )
+
         #message("start run qtcreator with plugin test")
         
         #execute_process(

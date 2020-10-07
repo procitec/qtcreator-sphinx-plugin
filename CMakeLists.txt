@@ -122,8 +122,3 @@ endif()
 
 INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" PATTERN "__pycache__" EXCLUDE  )
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "share/qtcreator/snippets" )
-
-if( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/RELEASEINFO.md")
-    INSTALL( FILES "${CMAKE_CURRENT_BINARY_DIR}/RELEASEINFO.md" RENAME "qtc-sphinx-plugin-dependencies.md" DESTINATION "/")
-endif()
-
