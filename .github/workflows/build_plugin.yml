@@ -214,21 +214,21 @@ jobs:
     - name: Configure
       shell: cmake -P {0}
       run: |
-        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
-          execute_process(
-            COMMAND "${{ matrix.config.environment_script }}" && set
-            OUTPUT_FILE environment_script_output.txt
-          )
-          file(STRINGS environment_script_output.txt output_lines)
-          foreach(line IN LISTS output_lines)
-            if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
-              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
-
-              # Set for other steps
-              message("::set-env name=${CMAKE_MATCH_1}::${CMAKE_MATCH_2}")
-            endif()
-          endforeach()
-        endif()
+        #if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+        #  execute_process(
+        #    COMMAND "${{ matrix.config.environment_script }}" && set
+        #    OUTPUT_FILE environment_script_output.txt
+        #  )
+        #  file(STRINGS environment_script_output.txt output_lines)
+        #  foreach(line IN LISTS output_lines)
+        #    if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+        #      set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+        #
+        #      # Set for other steps
+        #      message("${CMAKE_MATCH_1}=${CMAKE_MATCH_2} >> \$GITHUB_ENV")
+        #    endif()
+        #  endforeach()
+        #endif()
 
         set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
 
