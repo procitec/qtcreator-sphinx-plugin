@@ -1,10 +1,17 @@
 name: Build Sphinx Plugin
 
-on: [push]
+# Trigger the workflow on push or pull request,
+# but only for the main branch
+on:
+    workflow_dispatch:
+    
+    push:
+        branches:
+            - qtc_4_13_2
 
 env:
   QT_VERSION: 5.15.0
-  QT_CREATOR_VERSION: 4.13.0
+  QT_CREATOR_VERSION: 4.13.2
   QT_CREATOR_VERSION_HINT: 
   QT_CREATOR_SNAPSHOT:
   PLUGIN_PRO: qtcreator-sphinx-plugin.pro
@@ -32,7 +39,7 @@ jobs:
           }
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Installing system libs
       shell: cmake -P {0}
@@ -170,20 +177,20 @@ jobs:
     - name: Configure
       shell: cmake -P {0}
       run: |
-        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
-          execute_process(
-            COMMAND "${{ matrix.config.environment_script }}" && set
-            OUTPUT_FILE environment_script_output.txt
-          )
-          file(STRINGS environment_script_output.txt output_lines)
-          foreach(line IN LISTS output_lines)
-            if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
-              set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+        set(ENV{CC} ${{ matrix.config.cc }})
+        set(ENV{CXX} ${{ matrix.config.cxx }})
 
-              # Set for other steps
-              message("::set-env name=${CMAKE_MATCH_1}::${CMAKE_MATCH_2}")
-            endif()
-          endforeach()
+        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+            execute_process(
+              COMMAND "${{ matrix.config.environment_script }}" && set
+              OUTPUT_FILE environment_script_output.txt
+            )
+            file(STRINGS environment_script_output.txt output_lines)
+            foreach(line IN LISTS output_lines)
+              if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+                set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              endif()
+            endforeach()
         endif()
 
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/qtcreator" qtcreator_dir)
@@ -310,7 +317,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Create Release
       id: create_release
