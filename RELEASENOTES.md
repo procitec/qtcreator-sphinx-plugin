@@ -1,3 +1,7 @@
+## v0.2.2
+
+* Build against QtCreator 4.13.2
+
 ## v0.2.1
 
 ### Features
