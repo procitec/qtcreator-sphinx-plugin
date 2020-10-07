@@ -2,9 +2,10 @@ name: Build Sphinx Plugin
 
 # Trigger the workflow on push or pull request,
 # but only for the main branch
-push:
-    branches:
-        - master
+on:
+    push:
+        branches:
+            - master
 
 env:
   QT_VERSION: 5.15.1
