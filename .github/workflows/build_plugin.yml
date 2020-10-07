@@ -245,7 +245,7 @@ jobs:
         set( qtc_version ${{ steps.qt_creator.outputs.qtc_version }} )
         set( qtc_url ${{ steps.qt_creator.outputs.qtc_base_url }} )
 
-        configure_file( RELEASEINFO.md.in RELEASEINFO.md @ONLY )
+        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
         execute_process( COMMAND cmake -E make_directory "build" )
 
@@ -322,7 +322,7 @@ jobs:
         endif()
 
         execute_process(
-          COMMAND ${CMAKE_COMMAND} -E copy "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/RELEASEINFO.md>" "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md>"
+          COMMAND ${CMAKE_COMMAND} -E copy "$ENV{GITHUB_WORKSPACE}/RELEASEINFO.md" "$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md"
         )
 
         #message("start run qtcreator with plugin test")
