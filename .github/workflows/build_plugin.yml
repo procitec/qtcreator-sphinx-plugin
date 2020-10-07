@@ -3,6 +3,8 @@ name: Build Sphinx Plugin
 # Trigger the workflow on push or pull request,
 # but only for the main branch
 on:
+    workflow_dispatch:
+    
     push:
         branches:
             - master
