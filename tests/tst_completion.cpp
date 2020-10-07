@@ -12,7 +12,9 @@
 #include <QtGui/QTextDocumentFragment>
 #include <QtTest/QtTest>
 
-// add necessary includes here
+constexpr int COMPLETION_TIMEOUT = 150;
+constexpr int KEYPRESS_TIMEOUT = 20;
+
 TestCompletion::TestCompletion() {}
 
 TestCompletion::~TestCompletion() {}
@@ -86,9 +88,9 @@ void TestCompletion::testSimpleDirective()
     QVERIFY(mEditor->autoCompleter());
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
-    QTest::qWait(20);
+    QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-    QTest::qWait(20);
+    QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
 }
@@ -121,9 +123,9 @@ void TestCompletion::testSimpleDirectiveOption()
     QVERIFY(mEditor->autoCompleter());
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
-    QTest::qWait(20);
+    QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-    QTest::qWait(20);
+    QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
 }
@@ -150,10 +152,10 @@ void TestCompletion::testSimpleRole()
     QVERIFY(mEditor->autoCompleter());
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
-    QTest::qWait(20);
+    QTest::qWait(COMPLETION_TIMEOUT);
     if (shouldComplete) {
         QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-        QTest::qWait(20);
+        QTest::qWait(KEYPRESS_TIMEOUT);
     }
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
@@ -189,9 +191,9 @@ void TestCompletion::testSimpleSnippetDirective()
     QVERIFY(mEditor->autoCompleter());
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
-    QTest::qWait(20);
+    QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-    QTest::qWait(20);
+    QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
 }
@@ -206,9 +208,9 @@ void TestCompletion::testSimpleSnippetRole()
     QVERIFY(mEditor->autoCompleter());
     auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
-    QTest::qWait(20);
+    QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
-    QTest::qWait(20);
+    QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
 }

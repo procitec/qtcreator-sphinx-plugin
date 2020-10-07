@@ -116,5 +116,17 @@ if( NOT EXISTS "${IDE_SOURCE_TREE}/include/src/libs/3rdparty/syntax-highlighting
     )
 endif()
 
+enable_testing()
+
+
+add_test (NAME test_plugin_install
+          COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${IDE_BUILD_TREE} -P ${CMAKE_BINARY_DIR}/cmake_install.cmake
+)
+
+add_test( NAME test_plugin COMMAND ${IDE_BUILD_TREE}/bin/qtcreator -test Sphinx )
+
+set_tests_properties( "test_plugin" PROPERTIES FIXTURES_REQUIRED test_plugin_install )
+
+
 INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" PATTERN "__pycache__" EXCLUDE  )
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "share/qtcreator/snippets" )
