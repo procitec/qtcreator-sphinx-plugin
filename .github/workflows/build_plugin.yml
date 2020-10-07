@@ -223,9 +223,8 @@ jobs:
             foreach(line IN LISTS output_lines)
                 if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
                     set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
-                    message("setting environment for ${CMAKE_MATCH_1} to ${CMAKE_MATCH_2}")
                     # Set for other steps
-                    message("${CMAKE_MATCH_1}=${CMAKE_MATCH_2} >> \$GITHUB_ENV")
+                    message("echo ${CMAKE_MATCH_1}=${CMAKE_MATCH_2} >> \$GITHUB_ENV")
                 endif()
             endforeach()
         endif()
