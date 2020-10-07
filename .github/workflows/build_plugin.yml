@@ -303,7 +303,7 @@ jobs:
         endif()
 
         execute_process(
-          COMMAND ${CMAKE_COMMAND} -E copy "$ENV{GITHUB_WORKSPACE}/build/RELEASEINFO.md" "$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md"
+          COMMAND ${CMAKE_COMMAND} -E copy "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/RELEASEINFO.md>" "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md>"
         )
 
 
