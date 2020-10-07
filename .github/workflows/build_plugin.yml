@@ -214,6 +214,22 @@ jobs:
     - name: Configure
       shell: cmake -P {0}
       run: |
+        set(ENV{CC} ${{ matrix.config.cc }})
+        set(ENV{CXX} ${{ matrix.config.cxx }})
+
+        if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
+            execute_process(
+              COMMAND "${{ matrix.config.environment_script }}" && set
+              OUTPUT_FILE environment_script_output.txt
+            )
+            file(STRINGS environment_script_output.txt output_lines)
+            foreach(line IN LISTS output_lines)
+              if (line MATCHES "^([a-zA-Z0-9_-]+)=(.*)$")
+                set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+              endif()
+            endforeach()
+        endif()
+
         set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
 
         set(path_separator ":")
@@ -252,6 +268,9 @@ jobs:
     - name: Build
       shell: cmake -P {0}
       run: |
+        set(ENV{CC} ${{ matrix.config.cc }})
+        set(ENV{CXX} ${{ matrix.config.cxx }})
+
         if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
           execute_process(
             COMMAND "${{ matrix.config.environment_script }}" && set
@@ -263,8 +282,8 @@ jobs:
               set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
             endif()
           endforeach()
-        endif()      
-      
+        endif()
+
         set(path_separator ":")
         if ("${{ runner.os }}" STREQUAL "Windows")
             set(path_separator ";")
@@ -301,11 +320,6 @@ jobs:
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status of ninja install")
         endif()
-
-        execute_process(
-          COMMAND ${CMAKE_COMMAND} -E copy "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/RELEASEINFO.md>" "$<SHELL_PATH:$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md>"
-        )
-
 
         #message("start run qtcreator with plugin test")
         
