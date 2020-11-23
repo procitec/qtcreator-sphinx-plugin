@@ -3,7 +3,7 @@
 #include "SphinxDocument.h"
 #include "SphinxFormatActions.h"
 #include "SphinxFormatter.h"
-#include "SphinxPreviewPage.h"
+#include "SphinxRightPaneWidget.h"
 #include <texteditor/tabsettings.h>
 #include <texteditor/textdocument.h>
 #include <texteditor/texteditor.h>
@@ -72,7 +72,8 @@ protected:
 private Q_SLOTS:
     void onCustomContextMenu(const QPoint &pos);
     void onUrlAction();
-    void onPreviewAction();
+    void onToggleRightPane();
+    void onLivePreviewHtmlChanged(const QString &);
 
 private:
     void addToolBar();
@@ -85,7 +86,9 @@ private:
     void handleTabKeyInsert();
     void scheduleRstCheckUpdate();
     void updateRstCheck();
-    void updatePreview(bool show);
+    void scheduleLivePreview();
+    void onShowPreview(bool show);
+    void updateLivePreview();
 
     int mAutoIndent = 0;
     bool mInsertSpaceForTab = true;
@@ -114,10 +117,14 @@ private:
     bool mReSTCheckUpdatePending = false;
     bool mUseReSTCheckHighlighter = false;
 
+    QTimer mLivePreviewTimer;
+    bool mLivePreviewPending = false;
+    bool mUseLivePreview = false;
+
     QString mRealFileName;
-    PreviewPage *mPreview = nullptr;
+    RightPaneWidget *mRightPane = nullptr;
 
     QAction *mUrlAction = nullptr;
-    QAction *mPreviewAction = nullptr;
+    QAction *mShowRightPaneAction = nullptr;
 };
 } // namespace qtc::plugin::sphinx

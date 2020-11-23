@@ -30,38 +30,25 @@ OptionsWidget::OptionsWidget(const Settings *settings)
 
     layout->addWidget(customHighLighter);
 
-    auto *reSTCheckHighlighter = new QGroupBox(tr("rstcheck Highlighter"));
-    auto *reSTLayout = new QVBoxLayout(reSTCheckHighlighter);
+    auto *reSTToolsGroup = new QGroupBox(tr("ReST Tools"));
+    auto *reSTLayout = new QVBoxLayout(reSTToolsGroup);
     auto *reSTFirstRow = new QHBoxLayout();
     reSTLayout->addLayout(reSTFirstRow);
     auto *reSTSecondRow = new QHBoxLayout();
     reSTLayout->addLayout(reSTSecondRow);
-
-    mUseReSTCheckHighlighter.setChecked(settings->useReSTCheckHighlighter());
-    reSTFirstRow->addWidget(&mUseReSTCheckHighlighter);
-    //    reSTLayout->addWidget(&mUseReSTCheckHighlighter, 0, 0);
-
-    auto *reSTCheckLabel = new QLabel(
-        tr("Enable rstcheck (<a href=\"https://github.com/myint/rstcheck\">rstcheck "
-           "Homepage</a>)"));
-    reSTCheckLabel->setTextFormat(Qt::RichText);
-    reSTCheckLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    reSTCheckLabel->setOpenExternalLinks(true);
-
-    reSTFirstRow->addWidget(reSTCheckLabel);
-
-    reSTFirstRow->addSpacerItem(new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+    auto *reSTThirdRow = new QHBoxLayout();
+    reSTLayout->addLayout(reSTThirdRow);
 
     auto *reSTCheckFilePathLabel = new QLabel(tr("python3 command"));
-    reSTSecondRow->addWidget(reSTCheckFilePathLabel);
+    reSTFirstRow->addWidget(reSTCheckFilePathLabel);
 
     mReSTCheckFilePath.setText(settings->pythonFilePath());
 
-    reSTSecondRow->addWidget(&mReSTCheckFilePath);
+    reSTFirstRow->addWidget(&mReSTCheckFilePath);
 
     auto *reSTCheckFilePathBrowse = new QPushButton(QIcon::fromTheme("document-open"), QString());
     reSTCheckFilePathBrowse->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    reSTSecondRow->addWidget(reSTCheckFilePathBrowse);
+    reSTFirstRow->addWidget(reSTCheckFilePathBrowse);
 
     connect(reSTCheckFilePathBrowse, &QAbstractButton::pressed, this, [=]() {
         auto fileName = QFileDialog::getOpenFileName(this, tr("python3 executable"), "");
@@ -74,9 +61,35 @@ OptionsWidget::OptionsWidget(const Settings *settings)
                 QString("invalid python3 executable %1").arg(file.absoluteFilePath()));
         }
     });
+    reSTFirstRow->addSpacerItem(new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+    mUseReSTCheckHighlighter.setChecked(settings->useReSTCheckHighlighter());
+    reSTSecondRow->addWidget(&mUseReSTCheckHighlighter);
+    //    reSTLayout->addWidget(&mUseReSTCheckHighlighter, 0, 0);
+
+    auto *reSTCheckLabel = new QLabel(
+        tr("Enable rstcheck (<a href=\"https://github.com/myint/rstcheck\">rstcheck "
+           "Homepage</a>)"));
+    reSTCheckLabel->setTextFormat(Qt::RichText);
+    reSTCheckLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    reSTCheckLabel->setOpenExternalLinks(true);
+
+    reSTSecondRow->addWidget(reSTCheckLabel);
     reSTSecondRow->addSpacerItem(new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 
-    layout->addWidget(reSTCheckHighlighter);
+    mUseRST2HTML.setChecked(settings->useRST2HTML());
+    reSTThirdRow->addWidget(&mUseRST2HTML);
+    auto *rst2htmlLabel = new QLabel(
+        tr("Enable rst2html (<a href=\"https://pypi.org/project/rst2html5/\">rst2html5 "
+           "Homepage</a>)"));
+    rst2htmlLabel->setTextFormat(Qt::RichText);
+    rst2htmlLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    rst2htmlLabel->setOpenExternalLinks(true);
+
+    reSTThirdRow->addWidget(rst2htmlLabel);
+    reSTThirdRow->addSpacerItem(new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+    layout->addWidget(reSTToolsGroup);
 
     layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
@@ -94,6 +107,7 @@ Settings OptionsWidget::settings() const
     }
 
     settings.setUseReSTCheckHighlighter(mUseReSTCheckHighlighter.isChecked());
+    settings.setUseRST2HTML(mUseRST2HTML.isChecked());
 
     return settings;
 }

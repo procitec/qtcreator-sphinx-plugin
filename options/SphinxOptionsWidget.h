@@ -18,5 +18,6 @@ private:
     QCheckBox mUseCustomHighlighter;
     QCheckBox mUseReSTCheckHighlighter;
     QLineEdit mReSTCheckFilePath;
+    QCheckBox mUseRST2HTML;
 };
 } // namespace qtc::plugin::sphinx

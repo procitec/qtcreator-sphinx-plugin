@@ -4,6 +4,7 @@
 #include "editor/SphinxEditorFactory.h"
 #include "editor/SphinxFormatActions.h"
 #include "editor/SphinxOutputParser.h"
+#include "editor/SphinxRest2Html.h"
 #include "editor/SphinxRstcheckHighlighter.h"
 #include "options/SphinxOptionsPage.h"
 #include "options/SphinxSettings.h"
@@ -18,6 +19,7 @@ class PluginPrivate
 public:
     EditorFactory editorFactory;
     ReSTCheckHighLighter highlighter;
+    ReST2Html livePreview;
     CustomParser parser;
     CodeModel codeModel;
 };

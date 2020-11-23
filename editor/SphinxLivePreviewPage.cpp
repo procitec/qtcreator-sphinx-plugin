@@ -1,12 +1,10 @@
-#include "SphinxPreviewPage.h"
+#include "SphinxLivePreviewPage.h"
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
 #include <QtWidgets/QFileDialog>
-
-#include <projectexplorer/buildmanager.h>
 
 namespace qtc::plugin::sphinx {
 
@@ -34,31 +32,10 @@ static QByteArray getData(const QUrl &url)
     return data;
 }
 
-PreviewPage::PreviewPage(QWidget *parent)
+LivePreviewPage::LivePreviewPage(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
-    auto *customFirstRow = new QHBoxLayout();
-
-    auto *label = new QLabel(tr("Preview Url:"));
-    customFirstRow->addWidget(label);
-    mHtml = new QLineEdit();
-    mHtml->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
-
-    connect(mHtml, &QLineEdit::editingFinished, this, [=]() { onChangedHtml(mHtml->text()); });
-    customFirstRow->addWidget(mHtml);
-
-    auto *htmlFilePathBrowse = new QPushButton(QIcon::fromTheme("document-open"), QString());
-    htmlFilePathBrowse->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    customFirstRow->addWidget(htmlFilePathBrowse);
-
-    connect(htmlFilePathBrowse, &QAbstractButton::pressed, this, &PreviewPage::onOpenUrl);
-
-    //    customFirstRow->addSpacerItem(
-    //        new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
-
-    layout->addLayout(customFirstRow);
-
     mView = new QLiteHtmlWidget(this);
 
     mView->show();
@@ -74,17 +51,11 @@ PreviewPage::PreviewPage(QWidget *parent)
     mView->setPalette(p);
     mView->setResourceHandler([](const QUrl &url) { return getData(url); });
     setLayout(layout);
-
-    ProjectExplorer::BuildManager *buildManager = ProjectExplorer::BuildManager::instance();
-    connect(buildManager,
-            &ProjectExplorer::BuildManager::buildQueueFinished,
-            this,
-            &PreviewPage::onBuildQueueFinished);
 }
 
-PreviewPage::~PreviewPage() {}
+LivePreviewPage::~LivePreviewPage() {}
 
-void PreviewPage::onChangedHtml(const QString &html)
+void LivePreviewPage::onChangedHtml(const QString &html)
 {
     if (!html.isEmpty()) {
         auto url = QUrl(html);
@@ -96,22 +67,7 @@ void PreviewPage::onChangedHtml(const QString &html)
     }
 }
 
-void PreviewPage::updateView()
-{
-    if (url().isEmpty()) {
-        onOpenUrl();
-    } else {
-        setSourceInternal(url());
-        mView->update();
-    }
-}
-
-void PreviewPage::onBuildQueueFinished()
-{
-    mView->update();
-}
-
-void PreviewPage::setSourceInternal(const QUrl &url)
+void LivePreviewPage::setSourceInternal(const QUrl &url)
 {
     QUrl currentUrlWithoutFragment = mView->url();
     currentUrlWithoutFragment.setFragment({});
@@ -124,7 +80,17 @@ void PreviewPage::setSourceInternal(const QUrl &url)
     mView->setZoomFactor(1.1);
 }
 
-void PreviewPage::onOpenUrl()
+void LivePreviewPage::setHtml(const QString &html)
+{
+    mView->setHtml(html);
+}
+
+void LivePreviewPage::updateView()
+{
+    mView->update();
+}
+
+void LivePreviewPage::onOpenUrl()
 {
     {
         auto fileName = QFileDialog::getOpenFileName(this,
@@ -133,24 +99,15 @@ void PreviewPage::onOpenUrl()
                                                      tr("HTML (*.html *.htm)"));
         QFileInfo file(fileName);
         if (file.exists() && file.isReadable()) {
-            mHtml->setText(file.absoluteFilePath());
             onChangedHtml(file.absoluteFilePath());
 
         } else {
-            mHtml->clear();
-            mHtml->setToolTip(QString("invalid html file %1").arg(file.absoluteFilePath()));
         }
     }
 }
 
-QString PreviewPage::url() const
+void LivePreviewPage::setUrl(const QUrl &url)
 {
-    return mHtml->text();
-}
-
-void PreviewPage::setUrl(const QUrl &url)
-{
-    mHtml->setText(url.toString());
     setSourceInternal(url);
 }
 

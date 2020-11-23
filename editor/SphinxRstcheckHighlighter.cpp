@@ -1,6 +1,6 @@
 #include "SphinxRstcheckHighlighter.h"
 #include "../options/SphinxSettings.h"
-#include "Constants.h"
+#include "../qtcreator-sphinx-pluginconstants.h"
 
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
@@ -19,7 +19,7 @@ Q_LOGGING_CATEGORY(log, "qtc.sphinx.rstcheck");
 
 namespace qtc::plugin::sphinx {
 
-static ReSTCheckHighLighter *theInstance = nullptr;
+static ReSTCheckHighLighter *theReSTCheckHighlighterInstance = nullptr;
 
 class ReSTCheckFucture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
 {
@@ -58,7 +58,7 @@ public:
 
 ReSTCheckHighLighter::ReSTCheckHighLighter()
 {
-    theInstance = this;
+    theReSTCheckHighlighterInstance = this;
     QTextCharFormat format;
     format.setUnderlineColor(Qt::darkGreen);
     format.setUnderlineStyle(QTextCharFormat::WaveUnderline);
@@ -95,7 +95,7 @@ ReSTCheckHighLighter::~ReSTCheckHighLighter()
 
 ReSTCheckHighLighter *ReSTCheckHighLighter::instance()
 {
-    return theInstance;
+    return theReSTCheckHighlighterInstance;
 }
 
 // return false if we are busy, true if everything is ok (or rstcheck wasn't found)
@@ -235,9 +235,8 @@ Offenses ReSTCheckHighLighter::processReSTCheckOutput()
     return result;
 }
 
-qtc::plugin::sphinx::Range ReSTCheckHighLighter::lineColumnLengthToRange(int line,
-                                                                               int column,
-                                                                               int length)
+qtc::plugin::sphinx::ReSTCheckHighLighter::Range ReSTCheckHighLighter::lineColumnLengthToRange(
+    int line, int column, int length)
 {
     const QTextBlock block = mDocument->document()->findBlockByLineNumber(line - 1);
     const int pos = block.position() + column;

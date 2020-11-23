@@ -1,5 +1,5 @@
 #include "SphinxOutputParser.h"
-#include "Constants.h"
+#include "../qtcreator-sphinx-pluginconstants.h"
 #include <projectexplorer/customparser.h>
 #include <projectexplorer/projectexplorer.h>
 

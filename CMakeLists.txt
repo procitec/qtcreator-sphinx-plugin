@@ -56,6 +56,8 @@ add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator:
     qtcreator-sphinx-plugin-projectsettings.cpp
     editor/SphinxOutputParser.cpp
     editor/SphinxPreviewPage.cpp
+    editor/SphinxLivePreviewPage.cpp
+    editor/SphinxRightPaneWidget.cpp
     editor/SphinxDocument.cpp
     editor/SphinxEditor.cpp
     editor/SphinxEditorFactory.cpp
@@ -67,6 +69,7 @@ add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator:
     editor/SphinxCodeStylePreferencesFactory.cpp
     editor/SphinxCompletionAssist.cpp
     editor/SphinxRstcheckHighlighter.cpp
+    editor/SphinxRest2Html.cpp
     options/SphinxOptionsPage.cpp
     options/SphinxOptionsWidget.cpp
     options/SphinxSettings.cpp
@@ -77,6 +80,8 @@ add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator:
     qtcreator-sphinx-plugin-projectsettings.h
     editor/SphinxOutputParser.h
     editor/SphinxPreviewPage.h
+    editor/SphinxLivePreviewPage.h
+    editor/SphinxRightPaneWidget.h
     editor/SphinxDocument.h
     editor/SphinxEditor.h
     editor/SphinxEditorFactory.h
@@ -88,6 +93,7 @@ add_qtc_plugin( Sphinx VERSION "0.2.0" PLUGIN_DEPENDS QtCreator::Core QtCreator:
     editor/SphinxCodeStylePreferencesFactory.h
     editor/SphinxCompletionAssist.h
     editor/SphinxRstcheckHighlighter.h
+    editor/SphinxRest2Html.h
     editor/SphinxRegularExpressions.h
     editor/SphinxRegularExpressions.cpp
     options/SphinxOptionsPage.h

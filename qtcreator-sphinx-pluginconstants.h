@@ -15,6 +15,8 @@ const char LangSphinx[] = "SPHINX";
 
 const char MimeType[] = "text/x-rst";
 //const char ProjectMimeType[] = "text/x-sphinx-project";
+const char EditorDisplayName[] = "Sphinx Editor";
+const char CustomParserId[] = "Sphinx.CustomParser";
 
 } // namespace Constants
 } // namespace qtc::plugin::sphinx

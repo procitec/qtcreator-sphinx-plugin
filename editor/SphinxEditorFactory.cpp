@@ -1,5 +1,5 @@
 #include "SphinxEditorFactory.h"
-#include "Constants.h"
+#include "../qtcreator-sphinx-pluginconstants.h"
 #include "SphinxCompletionAssist.h"
 #include "SphinxDocument.h"
 #include "SphinxEditor.h"

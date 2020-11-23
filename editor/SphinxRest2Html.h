@@ -27,18 +27,29 @@ class TextMark;
 typedef TextEditor::HighlightingResult Offense;
 typedef QVector<TextEditor::HighlightingResult> Offenses;
 
-class ReSTCheckHighLighter : public QObject
+class ReST2Html : public QObject
 {
     Q_OBJECT
 public:
-    ReSTCheckHighLighter();
-    ~ReSTCheckHighLighter();
+    ReST2Html();
+    ~ReST2Html();
 
-    static ReSTCheckHighLighter *instance();
+    static ReST2Html *instance();
 
     bool run(TextEditor::TextDocument *document, const QString &fileNameTip);
 
+signals:
+    void htmlChanged(const QString &);
+
 private:
+    struct Diagnostic
+    {
+        int line;
+        int severity;
+        QString message;
+        std::shared_ptr<TextMark> textMark;
+    };
+
     class Range
     {
     public:
@@ -71,25 +82,20 @@ private:
         }
     };
 
-    struct Diagnostic
-    {
-        int line;
-        int severity;
-        QString message;
-        std::shared_ptr<TextMark> textMark;
-    };
-
     using Diagnostics = std::vector<Diagnostic>;
 
-    void initReSTCheckProcess();
-    void finishReSTCheckHighlight();
-    Offenses processReSTCheckOutput();
+    void initReST2HtmlProcess(const QString &);
+    void restartReST2HtmlProcess(const QString &);
+    void closeReST2HtmlProcess();
+    void finishReST2HtmlHighlight();
+    void processReST2HtmlOutput();
+    Offenses processReST2HtmlErrorOutput();
     Range lineColumnLengthToRange(int line, int column, int length);
 
-    bool mReSTCheckFound = false;
+    bool mReST2HtmlFound = false;
     bool mBusy = false;
-    QProcess *mReSTCheckProcess = nullptr;
-    QString mReSTCheckScript;
+    QProcess *mReST2HtmlProcess = nullptr;
+    QString mReST2HtmlScript;
     QTemporaryFile mTemporaryFile;
     QString mPythonFilePath;
     QString mOutputBuffer;
@@ -104,5 +110,6 @@ private:
     QElapsedTimer mTimer;
     QString mStartSeq = "%<$<!<";
     QString mEndSeq = ">!>$>%";
+    QString mOutHtml;
 };
 } // namespace qtc::plugin::sphinx

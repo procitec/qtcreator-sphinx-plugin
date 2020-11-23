@@ -5,10 +5,11 @@
 namespace qtc::plugin::sphinx {
 
 namespace SettingsIds {
-const QString CustomHighlighter = "CustomHighlighter";
-const QString ReSTCheckHighlighter = "ReSTCheckHighlighter";
-const QString PythonFilePath = "PythonFilePath";
 const QString IndentSize = "IndentSize";
+const QString CustomHighlighter = "CustomHighlighter";
+const QString PythonFilePath = "PythonFilePath";
+const QString ReSTCheckHighlighter = "ReSTCheckHighlighter";
+const QString RST2HTML = "rst2html";
 }; // namespace SettingsIds
 
 class Settings
@@ -23,11 +24,14 @@ public:
     bool useCustomHighlighter() const { return mUseCustomHighlighter; }
     void setUseCustomHighlighter(bool use) { mUseCustomHighlighter = use; }
 
+    QString pythonFilePath() const { return mPythonFilePath; }
+    void setPythonFilePath(const QString &filePath) { mPythonFilePath = filePath; }
+
     bool useReSTCheckHighlighter() const { return mUseReSTCheckHighlighter; }
     void setUseReSTCheckHighlighter(bool use) { mUseReSTCheckHighlighter = use; }
 
-    QString pythonFilePath() const { return mPythonFilePath; }
-    void setPythonFilePath(const QString &filePath) { mPythonFilePath = filePath; }
+    bool useRST2HTML() const { return mUseRST2HTML; }
+    void setUseRST2HTML(bool use) { mUseRST2HTML = use; }
 
     bool operator==(const Settings &other) const;
     bool operator!=(const Settings &other) const;
@@ -35,6 +39,8 @@ public:
 private:
     bool mUseCustomHighlighter = true;
     bool mUseReSTCheckHighlighter = false;
+    bool mUseRST2HTML = false;
+
     QString mPythonFilePath;
     int mIndentSize = 4;
 };
@@ -42,8 +48,9 @@ private:
 inline bool Settings::operator==(const Settings &rhs) const
 {
     return (mUseCustomHighlighter == rhs.mUseCustomHighlighter) && (mIndentSize == rhs.mIndentSize)
+           && (mPythonFilePath == rhs.mPythonFilePath)
            && (mUseReSTCheckHighlighter == rhs.mUseReSTCheckHighlighter)
-           && (mPythonFilePath == rhs.mPythonFilePath);
+           && (mUseRST2HTML == rhs.mUseRST2HTML);
 }
 
 inline bool Settings::operator!=(const Settings &other) const

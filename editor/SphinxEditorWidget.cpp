@@ -1,8 +1,9 @@
 #include "SphinxEditorWidget.h"
 #include "../options/SphinxSettings.h"
 #include "../qtcreator-sphinx-plugin-projectsettings.h"
-#include "Constants.h"
+#include "../qtcreator-sphinx-pluginconstants.h"
 #include "SphinxFormatActions.h"
+#include "SphinxRest2Html.h"
 #include "SphinxRstcheckHighlighter.h"
 
 #include "coreplugin/icore.h"
@@ -13,6 +14,7 @@
 namespace qtc::plugin::sphinx {
 
 const int RSTCHECK_UPDATE_INTERVAL = 300;
+const int LIVEPREVIEW_UPDATE_INTERVAL = 300;
 
 EditorWidget::EditorWidget()
     : TextEditor::TextEditorWidget()
@@ -30,12 +32,21 @@ EditorWidget::EditorWidget()
             updateRstCheck();
     });
 
+    mLivePreviewTimer.setSingleShot(true);
+    mLivePreviewTimer.setInterval(LIVEPREVIEW_UPDATE_INTERVAL);
+    connect(&mLivePreviewTimer, &QTimer::timeout, this, [this] {
+        if (mLivePreviewPending) {
+            updateLivePreview();
+        }
+    });
+
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &QWidget::customContextMenuRequested, this, &EditorWidget::onCustomContextMenu);
 }
 void EditorWidget::finalizeInitialization()
 {
     connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleRstCheckUpdate);
+    connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleLivePreview);
 }
 
 void EditorWidget::onCustomContextMenu(const QPoint &pos)
@@ -45,10 +56,10 @@ void EditorWidget::onCustomContextMenu(const QPoint &pos)
     this->appendStandardContextMenuActions(&menu);
 
     menu.addSeparator();
-
-    if (mPreview) {
-        menu.addAction(mPreviewAction);
-    } else {
+    if (mRightPane) {
+        menu.addAction(mShowRightPaneAction);
+    }
+    if (!mRightPane->preview().isEnabled()) {
         menu.addAction(mUrlAction);
     }
 
@@ -138,23 +149,35 @@ void EditorWidget::connectActions()
 
     mUrlAction = new QAction(tr("link to preview url"), this);
     connect(mUrlAction, &QAction::triggered, this, &EditorWidget::onUrlAction);
-    mPreviewAction = new QAction(tr("toogle preview"), this);
-    connect(mPreviewAction, &QAction::triggered, this, &EditorWidget::onPreviewAction);
+    mShowRightPaneAction = new QAction(tr("toggle preview"), this);
+    connect(mShowRightPaneAction, &QAction::triggered, this, &EditorWidget::onToggleRightPane);
+    connect(ReST2Html::instance(), &ReST2Html::htmlChanged, this, &EditorWidget::onLivePreviewHtmlChanged);
 }
 
 void EditorWidget::onUrlAction()
 {
-    if (!mPreview) {
-        mPreview = new PreviewPage(this);
-    }
-    updatePreview(true);
-    mPreview->onOpenUrl();
+    onShowPreview(true);
+    mRightPane->setCurrentTab(RightPaneWidget::PAGE_PV);
+    mRightPane->preview().updateView();
 }
 
-void EditorWidget::onPreviewAction()
+void EditorWidget::onToggleRightPane()
 {
-    if (mPreview) {
-        updatePreview(!mPreview->isVisible());
+    if (mRightPane) {
+        onShowPreview(!mRightPane->isVisible());
+        if (mUseLivePreview && mRightPane->isVisible()) {
+            mRightPane->setCurrentTab(RightPaneWidget::PAGE_LIVEPV);
+            mRightPane->livePreview().updateView();
+        }
+    }
+}
+
+void EditorWidget::onLivePreviewHtmlChanged(const QString &html)
+{
+    if (!html.isEmpty() && mRightPane->isVisible()) {
+        onShowPreview(true);
+        mRightPane->setCurrentTab(RightPaneWidget::PAGE_LIVEPV);
+        mRightPane->livePreview().setHtml(html);
     }
 }
 
@@ -170,8 +193,18 @@ void EditorWidget::readSettings()
 {
     QSettings *s = Core::ICore::settings();
     s->beginGroup(Constants::SettingsGeneralId);
-    mUseReSTCheckHighlighter = s->value(SettingsIds::ReSTCheckHighlighter, QVariant(true)).toBool();
+    mUseReSTCheckHighlighter = s->value(SettingsIds::ReSTCheckHighlighter,
+                                        QVariant(mUseReSTCheckHighlighter))
+                                   .toBool();
+    mUseLivePreview = s->value(SettingsIds::RST2HTML, QVariant(mUseLivePreview)).toBool();
     s->endGroup();
+
+    if (mUseLivePreview) {
+        if (!mRightPane) {
+            mRightPane = new RightPaneWidget(this);
+        }
+        mRightPane->livePreview().setEnabled(true);
+    }
 
     mParts = "#";
     mPartsOverline = true;
@@ -200,11 +233,12 @@ void EditorWidget::readFileSettings()
             auto filePath = Utils::FilePath::fromString(mRealFileName);
             if (filePath == iter.key()) {
                 if (!iter.value().isEmpty()) {
-                    if (!mPreview) {
-                        mPreview = new PreviewPage(this);
+                    if (!mRightPane) {
+                        mRightPane = new RightPaneWidget(this);
                     }
-                    updatePreview(true);
-                    mPreview->setUrl(iter.value());
+                    onShowPreview(true);
+                    mRightPane->preview().setEnabled(true);
+                    mRightPane->preview().setUrl(iter.value());
                 }
             }
         }
@@ -213,14 +247,14 @@ void EditorWidget::readFileSettings()
 
 void EditorWidget::saveFileSettings()
 {
-    if (mPreview) {
+    if (mRightPane) {
         auto *project = ProjectExplorer::SessionManager::projectForFile(textDocument()->filePath());
         if (!project) {
             project = ProjectExplorer::SessionManager::startupProject();
         }
         if (project) {
             const auto projectSettings = Internal::ProjectSettings::getSettings(project);
-            auto url = mPreview->url();
+            auto url = mRightPane->preview().url();
             auto filePath = textDocument()->filePath();
             if (!url.isEmpty() && filePath.exists()) {
                 projectSettings->addLinkedPreview(Internal::LinkedPreview(filePath, url));
@@ -388,27 +422,46 @@ void EditorWidget::updateRstCheck()
     }
 }
 
+void EditorWidget::scheduleLivePreview()
+{
+    mLivePreviewPending = mLivePreviewTimer.isActive();
+    if (mLivePreviewPending)
+        return;
+
+    mLivePreviewPending = false;
+    updateLivePreview();
+    mLivePreviewTimer.start();
+}
+
+void EditorWidget::updateLivePreview()
+{
+    if (mUseLivePreview && !ReST2Html::instance()->run(textDocument(), mRealFileName)) {
+        mLivePreviewPending = true;
+        mLivePreviewTimer.start();
+    }
+}
+
 void EditorWidget::showEvent(QShowEvent *e)
 {
-    updatePreview(true);
+    onShowPreview(true);
     TextEditorWidget::showEvent(e);
 }
 
 void EditorWidget::hideEvent(QHideEvent *e)
 {
-    updatePreview(false);
+    onShowPreview(false);
     TextEditorWidget::hideEvent(e);
 }
 
-void EditorWidget::updatePreview(bool show)
+void EditorWidget::onShowPreview(bool show)
 {
-    if (mPreview) {
+    if (mRightPane) {
         if (show) {
-            mPreview->show();
-            Core::RightPaneWidget::instance()->setWidget(mPreview);
+            mRightPane->show();
+            Core::RightPaneWidget::instance()->setWidget(mRightPane);
             Core::RightPaneWidget::instance()->setShown(true);
         } else {
-            mPreview->hide();
+            mRightPane->hide();
             Core::RightPaneWidget::instance()->setWidget(nullptr);
             Core::RightPaneWidget::instance()->setShown(false);
         }
