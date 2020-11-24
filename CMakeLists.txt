@@ -129,9 +129,19 @@ add_test (NAME test_plugin_install
           COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${IDE_BUILD_TREE} -P ${CMAKE_BINARY_DIR}/cmake_install.cmake
 )
 
+set (GITHUB_BUILD False )
+
+if( NOT ("$ENV[GITHUB_WORKSPACE}" STREQUAL ""))
+    set( GITHUB_BUILD True )
+endif()
+
 add_test( NAME test_plugin COMMAND ${IDE_BUILD_TREE}/bin/qtcreator -test Sphinx )
 
 set_tests_properties( "test_plugin" PROPERTIES FIXTURES_REQUIRED test_plugin_install )
+
+if ( GITHUB_BUILD AND WIN32 )
+    set_tests_properties( "test_plugin" PROPERTIES DISABLED True )
+endif()
 
 
 INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "share/qtcreator" PATTERN "__pycache__" EXCLUDE  )
