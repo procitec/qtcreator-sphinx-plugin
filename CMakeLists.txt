@@ -139,7 +139,7 @@ add_test( NAME test_plugin COMMAND ${IDE_BUILD_TREE}/bin/qtcreator -test Sphinx 
 
 set_tests_properties( "test_plugin" PROPERTIES FIXTURES_REQUIRED test_plugin_install )
 
-if ( GITHUB_BUILD AND WIN32 )
+if ( GITHUB_BUILD )
     set_tests_properties( "test_plugin" PROPERTIES DISABLED True )
 endif()
 

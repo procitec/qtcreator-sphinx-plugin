@@ -334,7 +334,7 @@ jobs:
         )
 
         if (NOT result EQUAL 0)
-          message(WARNING "error: Test for plugin failed!!\n${result}")
+          message(FATAL_ERROR "error: Test for plugin failed!!\n${result}")
         endif()
         
         file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
