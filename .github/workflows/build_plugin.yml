@@ -1,7 +1,7 @@
 name: Build Sphinx Plugin
 
 # Trigger the workflow on push or pull request,
-# but only for the main branch
+# but only for the qtc_4_14_0 branch
 on:
     workflow_dispatch:
     
