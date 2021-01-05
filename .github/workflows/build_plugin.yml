@@ -6,8 +6,8 @@ on:
     workflow_dispatch:
     
     push:
-        branches:
-            - qtc_4_14_0
+        tags:
+            - "v*"
 
 env:
   QT_VERSION: 5.15.2
