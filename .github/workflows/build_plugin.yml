@@ -1,19 +1,19 @@
 name: Build Sphinx Plugin
 
 # Trigger the workflow on push or pull request,
-# but only for the main branch
+# but only for the qtc_4_14_2 branch
 on:
     workflow_dispatch:
     
     push:
-        branches:
-            - master
+        tags:
+            - "v*"
 
 env:
   QT_VERSION: 5.15.2
-  QT_CREATOR_VERSION: 4.15.0
-  QT_CREATOR_VERSION_HINT: -beta1
-  QT_CREATOR_SNAPSHOT: latest
+  QT_CREATOR_VERSION: 4.14.2
+  QT_CREATOR_VERSION_HINT:
+  QT_CREATOR_SNAPSHOT:
   PLUGIN_PRO: qtcreator-sphinx-plugin.pro
   PLUGIN_NAME: qtcreator-sphinx-plugin
   CMAKE_VERSION: 3.17.0
