@@ -222,6 +222,8 @@ jobs:
 
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
         set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
+        set(ENV{QTC_SOURCE_DIR} "${{ steps.qt_creator.outputs.qtc_dir }}" )
+        set(ENV{QTC_BUILD_DIR} "${{ steps.qt_creator.outputs.qtc_dir }}" )
         
         execute_process( COMMAND cmake -E make_directory "build" )
         
