@@ -120,17 +120,19 @@ bool ReST2Html::run(TextEditor::TextDocument *document, const QString &fileNameT
     if (!mReST2HtmlFound || !(mReST2HtmlProcess->state() == QProcess::Running))
         return true;
 
-    mBusy = true;
-    mStartRevision = document->document()->revision();
-
-    mTimer.start();
-    mDocument = document;
-
-    mReST2HtmlProcess->write(mStartSeq.toUtf8().constData());
     QByteArray data = document->plainText().toUtf8();
-    mReST2HtmlProcess->write(data.constData(), data.length());
-    mReST2HtmlProcess->write(mEndSeq.toUtf8().constData());
-    mReST2HtmlProcess->write("\n");
+    if (!data.isEmpty()) {
+        mBusy = true;
+        mStartRevision = document->document()->revision();
+
+        mTimer.start();
+        mDocument = document;
+
+        mReST2HtmlProcess->write(mStartSeq.toUtf8().constData());
+        mReST2HtmlProcess->write(data.constData(), data.length());
+        mReST2HtmlProcess->write(mEndSeq.toUtf8().constData());
+        mReST2HtmlProcess->write("\n");
+    }
     return true;
 }
 

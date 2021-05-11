@@ -1,10 +1,10 @@
 #include "SphinxLivePreviewPage.h"
 
+#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QVBoxLayout>
-
-#include <QtWidgets/QFileDialog>
 
 namespace qtc::plugin::sphinx {
 
@@ -55,60 +55,32 @@ LivePreviewPage::LivePreviewPage(QWidget *parent)
 
 LivePreviewPage::~LivePreviewPage() {}
 
-void LivePreviewPage::onChangedHtml(const QString &html)
-{
-    if (!html.isEmpty()) {
-        auto url = QUrl(html);
-        if (url.isValid()) {
-            setSourceInternal(QUrl(QString("file://%1").arg(html)));
-        }
-    } else {
-        //mView->clear();
-    }
-}
-
-void LivePreviewPage::setSourceInternal(const QUrl &url)
-{
-    QUrl currentUrlWithoutFragment = mView->url();
-    currentUrlWithoutFragment.setFragment({});
-    QUrl newUrlWithoutFragment = url;
-    newUrlWithoutFragment.setFragment({});
-    mView->setUrl(url);
-    if (currentUrlWithoutFragment != newUrlWithoutFragment)
-        mView->setHtml(QString::fromUtf8(getData(url)));
-
-    mView->setZoomFactor(1.1);
-}
 
 void LivePreviewPage::setHtml(const QString &html)
 {
+    // preserve scroll position
+    auto vPos = -1;
+    auto hPos = -1;
+    auto vBar = mView->verticalScrollBar();
+    auto hBar = mView->horizontalScrollBar();
+    if (vBar) {
+        vPos = vBar->sliderPosition();
+    }
+    if (hBar) {
+        hPos = hBar->sliderPosition();
+    }
+
     mView->setHtml(html);
+    if (0 < vPos && vBar) {
+        vBar->setSliderPosition(vPos);
+    }
+    if (0 < hPos && hBar) {
+        hBar->setSliderPosition(hPos);
+    }
 }
 
 void LivePreviewPage::updateView()
 {
     mView->update();
 }
-
-void LivePreviewPage::onOpenUrl()
-{
-    {
-        auto fileName = QFileDialog::getOpenFileName(this,
-                                                     tr("html file"),
-                                                     "",
-                                                     tr("HTML (*.html *.htm)"));
-        QFileInfo file(fileName);
-        if (file.exists() && file.isReadable()) {
-            onChangedHtml(file.absoluteFilePath());
-
-        } else {
-        }
-    }
-}
-
-void LivePreviewPage::setUrl(const QUrl &url)
-{
-    setSourceInternal(url);
-}
-
 } // namespace qtc::plugin::sphinx

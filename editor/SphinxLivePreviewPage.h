@@ -16,14 +16,6 @@ public:
     void updateView();
     void setHtml(const QString &);
 
-private Q_SLOTS:
-    void onOpenUrl();
-    void onChangedHtml(const QString &);
-    void setSourceInternal(const QUrl &url);
-
-private:
-    void setUrl(const QUrl &);
-
 private:
     //QWebEngineView *mView;
     QLiteHtmlWidget *mView = nullptr;
