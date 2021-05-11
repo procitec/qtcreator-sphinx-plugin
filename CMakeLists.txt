@@ -35,21 +35,24 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC OFF)
 
-## Add paths to check for cmake modules:
-
-list(APPEND CMAKE_MODULE_PATH "${IDE_SOURCE_TREE}/lib/cmake/QtCreator")
-include(QtCreatorConfig)
+list(APPEND CMAKE_PREFIX_PATH "${IDE_SOURCE_TREE}")
 
 set(CMAKE_INSTALL_PREFIX "" )
 set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
-find_package(Qt5
-  COMPONENTS Test XmlPatterns LinguistTools REQUIRED
-)
+find_package(QtCreator COMPONENTS Core TextEditor ProjectExplorer REQUIRED)
+#find_package(Qt5
+#  COMPONENTS Test XmlPatterns LinguistTools REQUIRED
+#)
+
+find_package( Qt5 COMPONENTS Test XmlPatterns LinguistTools Widgets REQUIRED)
+set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION} PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer DEPENDS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::XmlPatterns QtCreator::qlitehtml
+add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION}
+    PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
+    DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::XmlPatterns QtCreator::qlitehtml
     SOURCES
     editor/SphinxCodeModel.cpp
     qtcreator-sphinx-plugin.cpp
@@ -112,7 +115,7 @@ extend_qtc_plugin(Sphinx
       tests/tst_completion.cpp
       tests/tst_formatter.h
       tests/tst_completion.h
-  DEPENDS Qt5::Test
+  DEPENDS  ${QtX}::Test
 )
 
 
