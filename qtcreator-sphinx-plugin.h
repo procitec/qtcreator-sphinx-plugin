@@ -17,6 +17,7 @@ namespace Internal {
 class PluginPrivate
 {
 public:
+    PluginPrivate();
     EditorFactory editorFactory;
     ReSTCheckHighLighter highlighter;
     ReST2Html preview;

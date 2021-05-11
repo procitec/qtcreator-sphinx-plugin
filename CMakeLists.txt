@@ -44,7 +44,7 @@ set(CMAKE_INSTALL_PREFIX "" )
 set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
 find_package(Qt5
-  COMPONENTS Test XmlPatterns REQUIRED
+  COMPONENTS Test XmlPatterns LinguistTools REQUIRED
 )
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
@@ -101,6 +101,8 @@ add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION} PLUGIN_DEPENDS
     options/SphinxSettings.h
     qtcreator-sphinx-plugin.qrc
 )
+
+add_translation_targets(Sphinx INSTALL_DESTINATION "share/qtcreator/translations" LANGUAGES "de"  TARGETS Sphinx)
 
 
 extend_qtc_plugin(Sphinx

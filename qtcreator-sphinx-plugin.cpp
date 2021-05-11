@@ -25,6 +25,7 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QtCore/QTranslator>
 #include <QtTest/QTest>
 
 #ifdef WITH_TESTS
@@ -32,7 +33,10 @@ QTEST_APPLESS_MAIN(qtc::plugin::sphinx::Plugin)
 #endif
 
 namespace qtc::plugin::sphinx {
+namespace Internal {
+PluginPrivate::PluginPrivate() {}
 
+} // namespace Internal
 Plugin::Plugin()
 {
     // Create your members
@@ -67,6 +71,15 @@ bool Plugin::initialize(const QStringList &arguments, QString *errorString)
                                                tr("Sphinx", "SnippetProvider"),
                                                &EditorFactory::decorateEditor);
 
+    const QString locale = Core::ICore::userInterfaceLanguage();
+    if (!locale.isEmpty()) {
+        auto qtr = new QTranslator(this);
+        const QString creatorTrPath = Core::ICore::resourcePath("translations").toString();
+        const QString trFile = QLatin1String(Constants::SnippetGroupId) + "_" + locale;
+        if (qtr->load(trFile, creatorTrPath)) {
+            QCoreApplication::installTranslator(qtr);
+        }
+    }
     return true;
 }
 

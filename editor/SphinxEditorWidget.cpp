@@ -178,6 +178,7 @@ void EditorWidget::onPreviewHtmlChanged(const QString &html)
     if (!html.isEmpty() && mRightPane->isVisible()) {
         onShowRightPane(true);
         //mRightPane->setCurrentTab(RightPaneWidget::PAGE_PREVIEW);
+        mRightPane->setTabEnabled(RightPaneWidget::PAGE_PREVIEW, true);
         mRightPane->preview().setHtml(html);
     }
 }
