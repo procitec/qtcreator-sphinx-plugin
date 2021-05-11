@@ -76,7 +76,8 @@ ReST2Html::ReST2Html()
     QFileInfo info(pythonFilePath);
     if (info.exists() && info.isExecutable()) {
         mPythonFilePath = info.absoluteFilePath();
-        mReST2HtmlScript = Core::ICore::resourcePath() + "/sphinx/rst2html/rest_to_html.py";
+        mReST2HtmlScript = Core::ICore::resourcePath().toString()
+                           + QLatin1String("/sphinx/rst2html/rest_to_html.py");
         mReST2HtmlFound = QFileInfo(mReST2HtmlScript).exists();
     } else {
         mPythonFilePath.clear();
@@ -141,9 +142,8 @@ void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
         void (QProcess::*signal)(int, QProcess::ExitStatus) = &QProcess::finished;
         QObject::connect(mReST2HtmlProcess, signal, [&](int status, QProcess::ExitStatus /*exitStatus*/) {
             if (status) {
-                Core::MessageManager::instance()
-                    ->write(QString::fromUtf8(mReST2HtmlProcess->readAllStandardError().trimmed()),
-                            Core::MessageManager::ModeSwitch);
+                Core::MessageManager::instance()->writeFlashing(
+                    QString::fromUtf8(mReST2HtmlProcess->readAllStandardError().trimmed()));
             }
         });
 

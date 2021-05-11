@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QtConcurrent/QtConcurrent>
+#include <QtCore/QFutureInterface>
 #include <QtCore/QRegularExpression>
 
 namespace qtc::plugin::sphinx {
@@ -25,34 +27,93 @@ bool CompletionAssistProvider::isActivationCharSequence(const QString &sequence)
     return sequence.startsWith(".. ") || (0 == sequence.indexOf(QRegularExpression("^\\s+:")));
 }
 
+static QStringList createProposal(QFutureWatcher<QStringList> *future,
+                                  const QString &text,
+                                  const QString &wordUnderCursor)
+{
+    const QRegularExpression wordRE("([a-zA-Z_][a-zA-Z0-9_]{2,})");
+
+    QSet<QString> words;
+    QRegularExpressionMatchIterator it = wordRE.globalMatch(text);
+    int wordUnderCursorFound = 0;
+    while (it.hasNext()) {
+        if (future->isCanceled())
+            return {};
+        QRegularExpressionMatch match = it.next();
+        const QString &word = match.captured();
+        if (word == wordUnderCursor) {
+            // Only add the word under cursor if it
+            // already appears elsewhere in the text
+            if (++wordUnderCursorFound < 2)
+                continue;
+        }
+
+        if (!words.contains(word))
+            words.insert(word);
+    }
+
+    return words.values();
+}
+
 CompletionAssistProcessor::CompletionAssistProcessor()
     : m_SphinxSnippetCollector(Constants::SnippetGroupId, QIcon())
+    , mDocumentWords()
 {}
+
+CompletionAssistProcessor::~CompletionAssistProcessor()
+{
+    cancel();
+}
+
+void CompletionAssistProcessor::cancel()
+{
+    if (isWatcherRunning()) {
+        mWordProcessor.cancel();
+    }
+}
 
 TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor::AssistInterface *interface)
 {
-    if (interface->reason() == TextEditor::IdleEditor)
-        return 0;
-
     TextEditor::IAssistProposal *proposal = nullptr;
+    QList<TextEditor::AssistProposalItemInterface *> snippetProposal = {};
 
     int startPosition = interface->position();
     const QString line = interface->textDocument()->findBlock(startPosition).text();
     const int blockPos = interface->textDocument()->findBlock(startPosition).position();
+
+    auto linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
     QString context;
-    int linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
+
     if (0 < linePos) {
-        linePos++; // the letter afther the space
+        linePos++; // the letter after the space
         context = line.mid(linePos, startPosition);
     } else {
         context = line;
         linePos = 0;
     }
 
-    QString myTyping = interface->textAt(startPosition, interface->position() - startPosition);
-    //auto fileName = interface->filePath();
+    if (interface->reason() == TextEditor::IdleEditor) {
+        if (!isWatcherRunning()) {
+            const QString text = interface->textDocument()->toPlainText();
+            // get the word unter cursor
+            auto wordUnderCursor = line.mid(linePos, startPosition);
 
-    QList<TextEditor::AssistProposalItemInterface *> snippetProposal;
+            QObject::connect(&mWordProcessor, &QFutureWatcher<QStringList>::finished, [this]() {
+                mDocumentWords = mWordProcessor.result();
+            });
+
+            // Start the computation.
+            QFuture<QStringList> future = QtConcurrent::run(createProposal,
+                                                            &mWordProcessor,
+                                                            text,
+                                                            wordUnderCursor);
+            mWordProcessor.setFuture(future);
+            //return nullptr;
+        }
+    }
+
+    // QString myTyping = interface->textAt(startPosition, interface->position() - startPosition);
+    //auto fileName = interface->filePath();
 
     for (auto *snippet : m_SphinxSnippetCollector.collect()) {
         if (snippet->text().startsWith(context)) { // this should match all directives
@@ -140,6 +201,31 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
                     item->setDetail(snippet.generateTip());
                     //                item->setIcon(icon);
                     //                item->setOrder(order);
+                    snippetProposal += item;
+                }
+            }
+        }
+    }
+
+    if (snippetProposal.empty()) {
+        linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
+
+        if (0 < linePos) {
+            linePos++; // the letter after the space
+            context = line.mid(linePos, startPosition);
+            //linePos = startPosition;
+        } else {
+            context = line;
+            linePos = 0;
+        }
+
+        // load from this document words
+        if (!context.isEmpty()) {
+            for (const auto &word : mDocumentWords) {
+                if (word.startsWith(context)) { // this should match all directives
+                    auto item = new TextEditor::AssistProposalItem;
+                    item->setText(word);
+                    item->setData(word);
                     snippetProposal += item;
                 }
             }

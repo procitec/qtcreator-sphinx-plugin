@@ -4,7 +4,8 @@
 #include <texteditor/codeassist/iassistprocessor.h>
 #include <texteditor/snippets/snippetassistcollector.h>
 
-#include <QIcon>
+#include <QtCore/QFutureWatcher>
+#include <QtGui/QIcon>
 
 namespace qtc::plugin::sphinx {
 
@@ -23,10 +24,17 @@ class CompletionAssistProcessor : public TextEditor::IAssistProcessor
 {
 public:
     CompletionAssistProcessor();
+    virtual ~CompletionAssistProcessor();
     TextEditor::IAssistProposal *perform(const TextEditor::AssistInterface *interface) override;
+    void cancel() final;
+
+private:
+    bool isWatcherRunning() const { return mWordProcessor.isRunning(); }
 
 private:
     TextEditor::SnippetAssistCollector m_SphinxSnippetCollector;
+    QStringList mDocumentWords;
+    QFutureWatcher<QStringList> mWordProcessor;
 };
 
 } // namespace qtc::plugin::sphinx

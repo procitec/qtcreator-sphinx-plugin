@@ -86,7 +86,6 @@ void TestCompletion::testSimpleDirective()
     mEditor->insertPlainText(text);
     qApp->processEvents();
     QVERIFY(mEditor->autoCompleter());
-    auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
@@ -121,7 +120,6 @@ void TestCompletion::testSimpleDirectiveOption()
     mEditor->insertPlainText(text);
     qApp->processEvents();
     QVERIFY(mEditor->autoCompleter());
-    auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
@@ -150,7 +148,6 @@ void TestCompletion::testSimpleRole()
     mEditor->insertPlainText(text);
     qApp->processEvents();
     QVERIFY(mEditor->autoCompleter());
-    auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(COMPLETION_TIMEOUT);
     if (shouldComplete) {
@@ -173,14 +170,6 @@ void TestCompletion::testSimpleSnippetDirective_data()
 )-");
 }
 
-void TestCompletion::testSimpleSnippetRole_data()
-{
-    QTest::addColumn<QString>("text");
-    QTest::addColumn<QString>("completion");
-
-    QTest::newRow("inline :ref:") << QString("inline _r") << QString("inline :ref:`label`");
-}
-
 void TestCompletion::testSimpleSnippetDirective()
 {
     QFETCH(QString, text);
@@ -189,13 +178,20 @@ void TestCompletion::testSimpleSnippetDirective()
     mEditor->insertPlainText(text);
     qApp->processEvents();
     QVERIFY(mEditor->autoCompleter());
-    auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
     QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
+}
+
+void TestCompletion::testSimpleSnippetRole_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("completion");
+
+    QTest::newRow("inline :ref:") << QString("inline _r") << QString("inline :ref:`label`");
 }
 
 void TestCompletion::testSimpleSnippetRole()
@@ -206,11 +202,98 @@ void TestCompletion::testSimpleSnippetRole()
     mEditor->insertPlainText(text);
     qApp->processEvents();
     QVERIFY(mEditor->autoCompleter());
-    auto tc = mEditor->textCursor();
     mEditor->invokeAssist(TextEditor::Completion, nullptr);
     QTest::qWait(COMPLETION_TIMEOUT);
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
     QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
     QCOMPARE(completed, completion);
+}
+
+void TestCompletion::testWords_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("typing");
+    QTest::addColumn<QString>("completion");
+
+    QTest::newRow("one char") << QString("This is a documents text. This ") << QString("d")
+                              << QString("documents");
+    QTest::newRow("two char") << QString("This is a documents text. This ") << QString("do")
+                              << QString("documents");
+
+    // widget is filled with words in alpabetical order and case sensitiv
+    QTest::newRow("multiple one char") << QString("This is a documents text in Theorie. This ")
+                                       << QString("T") << QString("Theorie");
+    QTest::newRow("multiple two char") << QString("This is a documents text in Theorie. This ")
+                                       << QString("Th") << QString("Theorie");
+    QTest::newRow("multiple case one char")
+        << QString("This is a documents text in theorie. ") << QString("T") << QString("This");
+    QTest::newRow("multiple case  two char")
+        << QString("this is a documents text in Theorie. this ") << QString("Th")
+        << QString("Theorie");
+}
+
+void TestCompletion::testWords()
+{
+    QFETCH(QString, text);
+    QFETCH(QString, typing);
+    QFETCH(QString, completion);
+
+    mEditor->insertPlainText(text);
+    qApp->processEvents();
+    QVERIFY(mEditor->autoCompleter());
+    QTest::keyClicks(qApp->focusWidget(), typing, Qt::NoModifier, 20);
+
+    QTest::qWait(COMPLETION_TIMEOUT);
+    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+    QTest::qWait(KEYPRESS_TIMEOUT);
+    auto completed = mEditor->toPlainText();
+    auto pos = completed.lastIndexOf(QRegExp(R"-(\s)-"));
+    QString word;
+
+    if (0 < pos) {
+        pos++; // the letter after the space
+        word = completed.right(completed.length() - pos);
+    }
+    QCOMPARE(word, completion);
+}
+
+void TestCompletion::testIdleDirective_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<QString>("typing");
+    QTest::addColumn<QString>("completion");
+    // clang-format off
+    QTest::newRow("simple directive")
+       << QString(".. code") << QString("-b") << QString(R"-(.. code-block:: language
+
+    
+
+)-");
+    // clang-format on
+}
+
+void TestCompletion::testIdleDirective()
+{
+    QFETCH(QString, text);
+    QFETCH(QString, typing);
+    QFETCH(QString, completion);
+
+    mEditor->insertPlainText(text);
+    qApp->processEvents();
+    QVERIFY(mEditor->autoCompleter());
+    QTest::keyClicks(qApp->focusWidget(), typing, Qt::NoModifier, 20);
+
+    QTest::qWait(COMPLETION_TIMEOUT);
+    QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
+    QTest::qWait(KEYPRESS_TIMEOUT);
+    auto completed = mEditor->toPlainText();
+    QVERIFY(completed.contains(completion));
+    auto pos = completed.lastIndexOf(completion);
+    QString word;
+
+    if (-1 < pos) {
+        word = completed.right(completed.length() - pos);
+    }
+    QCOMPARE(word, completion);
 }

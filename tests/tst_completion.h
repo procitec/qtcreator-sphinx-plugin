@@ -42,6 +42,12 @@ private slots:
     void testSimpleSnippetRole();
     void testSimpleSnippetRole_data();
 
+    void testWords();
+    void testWords_data();
+
+    void testIdleDirective();
+    void testIdleDirective_data();
+
 public:
     qtc::plugin::sphinx::EditorWidget *mEditor = nullptr;
     Core::IEditor *mIEditor = nullptr;

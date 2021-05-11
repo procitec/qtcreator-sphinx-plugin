@@ -29,6 +29,7 @@ RightPaneWidget::RightPaneWidget(QWidget *parent)
 void RightPaneWidget::setCurrentTab(int idx)
 {
     setCurrentIndex(idx);
+    setTabEnabled(idx, true);
 }
 
 } // namespace qtc::plugin::sphinx

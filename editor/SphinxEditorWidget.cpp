@@ -386,7 +386,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
         forwardToBase = false;
     } else if (k == Qt::Key_Return || k == Qt::Key_Enter) {
         for (auto line = 0; line < spacing(); line++) {
-            QPlainTextEdit::keyPressEvent(e);
+            TextEditorWidget::keyPressEvent(e);
         }
 
         forwardToBase = false;
@@ -398,7 +398,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
     }
 
     if (forwardToBase) {
-        QPlainTextEdit::keyPressEvent(e);
+        TextEditorWidget::keyPressEvent(e);
     }
 }
 

@@ -76,7 +76,8 @@ ReSTCheckHighLighter::ReSTCheckHighLighter()
     QFileInfo info(pythonFilePath);
     if (info.exists() && info.isExecutable()) {
         mPythonFilePath = info.absoluteFilePath();
-        mReSTCheckScript = Core::ICore::resourcePath() + "/sphinx/rstcheck/rest_check.py";
+        mReSTCheckScript = Core::ICore::resourcePath().toString()
+                           + QLatin1String("/sphinx/rstcheck/rest_check.py");
         mReSTCheckFound = QFileInfo(mReSTCheckScript).exists();
     } else {
         mPythonFilePath.clear();
@@ -132,9 +133,8 @@ void ReSTCheckHighLighter::initReSTCheckProcess()
     void (QProcess::*signal)(int, QProcess::ExitStatus) = &QProcess::finished;
     QObject::connect(mReSTCheckProcess, signal, [&](int status, QProcess::ExitStatus /*exitStatus*/) {
         if (status) {
-            Core::MessageManager::instance()
-                ->write(QString::fromUtf8(mReSTCheckProcess->readAllStandardError().trimmed()),
-                        Core::MessageManager::ModeSwitch);
+            Core::MessageManager::instance()->writeFlashing(
+                QString::fromUtf8(mReSTCheckProcess->readAllStandardError().trimmed()));
             mReSTCheckFound = false;
         }
     });
