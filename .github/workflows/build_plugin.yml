@@ -233,6 +233,9 @@ jobs:
             --qtc-path "${{ steps.qt_creator.outputs.qtc_dir }}"
             --output-path "$ENV{GITHUB_WORKSPACE}"
           RESULT_VARIABLE result
+          OUTPUT_VARIABLE output
+          ERROR_VARIABLE output
+          COMMAND_ECHO STDOUT
           WORKING_DIRECTORY build
         )
 
