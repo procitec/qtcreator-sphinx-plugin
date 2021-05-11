@@ -11,8 +11,8 @@ on:
 
 env:
   QT_VERSION: 5.15.2
-  QT_CREATOR_VERSION: 4.15.1
-  QT_CREATOR_VERSION_HINT: 
+  QT_CREATOR_VERSION: 5.0.0
+  QT_CREATOR_VERSION_HINT: -beta1
   QT_CREATOR_SNAPSHOT: latest
   PLUGIN_PRO: qtcreator-sphinx-plugin.pro
   PLUGIN_NAME: qtcreator-sphinx-plugin
