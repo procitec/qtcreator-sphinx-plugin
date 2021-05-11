@@ -16,14 +16,14 @@ TabWidget::TabWidget(QWidget *w)
 RightPaneWidget::RightPaneWidget(QWidget *parent)
     : QTabWidget(parent)
 {
-    mLivePreview = new LivePreviewPage();
     mPreview = new PreviewPage();
-    mLivePreview->setEnabled(false);
+    mHtml = new HtmlPage();
     mPreview->setEnabled(false);
-    insertTab(PAGE_LIVEPV, new TabWidget(mLivePreview), tr("LivePreview"));
-    insertTab(PAGE_PV, new TabWidget(mPreview), tr("Preview"));
-    setTabEnabled(PAGE_LIVEPV, false);
-    setTabEnabled(PAGE_PV, false);
+    mHtml->setEnabled(false);
+    insertTab(PAGE_PREVIEW, new TabWidget(mPreview), tr("Preview"));
+    insertTab(PAGE_HTML, new TabWidget(mHtml), tr("Html"));
+    setTabEnabled(PAGE_PREVIEW, false);
+    setTabEnabled(PAGE_HTML, false);
 }
 
 void RightPaneWidget::setCurrentTab(int idx)

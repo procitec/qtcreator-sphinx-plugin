@@ -19,7 +19,7 @@ class PluginPrivate
 public:
     EditorFactory editorFactory;
     ReSTCheckHighLighter highlighter;
-    ReST2Html livePreview;
+    ReST2Html preview;
     CustomParser parser;
     CodeModel codeModel;
 };

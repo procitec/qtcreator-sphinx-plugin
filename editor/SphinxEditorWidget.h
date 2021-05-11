@@ -73,7 +73,7 @@ private Q_SLOTS:
     void onCustomContextMenu(const QPoint &pos);
     void onUrlAction();
     void onToggleRightPane();
-    void onLivePreviewHtmlChanged(const QString &);
+    void onPreviewHtmlChanged(const QString &);
 
 private:
     void addToolBar();
@@ -86,9 +86,9 @@ private:
     void handleTabKeyInsert();
     void scheduleRstCheckUpdate();
     void updateRstCheck();
-    void scheduleLivePreview();
-    void onShowPreview(bool show);
-    void updateLivePreview();
+    void schedulePreview();
+    void onShowRightPane(bool show);
+    void updatePreview();
 
     int mAutoIndent = 0;
     bool mInsertSpaceForTab = true;
@@ -117,9 +117,9 @@ private:
     bool mReSTCheckUpdatePending = false;
     bool mUseReSTCheckHighlighter = false;
 
-    QTimer mLivePreviewTimer;
-    bool mLivePreviewPending = false;
-    bool mUseLivePreview = false;
+    QTimer mPreviewTimer;
+    bool mPreviewPending = false;
+    bool mUsePreview = false;
 
     QString mRealFileName;
     RightPaneWidget *mRightPane = nullptr;

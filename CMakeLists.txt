@@ -55,8 +55,8 @@ add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION} PLUGIN_DEPENDS
     qtcreator-sphinx-plugin.cpp
     qtcreator-sphinx-plugin-projectsettings.cpp
     editor/SphinxOutputParser.cpp
+    editor/SphinxHtmlPage.cpp
     editor/SphinxPreviewPage.cpp
-    editor/SphinxLivePreviewPage.cpp
     editor/SphinxRightPaneWidget.cpp
     editor/SphinxDocument.cpp
     editor/SphinxEditor.cpp
@@ -79,8 +79,8 @@ add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION} PLUGIN_DEPENDS
     qtcreator-sphinx-pluginconstants.h
     qtcreator-sphinx-plugin-projectsettings.h
     editor/SphinxOutputParser.h
+    editor/SphinxHtmlPage.h
     editor/SphinxPreviewPage.h
-    editor/SphinxLivePreviewPage.h
     editor/SphinxRightPaneWidget.h
     editor/SphinxDocument.h
     editor/SphinxEditor.h

@@ -110,20 +110,22 @@ bool ReSTCheckHighLighter::run(TextEditor::TextDocument *document, const QString
     if (!mReSTCheckFound)
         return true;
 
-    mBusy = true;
-    mStartRevision = document->document()->revision();
-
-    mTimer.start();
-    mDocument = document;
-
     const QString filePath = document->filePath().isEmpty() ? fileNameTip
                                                             : document->filePath().toString();
 
-    mReSTCheckProcess->write(mStartSeq.toUtf8().constData());
     QByteArray data = document->plainText().toUtf8();
-    mReSTCheckProcess->write(data.constData(), data.length());
-    mReSTCheckProcess->write(mEndSeq.toUtf8().constData());
-    mReSTCheckProcess->write("\n");
+    if (!data.isEmpty()) {
+        mBusy = true;
+        mStartRevision = document->document()->revision();
+
+        mTimer.start();
+        mDocument = document;
+
+        mReSTCheckProcess->write(mStartSeq.toUtf8().constData());
+        mReSTCheckProcess->write(data.constData(), data.length());
+        mReSTCheckProcess->write(mEndSeq.toUtf8().constData());
+        mReSTCheckProcess->write("\n");
+    }
     return true;
 }
 

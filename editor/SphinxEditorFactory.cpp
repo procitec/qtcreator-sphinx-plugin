@@ -36,7 +36,14 @@ EditorFactory::EditorFactory()
     //    setAutoCompleterCreator([]() { return new AutoCompleter; });
     setCompletionAssistProvider(new CompletionAssistProvider);
 
-    setSyntaxHighlighterCreator([]() { return new Highlighter; });
+    setSyntaxHighlighterCreator([]() {
+        QSettings *s = Core::ICore::settings();
+        s->beginGroup(Constants::SettingsGeneralId);
+        bool useInternalHighlighter = s->value(SettingsIds::CustomHighlighter, QVariant(true)).toBool();
+        s->endGroup();
+
+        return (useInternalHighlighter) ? new Highlighter : new TextEditor::SyntaxHighlighter;
+    });
     setUseGenericHighlighter(!useInternalHighlighter);
 
     Utils::CommentDefinition cmnt(".. ");
@@ -50,11 +57,20 @@ EditorFactory::EditorFactory()
                             | TextEditor::TextEditorActionHandler::UnCollapseAll);
 }
 
+// this is called by settings dialog for texteditor (snippets and so on)
 void EditorFactory::decorateEditor(TextEditor::TextEditorWidget *editor)
 {
     if (TextEditor::TextDocument *document = editor->textDocument()) {
         document->setIndenter(new Indenter(document->document()));
-        document->setSyntaxHighlighter(new Highlighter);
+        QSettings *s = Core::ICore::settings();
+        s->beginGroup(Constants::SettingsGeneralId);
+        bool useInternalHighlighter = s->value(SettingsIds::CustomHighlighter, QVariant(true)).toBool();
+        s->endGroup();
+        if (useInternalHighlighter) {
+            document->setSyntaxHighlighter(new Highlighter);
+        } else {
+            editor->setupGenericHighlighter();
+        }
     }
 }
 

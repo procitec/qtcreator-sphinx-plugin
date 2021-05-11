@@ -14,7 +14,7 @@
 namespace qtc::plugin::sphinx {
 
 const int RSTCHECK_UPDATE_INTERVAL = 300;
-const int LIVEPREVIEW_UPDATE_INTERVAL = 300;
+const int PREVIEW_UPDATE_INTERVAL = 300;
 
 EditorWidget::EditorWidget()
     : TextEditor::TextEditorWidget()
@@ -32,11 +32,11 @@ EditorWidget::EditorWidget()
             updateRstCheck();
     });
 
-    mLivePreviewTimer.setSingleShot(true);
-    mLivePreviewTimer.setInterval(LIVEPREVIEW_UPDATE_INTERVAL);
-    connect(&mLivePreviewTimer, &QTimer::timeout, this, [this] {
-        if (mLivePreviewPending) {
-            updateLivePreview();
+    mPreviewTimer.setSingleShot(true);
+    mPreviewTimer.setInterval(PREVIEW_UPDATE_INTERVAL);
+    connect(&mPreviewTimer, &QTimer::timeout, this, [this] {
+        if (mPreviewPending) {
+            updatePreview();
         }
     });
 
@@ -46,7 +46,7 @@ EditorWidget::EditorWidget()
 void EditorWidget::finalizeInitialization()
 {
     connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleRstCheckUpdate);
-    connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleLivePreview);
+    connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::schedulePreview);
 }
 
 void EditorWidget::onCustomContextMenu(const QPoint &pos)
@@ -59,7 +59,7 @@ void EditorWidget::onCustomContextMenu(const QPoint &pos)
     if (mRightPane) {
         menu.addAction(mShowRightPaneAction);
     }
-    if (!mRightPane->preview().isEnabled()) {
+    if (!mRightPane->html().isEnabled()) {
         menu.addAction(mUrlAction);
     }
 
@@ -151,33 +151,34 @@ void EditorWidget::connectActions()
     connect(mUrlAction, &QAction::triggered, this, &EditorWidget::onUrlAction);
     mShowRightPaneAction = new QAction(tr("toggle preview"), this);
     connect(mShowRightPaneAction, &QAction::triggered, this, &EditorWidget::onToggleRightPane);
-    connect(ReST2Html::instance(), &ReST2Html::htmlChanged, this, &EditorWidget::onLivePreviewHtmlChanged);
+    connect(ReST2Html::instance(), &ReST2Html::htmlChanged, this, &EditorWidget::onPreviewHtmlChanged);
 }
 
 void EditorWidget::onUrlAction()
 {
-    onShowPreview(true);
-    mRightPane->setCurrentTab(RightPaneWidget::PAGE_PV);
-    mRightPane->preview().updateView();
+    onShowRightPane(true);
+    mRightPane->setCurrentTab(RightPaneWidget::PAGE_HTML);
+    mRightPane->html().setEnabled(true);
+    mRightPane->html().updateView();
 }
 
 void EditorWidget::onToggleRightPane()
 {
     if (mRightPane) {
-        onShowPreview(!mRightPane->isVisible());
-        if (mUseLivePreview && mRightPane->isVisible()) {
-            mRightPane->setCurrentTab(RightPaneWidget::PAGE_LIVEPV);
-            mRightPane->livePreview().updateView();
+        onShowRightPane(!mRightPane->isVisible());
+        if (mUsePreview && mRightPane->isVisible()) {
+            mRightPane->setCurrentTab(RightPaneWidget::PAGE_PREVIEW);
+            mRightPane->preview().updateView();
         }
     }
 }
 
-void EditorWidget::onLivePreviewHtmlChanged(const QString &html)
+void EditorWidget::onPreviewHtmlChanged(const QString &html)
 {
     if (!html.isEmpty() && mRightPane->isVisible()) {
-        onShowPreview(true);
-        mRightPane->setCurrentTab(RightPaneWidget::PAGE_LIVEPV);
-        mRightPane->livePreview().setHtml(html);
+        onShowRightPane(true);
+        //mRightPane->setCurrentTab(RightPaneWidget::PAGE_PREVIEW);
+        mRightPane->preview().setHtml(html);
     }
 }
 
@@ -196,14 +197,14 @@ void EditorWidget::readSettings()
     mUseReSTCheckHighlighter = s->value(SettingsIds::ReSTCheckHighlighter,
                                         QVariant(mUseReSTCheckHighlighter))
                                    .toBool();
-    mUseLivePreview = s->value(SettingsIds::RST2HTML, QVariant(mUseLivePreview)).toBool();
+    mUsePreview = s->value(SettingsIds::RST2HTML, QVariant(mUsePreview)).toBool();
     s->endGroup();
 
-    if (mUseLivePreview) {
+    if (mUsePreview) {
         if (!mRightPane) {
             mRightPane = new RightPaneWidget(this);
         }
-        mRightPane->livePreview().setEnabled(true);
+        mRightPane->preview().setEnabled(true);
     }
 
     mParts = "#";
@@ -236,9 +237,9 @@ void EditorWidget::readFileSettings()
                     if (!mRightPane) {
                         mRightPane = new RightPaneWidget(this);
                     }
-                    onShowPreview(true);
-                    mRightPane->preview().setEnabled(true);
-                    mRightPane->preview().setUrl(iter.value());
+                    onShowRightPane(true);
+                    mRightPane->html().setEnabled(true);
+                    mRightPane->html().setUrl(iter.value());
                 }
             }
         }
@@ -254,7 +255,7 @@ void EditorWidget::saveFileSettings()
         }
         if (project) {
             const auto projectSettings = Internal::ProjectSettings::getSettings(project);
-            auto url = mRightPane->preview().url();
+            auto url = mRightPane->html().url();
             auto filePath = textDocument()->filePath();
             if (!url.isEmpty() && filePath.exists()) {
                 projectSettings->addLinkedPreview(Internal::LinkedPreview(filePath, url));
@@ -422,38 +423,38 @@ void EditorWidget::updateRstCheck()
     }
 }
 
-void EditorWidget::scheduleLivePreview()
+void EditorWidget::schedulePreview()
 {
-    mLivePreviewPending = mLivePreviewTimer.isActive();
-    if (mLivePreviewPending)
+    mPreviewPending = mPreviewTimer.isActive();
+    if (mPreviewPending)
         return;
 
-    mLivePreviewPending = false;
-    updateLivePreview();
-    mLivePreviewTimer.start();
+    mPreviewPending = false;
+    updatePreview();
+    mPreviewTimer.start();
 }
 
-void EditorWidget::updateLivePreview()
+void EditorWidget::updatePreview()
 {
-    if (mUseLivePreview && !ReST2Html::instance()->run(textDocument(), mRealFileName)) {
-        mLivePreviewPending = true;
-        mLivePreviewTimer.start();
+    if (mUsePreview && !ReST2Html::instance()->run(textDocument(), mRealFileName)) {
+        mPreviewPending = true;
+        mPreviewTimer.start();
     }
 }
 
 void EditorWidget::showEvent(QShowEvent *e)
 {
-    onShowPreview(true);
+    onShowRightPane(true);
     TextEditorWidget::showEvent(e);
 }
 
 void EditorWidget::hideEvent(QHideEvent *e)
 {
-    onShowPreview(false);
+    onShowRightPane(false);
     TextEditorWidget::hideEvent(e);
 }
 
-void EditorWidget::onShowPreview(bool show)
+void EditorWidget::onShowRightPane(bool show)
 {
     if (mRightPane) {
         if (show) {

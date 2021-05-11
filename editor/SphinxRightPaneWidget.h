@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QTabWidget>
 
-#include "SphinxLivePreviewPage.h"
+#include "SphinxHtmlPage.h"
 #include "SphinxPreviewPage.h"
 
 namespace qtc::plugin::sphinx {
@@ -21,25 +21,25 @@ class RightPaneWidget : public QTabWidget
     Q_OBJECT
 public:
     explicit RightPaneWidget(QWidget *parent = nullptr);
-    enum { PAGE_LIVEPV = 0, PAGE_PV };
+    enum { PAGE_PREVIEW = 0, PAGE_HTML };
 
-    LivePreviewPage &livePreview()
-    {
-        assert(mLivePreview);
-        return *mLivePreview;
-    }
     PreviewPage &preview()
     {
         assert(mPreview);
         return *mPreview;
+    }
+    HtmlPage &html()
+    {
+        assert(mHtml);
+        return *mHtml;
     };
     void setCurrentTab(int);
 
 signals:
 
 private:
-    LivePreviewPage *mLivePreview = nullptr;
     PreviewPage *mPreview = nullptr;
+    HtmlPage *mHtml = nullptr;
 };
 
 } // namespace qtc::plugin::sphinx
