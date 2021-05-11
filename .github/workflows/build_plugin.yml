@@ -240,6 +240,7 @@ jobs:
         )
 
         if (NOT result EQUAL 0)
+          message("output from build: ${output}")
           string(REGEX MATCH "FAILED:.*$" error_message "${output}")
           string(REPLACE "\n" "%0A" error_message "${error_message}")
           message("::error::${error_message}")
