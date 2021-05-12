@@ -208,9 +208,7 @@ jobs:
 
         endforeach()
 
-        message("::set-output name=qtc_base_url::${qtc_base_url}")
-
-
+        message("::set-output name=qtc_base_url::${qtc_base_url}/${qtc_platform}")
 
     - name: Build
       shell: cmake -P {0}
@@ -237,7 +235,7 @@ jobs:
 
         set(qt_version "$ENV{QT_VERSION}")
         set( qt_url "${{ steps.qt.outputs.qt_base_url }}" )
-        set( qtc_version "$ENV{QT_CREATOR_VERSION}")" )
+        set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
         set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url }}" )
 
         configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO_PLUGIN_$ENV{PLUGIN_NAME}.md @ONLY )
