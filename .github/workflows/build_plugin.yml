@@ -6,8 +6,8 @@ on:
     workflow_dispatch:
 
     push:
-        branches:
-            - master
+        tags:
+            - "v*"
 
 env:
   PLUGIN_NAME: qtcreator-sphinx-plugin
