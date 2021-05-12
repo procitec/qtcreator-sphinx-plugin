@@ -207,7 +207,7 @@ jobs:
             message("output from cmake command: ${output}")
             message(FATAL_ERROR "extracting qtcreator failed")
           endif()
-          )
+
         endforeach()
 
 
@@ -281,6 +281,15 @@ jobs:
 
         execute_process(
           COMMAND ${CMAKE_COMMAND} -E copy "$ENV{GITHUB_WORKSPACE}/RELEASEINFO.md" "$ENV{GITHUB_WORKSPACE}/build/install/qtc-sphinx-plugin-dependencies.md"
+        )
+
+        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
+
+        message("start compressing artifact to ${artifact}")
+
+        execute_process(
+            COMMAND 7z a -mmt+ ${artifact}.7z .
+            WORKING_DIRECTORY $ENV{GITHUB_WORKSPACE}/build/install
         )
 
     - uses: actions/upload-artifact@v2
