@@ -269,15 +269,6 @@ jobs:
           message(FATAL_ERROR "Configure failed")
         endif()
 
-        file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/$ENV{PLUGIN_NAME}-$ENV{QT_CREATOR_VERSION}-${{ matrix.config.artifact }}" artifact)
-
-        message("start compressing artifact to ${artifact}")
-
-        execute_process(
-            COMMAND 7z a -mmt+ ${artifact}.7z .
-            WORKING_DIRECTORY $ENV{GITHUB_WORKSPACE}/build/install
-        )
-
     - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:

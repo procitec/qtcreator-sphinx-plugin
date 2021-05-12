@@ -84,7 +84,7 @@ add_qtc_plugin( ${QTC_PLUGIN_NAME} VERSION ${qtcreator-plugin-sphinx_VERSION}
     qtcreator-sphinx-plugin.qrc
 )
 
-add_translation_targets( ${QTC_PLUGIN_NAME} INSTALL_DESTINATION "share/qtcreator/translations" LANGUAGES "de"  TARGETS ${QTC_PLUGIN_NAME} )
+add_translation_targets( ${QTC_PLUGIN_NAME} INSTALL_DESTINATION "${IDE_DATA_PATH}/translations" LANGUAGES "de"  TARGETS ${QTC_PLUGIN_NAME} )
 
 
 extend_qtc_plugin( ${QTC_PLUGIN_NAME}
