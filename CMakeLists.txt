@@ -99,10 +99,6 @@ extend_qtc_plugin( ${QTC_PLUGIN_NAME}
 
 enable_testing()
 
-if( EXISTS "RELEASEINFO_QTC_PLUGIN_${QTC_PLUGIN_NAME}.md" )
-    INSTALL( FILES "RELEASEINFO_QTC_PLUGIN_${QTC_PLUGIN_NAME}.md" DESTINATION "/" )
-endif()
-
 INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "${IDE_DATA_PATH}" PATTERN "__pycache__" EXCLUDE  )
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "${IDE_DATA_PATH}/snippets" )
 

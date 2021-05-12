@@ -246,7 +246,7 @@ jobs:
         set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
         set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url }}" )
 
-        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO_QTC_PLUGIN_SPHINX.md @ONLY )
+        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
         execute_process(
             COMMAND python
@@ -272,8 +272,10 @@ jobs:
     - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:
-        path: ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
+        path: |
+            ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
+            ./RELEASEINFO.md
 
   release:
     if: contains(github.ref, 'tags/v')
