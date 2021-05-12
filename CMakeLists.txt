@@ -29,7 +29,7 @@ set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION}
+add_qtc_plugin( ${QTC_PLUGIN_NAME} VERSION ${qtcreator-plugin-sphinx_VERSION}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
     DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::XmlPatterns QtCreator::qlitehtml
     SOURCES
@@ -84,10 +84,10 @@ add_qtc_plugin( Sphinx VERSION ${qtcreator-plugin-sphinx_VERSION}
     qtcreator-sphinx-plugin.qrc
 )
 
-add_translation_targets(Sphinx INSTALL_DESTINATION "share/qtcreator/translations" LANGUAGES "de"  TARGETS Sphinx)
+add_translation_targets( ${QTC_PLUGIN_NAME} INSTALL_DESTINATION "share/qtcreator/translations" LANGUAGES "de"  TARGETS ${QTC_PLUGIN_NAME} )
 
 
-extend_qtc_plugin(Sphinx
+extend_qtc_plugin( ${QTC_PLUGIN_NAME}
   CONDITION WITH_TESTS
   SOURCES
       tests/tst_formatter.cpp
@@ -107,7 +107,7 @@ extend_qtc_plugin(Sphinx
 
 enable_testing()
 
-if( EXISTS "RELEASEINFO.md" )
+if( EXISTS "RELEASEINFO_PLUGIN_${QTC_PLUGIN_NAME}.md" )
     INSTALL( FILES "RELEASEINFO.md" DESTINATION "/" )
 endif()
 
@@ -132,4 +132,4 @@ function( qtc_add_plugin_test plugin)
 
 endfunction()
 
-qtc_add_plugin_test( Sphinx )
+qtc_add_plugin_test( ${QTC_PLUGIN_NAME} )
