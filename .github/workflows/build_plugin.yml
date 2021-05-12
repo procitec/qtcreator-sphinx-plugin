@@ -209,6 +209,7 @@ jobs:
         endforeach()
 
         message("::set-output name=qtc_base_url::${qtc_base_url}/${qtc_platform}")
+        message("::set-output name=qtc_dir::${qtc_dir}")
 
     - name: Build
       shell: cmake -P {0}

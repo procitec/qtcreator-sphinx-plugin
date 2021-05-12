@@ -119,17 +119,15 @@ message("qt creator dir ${qtc_DIR}")
 
 function( qtc_add_plugin_test plugin)
     string( REPLACE "${IDE_CMAKE_INSTALL_PATH}/${IDE_CASED_ID}" "" qtc_DIR "${QtCreator_DIR}" )
-    message("qt creator dir ${qtc_DIR}")
 
     add_test (NAME test_plugin_${plugin}_install
               COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${qtc_DIR} -P ${CMAKE_BINARY_DIR}/cmake_install.cmake
     )
 
     set( qtc_app  "${qtc_DIR}/${IDE_APP_PATH}/${IDE_APP_TARGET}" )
-    message("qt qtc_app ${qtc_app}")
+
     add_test( NAME test_plugin_${plugin} COMMAND ${qtc_app} -test ${plugin} )
     set_tests_properties( test_plugin_${plugin} PROPERTIES FIXTURES_REQUIRED test_plugin_${plugin}_install )
-
 endfunction()
 
 qtc_add_plugin_test( ${QTC_PLUGIN_NAME} )
