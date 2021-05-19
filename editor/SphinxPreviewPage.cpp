@@ -1,4 +1,5 @@
 #include "SphinxPreviewPage.h"
+#include "SphinxWidgetHelpers.h"
 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
@@ -47,24 +48,9 @@ PreviewPage::~PreviewPage() {}
 void PreviewPage::setHtml(const QString &html)
 {
     // preserve scroll position
-    auto vPos = -1;
-    auto hPos = -1;
-    auto vBar = mView->verticalScrollBar();
-    auto hBar = mView->horizontalScrollBar();
-    if (vBar) {
-        vPos = vBar->sliderPosition();
-    }
-    if (hBar) {
-        hPos = hBar->sliderPosition();
-    }
-
+    auto pos = SphinxWidgetHelpers::scrollBarPos(mView);
     mView->setHtml(html);
-    if (0 < vPos && vBar) {
-        vBar->setSliderPosition(vPos);
-    }
-    if (0 < hPos && hBar) {
-        hBar->setSliderPosition(hPos);
-    }
+    SphinxWidgetHelpers::setScrollBarPos(mView, pos);
 }
 
 void PreviewPage::updateView()

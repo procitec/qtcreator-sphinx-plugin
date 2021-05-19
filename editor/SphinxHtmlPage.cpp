@@ -1,12 +1,13 @@
 #include "SphinxHtmlPage.h"
+#include "SphinxWidgetHelpers.h"
 
+#include <projectexplorer/buildmanager.h>
+
+#include <QtCore/QUrl>
+#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
-
-#include <QtWidgets/QFileDialog>
-
-#include <projectexplorer/buildmanager.h>
 
 namespace qtc::plugin::sphinx {
 
@@ -45,14 +46,14 @@ HtmlPage::HtmlPage(QWidget *parent)
     mHtml = new QLineEdit(this);
     mHtml->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 
-    connect(mHtml, &QLineEdit::editingFinished, this, [=]() { onChangedHtml(mHtml->text()); });
+    connect(mHtml, &QLineEdit::editingFinished, this, [=]() { onChangedHtmlFile(mHtml->text()); });
     customFirstRow->addWidget(mHtml);
 
     auto *htmlFilePathBrowse = new QPushButton(QIcon::fromTheme("document-open"), QString());
     htmlFilePathBrowse->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     customFirstRow->addWidget(htmlFilePathBrowse);
 
-    connect(htmlFilePathBrowse, &QAbstractButton::pressed, this, &HtmlPage::onOpenUrl);
+    connect(htmlFilePathBrowse, &QAbstractButton::pressed, this, &HtmlPage::onOpenFile);
 
     //    customFirstRow->addSpacerItem(
     //        new QSpacerItem(1, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
@@ -84,7 +85,7 @@ HtmlPage::HtmlPage(QWidget *parent)
 
 HtmlPage::~HtmlPage() {}
 
-void HtmlPage::onChangedHtml(const QString &html)
+void HtmlPage::onChangedHtmlFile(const QString &html)
 {
     if (!html.isEmpty()) {
         auto url = QUrl(html);
@@ -98,17 +99,22 @@ void HtmlPage::onChangedHtml(const QString &html)
 
 void HtmlPage::updateView()
 {
-    if (url().isEmpty()) {
-        onOpenUrl();
+    if (htmlFile().isEmpty()) {
+        onOpenFile();
     } else {
-        setSourceInternal(url());
+        setSourceInternal(htmlFile());
         mView->update();
     }
 }
 
 void HtmlPage::onBuildQueueFinished()
 {
-    mView->update();
+    if (!htmlFile().isEmpty()) {
+        auto pos = SphinxWidgetHelpers::scrollBarPos(mView);
+        reload();
+        //mView->update();
+        SphinxWidgetHelpers::setScrollBarPos(mView, pos);
+    }
 }
 
 void HtmlPage::setSourceInternal(const QUrl &url)
@@ -118,23 +124,38 @@ void HtmlPage::setSourceInternal(const QUrl &url)
     QUrl newUrlWithoutFragment = url;
     newUrlWithoutFragment.setFragment({});
     mView->setUrl(url);
-    if (currentUrlWithoutFragment != newUrlWithoutFragment)
+    //qDebug() << "current url is set to " << mView->url().toString();
+    if (currentUrlWithoutFragment != newUrlWithoutFragment) {
         mView->setHtml(QString::fromUtf8(getData(url)));
+    }
 
-    mView->setZoomFactor(1.1);
+    //mView->setZoomFactor(1.1);
+}
+void HtmlPage::reload()
+{
+    if (!mView->url().isEmpty()) {
+        mView->setHtml(QString::fromUtf8(getData(mView->url())));
+    }
+    //mView->setZoomFactor(1.1);
 }
 
-void HtmlPage::onOpenUrl()
+void HtmlPage::onOpenFile()
 {
     {
+        auto text = mHtml->text();
+        auto dir = QString();
+        if (!text.isEmpty()) {
+            auto fileinfo = QFileInfo(text);
+            dir = (fileinfo.absoluteDir().exists()) ? fileinfo.dir().absolutePath() : QString();
+        }
         auto fileName = QFileDialog::getOpenFileName(this,
                                                      tr("html file"),
-                                                     "",
+                                                     dir,
                                                      tr("HTML (*.html *.htm)"));
         QFileInfo file(fileName);
         if (file.exists() && file.isReadable()) {
             mHtml->setText(file.absoluteFilePath());
-            onChangedHtml(file.absoluteFilePath());
+            onChangedHtmlFile(file.absoluteFilePath());
 
         } else {
             mHtml->clear();
@@ -143,15 +164,15 @@ void HtmlPage::onOpenUrl()
     }
 }
 
-QString HtmlPage::url() const
+QString HtmlPage::htmlFile() const
 {
     return mHtml->text();
 }
 
-void HtmlPage::setUrl(const QUrl &url)
+void HtmlPage::setHtmlFile(const QFileInfo &file)
 {
-    mHtml->setText(url.toString());
-    setSourceInternal(url);
+    mHtml->setText(file.absoluteFilePath());
+    onChangedHtmlFile(mHtml->text());
 }
 
 } // namespace qtc::plugin::sphinx

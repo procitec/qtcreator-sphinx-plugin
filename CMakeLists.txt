@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(qtcreator-plugin-sphinx VERSION "5.0.0.1")
+project(qtcreator-plugin-sphinx VERSION "5.0.0")
 
 set( QTC_PLUGIN_NAME Sphinx )
 set( QTC_PLUGIN_REVISION ${PROJECT_VERSION})
@@ -56,6 +56,8 @@ add_qtc_plugin( ${QTC_PLUGIN_NAME} VERSION ${qtcreator-plugin-sphinx_VERSION}
     options/SphinxOptionsWidget.cpp
     options/SphinxSettings.cpp
     editor/SphinxCodeModel.h
+    editor/SphinxWidgetHelpers.h
+    editor/SphinxWidgetHelpers.cpp
     qtcreator-sphinx-plugin.h
     qtcreator-sphinx-plugin_global.h
     qtcreator-sphinx-pluginconstants.h

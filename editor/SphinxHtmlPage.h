@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QFileInfo>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QWidget>
 
@@ -13,18 +14,19 @@ public:
     explicit HtmlPage(QWidget *parent = nullptr);
     virtual ~HtmlPage();
 
-    QString url() const;
-    void setUrl(const QUrl &);
+    QString htmlFile() const;
+    void setHtmlFile(const QFileInfo &);
     void updateView();
 
 public Q_SLOTS:
-    void onOpenUrl();
+    void onOpenFile();
 protected Q_SLOTS:
-    void onChangedHtml(const QString &);
+    void onChangedHtmlFile(const QString &);
     void onBuildQueueFinished();
 
 private:
     void setSourceInternal(const QUrl &url);
+    void reload();
 
 private:
     //QWebEngineView *mView;

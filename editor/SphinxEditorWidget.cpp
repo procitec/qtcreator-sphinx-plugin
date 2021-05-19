@@ -158,7 +158,6 @@ void EditorWidget::onUrlAction()
 {
     onShowRightPane(true);
     mRightPane->setCurrentTab(RightPaneWidget::PAGE_HTML);
-    mRightPane->html().setEnabled(true);
     mRightPane->html().updateView();
 }
 
@@ -205,7 +204,6 @@ void EditorWidget::readSettings()
         if (!mRightPane) {
             mRightPane = new RightPaneWidget(this);
         }
-        mRightPane->preview().setEnabled(true);
     }
 
     mParts = "#";
@@ -239,8 +237,7 @@ void EditorWidget::readFileSettings()
                         mRightPane = new RightPaneWidget(this);
                     }
                     onShowRightPane(true);
-                    mRightPane->html().setEnabled(true);
-                    mRightPane->html().setUrl(iter.value());
+                    mRightPane->html().setHtmlFile(iter.value());
                 }
             }
         }
@@ -256,7 +253,7 @@ void EditorWidget::saveFileSettings()
         }
         if (project) {
             const auto projectSettings = Internal::ProjectSettings::getSettings(project);
-            auto url = mRightPane->html().url();
+            auto url = mRightPane->html().htmlFile();
             auto filePath = textDocument()->filePath();
             if (!url.isEmpty() && filePath.exists()) {
                 projectSettings->addLinkedPreview(Internal::LinkedPreview(filePath, url));
