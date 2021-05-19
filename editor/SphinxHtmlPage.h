@@ -18,11 +18,14 @@ public:
     void setHtmlFile(const QFileInfo &);
     void updateView();
 
+protected:
+    void wheelEvent(QWheelEvent *) override;
 public Q_SLOTS:
     void onOpenFile();
 protected Q_SLOTS:
     void onChangedHtmlFile(const QString &);
     void onBuildQueueFinished();
+    void onContextMenuRequested(const QPoint &pos, const QUrl &url);
 
 private:
     void setSourceInternal(const QUrl &url);
@@ -32,6 +35,7 @@ private:
     //QWebEngineView *mView;
     QLiteHtmlWidget *mView = nullptr;
     QLineEdit *mHtml = nullptr;
+    const double mZoomStep = 0.1;
 };
 
 } // namespace qtc::plugin::sphinx

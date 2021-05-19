@@ -6,6 +6,7 @@
 #include <QtCore/QUrl>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
@@ -61,6 +62,7 @@ HtmlPage::HtmlPage(QWidget *parent)
     layout->addLayout(customFirstRow);
 
     mView = new QLiteHtmlWidget(this);
+    connect(mView, &QLiteHtmlWidget::contextMenuRequested, this, &HtmlPage::onContextMenuRequested);
 
     mView->show();
     layout->addWidget(mView);
@@ -84,6 +86,37 @@ HtmlPage::HtmlPage(QWidget *parent)
 }
 
 HtmlPage::~HtmlPage() {}
+
+void HtmlPage::wheelEvent(QWheelEvent *e)
+{
+    if (e) {
+        if (e->modifiers() & Qt::ControlModifier) {
+            e->setAccepted(true);
+            qreal zoom = 1.0;
+
+            if (e->angleDelta().y() < 0.0) {
+                zoom *= -1.0;
+            }
+            mView->setZoomFactor(mView->zoomFactor() + mZoomStep * zoom);
+        }
+    }
+}
+
+void HtmlPage::onContextMenuRequested(const QPoint &pos, const QUrl &url)
+{
+    QMenu menu;
+
+    menu.addAction(tr("Reload"), this, [this] { reload(); });
+    menu.addSeparator();
+    menu.addAction(tr("Zoom in"), this, [this] {
+        mView->setZoomFactor(mView->zoomFactor() + mZoomStep);
+    });
+    menu.addAction(tr("Zoom out"), this, [this] {
+        mView->setZoomFactor(mView->zoomFactor() - mZoomStep);
+    });
+    menu.addAction(tr("Zoom reset"), this, [this] { mView->setZoomFactor(1.0); });
+    menu.exec(mView->mapToGlobal(pos));
+}
 
 void HtmlPage::onChangedHtmlFile(const QString &html)
 {
