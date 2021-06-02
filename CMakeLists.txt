@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(qtcreator-plugin-sphinx VERSION "5.0.0")
+project(qtcreator-plugin-sphinx)
 
 set( QTC_PLUGIN_NAME Sphinx )
-set( QTC_PLUGIN_REVISION ${PROJECT_VERSION})
 
 option(WITH_TESTS "Build Tests" ON)
 option(WITH_DEBUG_CMAKE "Enabled CMake project debugging functionality (e.g. source file disk checking)" OFF)
@@ -29,7 +28,7 @@ set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-add_qtc_plugin( ${QTC_PLUGIN_NAME} VERSION ${qtcreator-plugin-sphinx_VERSION}
+add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
     DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::XmlPatterns QtCreator::qlitehtml
     SOURCES
