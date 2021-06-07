@@ -21,7 +21,7 @@ public:
     virtual ~EditorWidget();
 
     void unCommentSelection() override;
-    void aboutToOpen(const QString &fileName, const QString &realFileName) override;
+    void aboutToOpen(const Utils::FilePath &filePath, const Utils::FilePath &realFilePath) override;
 
     void increaseIndent() { mAutoIndent++; }
     void decreaseIndent() { mAutoIndent = (0 < mAutoIndent) ? mAutoIndent - 1 : 0; }

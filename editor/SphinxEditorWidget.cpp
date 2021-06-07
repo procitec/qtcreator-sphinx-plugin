@@ -76,10 +76,10 @@ EditorWidget::~EditorWidget()
     saveFileSettings();
 }
 
-void EditorWidget::aboutToOpen(const QString &fileName, const QString &realFileName)
+void EditorWidget::aboutToOpen(const Utils::FilePath &filePath, const Utils::FilePath &realFilePath)
 {
-    Q_UNUSED(fileName)
-    mRealFileName = realFileName;
+    Q_UNUSED(filePath)
+    mRealFileName = realFilePath.toString();
     readFileSettings();
 }
 
