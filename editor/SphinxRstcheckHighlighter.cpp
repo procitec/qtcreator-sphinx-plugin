@@ -76,7 +76,7 @@ ReSTCheckHighLighter::ReSTCheckHighLighter()
     QFileInfo info(pythonFilePath);
     if (info.exists() && info.isExecutable()) {
         mPythonFilePath = info.absoluteFilePath();
-        mReSTCheckScript = Core::ICore::resourcePath().toString()
+        mReSTCheckScript = Core::ICore::resourcePath()
                            + QLatin1String("/sphinx/rstcheck/rest_check.py");
         mReSTCheckFound = QFileInfo(mReSTCheckScript).exists();
     } else {

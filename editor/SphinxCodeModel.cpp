@@ -16,7 +16,7 @@ CodeModel::CodeModel()
 {
     theInstance = this;
     qDebug() << "start reading code model";
-    mModelDir.setPath(Core::ICore::resourcePath().toString() + "/sphinx/model");
+    mModelDir.setPath(Core::ICore::resourcePath() + "/sphinx/model");
     if (mModelDir.exists() && mModelDir.isReadable()) {
         mModelDir.setNameFilters(QStringList() << "*.xml");
         auto modelFiles = mModelDir.entryInfoList(QDir::Files | QDir::Readable);
