@@ -291,13 +291,13 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
         body: |
             External dependencies used to build the plugin.
             The Qt and QtCreator Versions should match with the versions from build.
             QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
             Qt: ${{ steps.qt.outputs.qt_base_url }}
+        draft: false
+        prerelease: false
 
     - name: Store Release url
       run: |
