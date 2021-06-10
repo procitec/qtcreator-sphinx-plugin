@@ -74,7 +74,7 @@ bool Plugin::initialize(const QStringList &arguments, QString *errorString)
     const QString locale = Core::ICore::userInterfaceLanguage();
     if (!locale.isEmpty()) {
         auto qtr = new QTranslator(this);
-        const QString creatorTrPath = Core::ICore::resourcePath("translations").toString();
+        const QString creatorTrPath = Core::ICore::resourcePath() + QLatin1String("/translations");
         const QString trFile = QLatin1String(Constants::SnippetGroupId) + "_" + locale;
         if (qtr->load(trFile, creatorTrPath)) {
             QCoreApplication::installTranslator(qtr);
