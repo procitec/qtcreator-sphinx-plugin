@@ -208,7 +208,8 @@ jobs:
 
         endforeach()
 
-        message("::set-output name=qtc_base_url::${qtc_base_url}/${qtc_platform}")
+        message("::set-output name=qtc_base_url::${qtc_base_url}")
+        message("::set-output name=qtc_base_url_platform::${qtc_base_url}/${qtc_platform}")
         message("::set-output name=qtc_dir::${qtc_dir}")
 
     - name: Build
@@ -244,9 +245,7 @@ jobs:
         set(qt_version "$ENV{QT_VERSION}")
         set( qt_url "${{ steps.qt.outputs.qt_base_url }}" )
         set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
-        set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url }}" )
-
-        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO-${{ matrix.config.artifact }}.md @ONLY )
+        set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url_platform }}" )
 
         execute_process(
             COMMAND python
@@ -292,7 +291,12 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
-        draft: true
+        body: |
+            External dependencies used to build the plugin.
+            The Qt and QtCreator Versions should match with the versions from build.
+            QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
+            Qt: ${{ steps.qt.outputs.qt_base_url }}
+        draft: false
         prerelease: false
 
     - name: Store Release url
