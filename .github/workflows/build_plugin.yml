@@ -247,8 +247,6 @@ jobs:
         set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
         set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url_platform }}" )
 
-        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO-${{ matrix.config.artifact }}.md @ONLY )
-
         execute_process(
             COMMAND python
                 -u
