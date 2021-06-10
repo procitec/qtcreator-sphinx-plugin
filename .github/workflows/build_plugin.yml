@@ -246,7 +246,7 @@ jobs:
         set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
         set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url }}" )
 
-        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
+        configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO-${{ matrix.config.artifact }}.md @ONLY )
 
         execute_process(
             COMMAND python
@@ -275,7 +275,7 @@ jobs:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
         path: |
             ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
-            ./RELEASEINFO.md
+            ./RELEASEINFO-${{ matrix.config.artifact }}.md
 
   release:
     if: contains(github.ref, 'tags/v')
@@ -351,3 +351,13 @@ jobs:
         asset_path: ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
         asset_content_type: application/x-7z-compressed
+    - name: Upload ReleaseInfo
+      id: upload_releaseinfo
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
+        asset_path: ./RELEASEINFO-${{ matrix.config.artifact }}.md
+        asset_name: RELEASEINFO-${{ matrix.config.artifact }}.md
+        asset_content_type: text/markdown
