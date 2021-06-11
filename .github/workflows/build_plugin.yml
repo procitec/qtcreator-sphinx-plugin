@@ -290,9 +290,9 @@ jobs:
         shell: cmake -P {0}
         run: |
             set( qt_version "$ENV{QT_VERSION}")
-            set( qt_url "${{ needs.build.outputs.qt_base_url }}" )
+            set( qt_url "${{ needs.build.outputs.qt_url }}" )
             set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
-            set( qtc_url "${{ needs.build.outputs.qtc_base_url }}" )
+            set( qtc_url "${{ needs.build.outputs.qtc_url }}" )
             configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
       - uses: actions/upload-artifact@v2
