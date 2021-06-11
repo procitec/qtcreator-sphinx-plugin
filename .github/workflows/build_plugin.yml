@@ -295,6 +295,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
             name: RELEASEINFO.md
+            path: |
+                ./RELEASEINFO.md
 
   release:
     if: contains(github.ref, 'tags/v')
@@ -322,5 +324,5 @@ jobs:
          draft: true
          prerelease: false
          files: |
-           **/*.7z
-           RELEASEINFO.md
+           'download/**/*.7z'
+           download/RELEASEINFO.md
