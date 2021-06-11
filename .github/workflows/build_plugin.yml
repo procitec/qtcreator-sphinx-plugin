@@ -267,19 +267,34 @@ jobs:
           message("output from configure: ${output}")
           message(FATAL_ERROR "Configure failed")
         endif()
-
+        
     - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
         path: |
             ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
-            ./RELEASEINFO-${{ matrix.config.artifact }}.md
+        
+  release_info:
+      runs-on: ubuntu-latest
+      needs: build
+      
+      steps:
+      - name: ReleaseInfo
+        id: release_info
+        shell: cmake -P {0}
+        run: |
+            set( qt_version "$ENV{QT_VERSION}")
+            set( qt_url "${{ steps.qt.outputs.qt_base_url }}" )
+            set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
+            set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url }}" )
+            configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
+
 
   release:
     if: contains(github.ref, 'tags/v')
     runs-on: ubuntu-latest
-    needs: build
+    needs: release_info
 
     steps:
     - name: Download artifact
@@ -298,14 +313,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-         # body_path: ${{ github.workflow }}-CHANGELOG.txt
-         body: |
-            External dependencies used to build the plugin.
-            The Qt and QtCreator Versions should match with the versions from build.
-            QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
-            Qt: ${{ steps.qt.outputs.qt_base_url }}
+         body_path: RELEASEINFO.md
          draft: true
          prerelease: false
          files: |
-           download/*.7z
+           ./download/qtcreator-*/*.7z
 

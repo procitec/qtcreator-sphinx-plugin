@@ -1,0 +1,17 @@
+# Versions
+
+External dependencies used to build the plugin.
+The Qt and QtCreator Versions should match with the versions from build.
+
+# Qt
+
+Version: @qt_version@
+
+Url: [@qt_url@](@qt_url@)
+
+# QtCreator
+-
+Version: @qtc_version@
+
+Url: [@qtc_url@](@qtc_url@)
+
