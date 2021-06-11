@@ -23,7 +23,6 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     outputs:
       qtc_url: ${{ steps.qt_creator.outputs.qtc_base_url }}
-      qt_url: ${{ steps.qt.outputs.qt_base_url }}
     strategy:
       matrix:
         config:
@@ -240,15 +239,8 @@ jobs:
             set( buildscript_DIR "Qt Creator.app/Contents/Resources/scripts/build_plugin.py" )
         endif()
 
-
-
         set(ENV{NINJA_STATUS} "[%f/%t %o/sec] ")
         set(ENV{Qt5_DIR} "${{ steps.qt.outputs.qt_dir }}" )
-
-        set(qt_version "$ENV{QT_VERSION}")
-        set( qt_url "${{ steps.qt.outputs.qt_base_url }}" )
-        set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
-        set( qtc_url "${{ steps.qt_creator.outputs.qtc_base_url_platform }}" )
 
         execute_process(
             COMMAND python
@@ -290,9 +282,9 @@ jobs:
         shell: cmake -P {0}
         run: |
             set( qt_version "$ENV{QT_VERSION}")
-            set( qt_url "${{ needs.build.outputs.qt_url }}" )
             set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
             set( qtc_url "${{ needs.build.outputs.qtc_url }}" )
+            set( readme_url "$$ENV{GITHUB_SERVER_URL}/$ENV{GITHUB_REPOSITORY}/blob/${{ github.ref }}/RELEASENOTES.md" )
             configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
       - uses: actions/upload-artifact@v2
