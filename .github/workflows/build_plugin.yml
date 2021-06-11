@@ -282,81 +282,30 @@ jobs:
     needs: build
 
     steps:
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-         # body_path: ${{ github.workflow }}-CHANGELOG.txt
-         body: |
-            External dependencies used to build the plugin.
-            The Qt and QtCreator Versions should match with the versions from build.
-            QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
-            Qt: ${{ steps.qt.outputs.qt_base_url }}
-         draft: true
-         prerelease: false
-
-    - name: Store Release url
-      run: |
-        echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
-
-    - uses: actions/upload-artifact@v1
-      with:
-        path: ./upload_url
-        name: upload_url
-  publish:
-    if: contains(github.ref, 'tags/v')
-
-    name: Release ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      matrix:
-        config:
-        - {
-            name: "Windows Latest x64", artifact: "Windows-x64.7z",
-            os: ubuntu-latest
-          }
-        - {
-            name: "Linux Latest x64", artifact: "Linux-x64.7z",
-            os: ubuntu-latest
-          }
-        - {
-            name: "macOS Latest x64", artifact: "macOS-x64.7z",
-            os: macos-latest
-          }
-    needs: release
-
-    steps:
-        
     - name: Download artifact
       uses: actions/download-artifact@v2
-#      with:
-#        name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
-#        path: ./
-        
-    - name: Download URL
-      uses: actions/download-artifact@v2
+      id: download
       with:
-        name: upload_url
-        path: ./
+        path: download
         
-    - name: Display structure of downloaded files
-      run: ls -R
-      working-directory: ./
+     - name: Display structure of downloaded files
+       run: ls -R
+       working-directory: download
+    
+     - name: Create Release
+       id: create_release
+       uses: softprops/action-gh-release@v1
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       with:
+          # body_path: ${{ github.workflow }}-CHANGELOG.txt
+          body: |
+             External dependencies used to build the plugin.
+             The Qt and QtCreator Versions should match with the versions from build.
+             QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
+             Qt: ${{ steps.qt.outputs.qt_base_url }}
+          draft: true
+          prerelease: false
+          files: |
+            download/*.7z
 
-    - id: set_upload_url
-      run: |
-        upload_url=`cat ./upload_url`
-        echo ::set-output name=upload_url::$upload_url
-
-    - name: Upload to Release
-      id: upload_to_release
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
-        asset_path: ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
-        asset_name: ${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}
-        asset_content_type: application/x-7z-compressed
