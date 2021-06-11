@@ -280,6 +280,8 @@ jobs:
       needs: build
       
       steps:
+      - uses: actions/checkout@v2
+
       - name: ReleaseInfo
         id: release_info
         shell: cmake -P {0}
