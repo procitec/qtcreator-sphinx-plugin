@@ -320,9 +320,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-         body_path: RELEASEINFO.md
+         body_path: download/RELEASEINFO.md/RELEASEINFO.md
          draft: true
          prerelease: false
          files: |
            'download/**/*.7z'
-           download/RELEASEINFO.md
