@@ -288,24 +288,24 @@ jobs:
       with:
         path: download
         
-     - name: Display structure of downloaded files
-       run: ls -R
-       working-directory: download
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: download
     
-     - name: Create Release
-       id: create_release
-       uses: softprops/action-gh-release@v1
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-       with:
-          # body_path: ${{ github.workflow }}-CHANGELOG.txt
-          body: |
-             External dependencies used to build the plugin.
-             The Qt and QtCreator Versions should match with the versions from build.
-             QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
-             Qt: ${{ steps.qt.outputs.qt_base_url }}
-          draft: true
-          prerelease: false
-          files: |
-            download/*.7z
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+         # body_path: ${{ github.workflow }}-CHANGELOG.txt
+         body: |
+            External dependencies used to build the plugin.
+            The Qt and QtCreator Versions should match with the versions from build.
+            QtCreator: ${{ steps.qt_creator.outputs.qtc_base_url }}
+            Qt: ${{ steps.qt.outputs.qt_base_url }}
+         draft: true
+         prerelease: false
+         files: |
+           download/*.7z
 
