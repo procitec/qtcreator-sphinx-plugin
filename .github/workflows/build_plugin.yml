@@ -13,7 +13,7 @@ env:
   PLUGIN_NAME: qtcreator-sphinx-plugin
   QT_VERSION: 5.15.2
   QT_CREATOR_VERSION: 5.0.0-beta1
-  QT_CREATOR_SNAPSHOT: latest
+  QT_CREATOR_SNAPSHOT: 353
   CMAKE_VERSION: 3.18.3
   NINJA_VERSION: 1.10.1
 
@@ -306,9 +306,9 @@ jobs:
       with:
         path: download
         
-    - name: Display structure of downloaded files
-      run: ls -R
-      working-directory: download
+#    - name: Display structure of downloaded files
+#      run: ls -R
+#      working-directory: download
     
     - name: Create Release
       id: create_release
