@@ -284,7 +284,7 @@ jobs:
             set( qt_version "$ENV{QT_VERSION}")
             set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
             set( qtc_url "${{ needs.build.outputs.qtc_url }}" )
-            set( readme_url "$$ENV{GITHUB_SERVER_URL}/$ENV{GITHUB_REPOSITORY}/blob/${{ github.ref }}/RELEASENOTES.md" )
+            set( readme_url "$ENV{GITHUB_SERVER_URL}/$ENV{GITHUB_REPOSITORY}/blob/{{GITHUB_REF#refs/tags/}}/RELEASENOTES.md" )
             configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
       - uses: actions/upload-artifact@v2
