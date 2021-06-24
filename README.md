@@ -1,6 +1,6 @@
 # qtcreator-sphinx-plugin
 
-Plugin for QtCreator to improvide editing of Sphinx RestructredText files.
+Plugin for QtCreator to improve editing of Sphinx RestructredText files.
 
 The plugin is currently **Under Development**. Usage is possible, but on own risk.
 If you have issues or improvments, feel free to create an issue.
@@ -14,25 +14,25 @@ If you have issues or improvments, feel free to create an issue.
 * Code completion for directive and roles (proof of concept, directive config later)
 * Parser for Sphinx Warnings and Errors
 * Configurable Sphinx Snippets
-* File To HTML Result Linkage
+* File To HTML Result Linkage with View in right sidebar
+* Quick preview during typing with [rst2html5](https://pypi.org/project/rst2html5/)
 
 For further details refer to [Usage documentation](doc/Usage.md).
 
 ## Build
 
-To build the plugin, you must compile QtCreator from Source or get an appropriate version from 
-[QtCreator Snapshots](https://download.qt.io/snapshots/qtcreator/)
+To build the plugin, you must compile QtCreator from source or get an appropriate version from 
+[QtCreator Snapshots](https://download.qt.io/snapshots/qtcreator/) or [QtCreator Releases](https://download.qt.io/official_releases/qtcreator) .
 
-The plugin required the environment variables **QTC_SOURCE** and **QTC_BUILD** to be set
-(see [QtCreator Plugin Framework](https://doc-snapshots.qt.io/qtcreator-extending/first-plugin.html) ).
+The plugin could be build by using the "build_plugin.py" script provided by QtCreator.
+A short wrapper script for this "build.py" is available in the project root.
 
-To build the plugin simply run qmake in the build directory, pointing to the root qtcreator-sphinx-plugin.pro file
-(an out-of-source build is recommended).
+After the build the output directory could be copied to the QtCreator directory.
 
-After build you can install the plugin with *make install INSTALL_ROOT=dest* to install the plugin together with the configuration files.
+Alternatively you can get a compiled plugin binary from the provided [Releases](https://github.com/procitec/qtcreator-sphinx-plugin/releases). Please ensure to have the identical QtCreator Version from these builds.
+The Versions and Urls for Qt and QtCreator are provided with the build artefacts.
 
-Alternatively you can get a compiled plugin binary from the provided releases. Please ensure to have the identical QtCreator Version from these builds.
-The Versions and Urls for Qt and QtCreator are provided with the build artefact.
+The master branch is build against snapshots from the master repository, the branches are build against dedicated offical QtCreator Releases.
 
 ## Installation
 
@@ -46,8 +46,8 @@ and restart QtCreator.
 
 ## Dependencies
 
-The plugin has runtime dependencies for [rstcheck](https://pypi.org/project/rstcheck/) if enabled.
-An apropriate python executable must be configured to import *rstcheck* as a module from within the plugin.
-Configuration of environment is not possible, the provided wrapper script requires import of rstcheck.
+The plugin has runtime dependencies for [rstcheck](https://pypi.org/project/rstcheck/)  and [rst2html5](https://pypi.org/project/rst2html5/) if enabled.
+An apropriate python executable must be configured to import *rstcheck* and *rst2html5* as a module from within the plugin.
+Configuration of environment is not possible, the provided wrapper script requires import of the modules.
 The script is located in the *share* directory of the plugin and could be adapted to your needs.
 
