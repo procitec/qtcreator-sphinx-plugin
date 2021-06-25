@@ -14,12 +14,9 @@ logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.WARNING)
 # Activate this line  to get debug output of the initialization process
-logger.setLevel( logging.DEBUG )
-
-# activate this line if you want also log to file. Adapt the path to your needs.
-fh = logging.FileHandler('log.txt')
-logger.addHandler(fh)
-
+#logger.setLevel( logging.DEBUG )
+# set True to enable file logging (only for use during developing the parser)
+enable_file_logging = False
 
 try:
     import locale  # module missing in Jython
@@ -59,7 +56,7 @@ class Preview:
       logger.setLevel( logging.WARNING )
 
     print(f"{self.endSeq}", flush=True);
-    
+
   def __processCommands(self, commands):
     content = "\n".join(commands)
     try:
@@ -80,6 +77,12 @@ class Preview:
 if len(sys.argv) < 3:
   raise RuntimeError("ERROR: Missing arguments.\nUsage: rest_to_html.py protocol_start_sequence protocol_end_sequence")
 else:
+
+  if len(sys.argv) >=4 and enable_file_logging:
+      logfile_name = sys.argv[3]
+      fh = logging.FileHandler(logfile_name)
+      logger.addHandler(fh)
+
   logger.debug("MAIN() Completion script: %s", sys.argv[0])
   logger.debug("MAIN() protocol_start_sequence: %s", sys.argv[1] )
   logger.debug("MAIN() protocol_end_sequence: %s", sys.argv[2])

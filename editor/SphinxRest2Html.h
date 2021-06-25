@@ -91,6 +91,8 @@ private:
     void processReST2HtmlOutput();
     Offenses processReST2HtmlErrorOutput();
     Range lineColumnLengthToRange(int line, int column, int length);
+    QString logFilePath() const;
+
 
     bool mReST2HtmlFound = false;
     bool mBusy = false;
@@ -111,5 +113,6 @@ private:
     QString mStartSeq = "%<$<!<";
     QString mEndSeq = ">!>$>%";
     QString mOutHtml;
+    const QString mLogFile = "rest2html.log";
 };
 } // namespace qtc::plugin::sphinx
