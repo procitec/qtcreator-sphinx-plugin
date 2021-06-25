@@ -15,7 +15,7 @@
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextDocument>
 
-Q_LOGGING_CATEGORY(log, "qtc.sphinx.rstcheck");
+Q_LOGGING_CATEGORY(log_rstcheck, "qtc.sphinx.rstcheck");
 
 namespace qtc::plugin::sphinx {
 
@@ -174,11 +174,6 @@ void ReSTCheckHighLighter::finishReSTCheckHighlight()
                                                                          ReSTCheckFucture.future());
 
     mBusy = false;
-
-#if 0
-    qCDebug(log) << "rstcheck in" << mTimer.elapsed() << "ms," << offenses.count()
-                 << "offenses found.";
-#endif
 }
 
 static int kindOfSeverity(const QStringRef &severity)

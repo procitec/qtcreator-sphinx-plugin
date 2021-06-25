@@ -157,7 +157,7 @@ void HtmlPage::setSourceInternal(const QUrl &url)
     QUrl newUrlWithoutFragment = url;
     newUrlWithoutFragment.setFragment({});
     mView->setUrl(url);
-    //qDebug() << "current url is set to " << mView->url().toString();
+    //qCDebug() << "current url is set to " << mView->url().toString();
     if (currentUrlWithoutFragment != newUrlWithoutFragment) {
         mView->setHtml(QString::fromUtf8(getData(url)));
     }
