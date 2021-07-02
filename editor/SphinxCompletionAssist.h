@@ -5,6 +5,7 @@
 #include <texteditor/snippets/snippetassistcollector.h>
 
 #include <QtCore/QFutureWatcher>
+#include <QtCore/QMutex>
 #include <QtGui/QIcon>
 
 namespace qtc::plugin::sphinx {
@@ -35,6 +36,7 @@ private:
     TextEditor::SnippetAssistCollector m_SphinxSnippetCollector;
     QStringList mDocumentWords;
     QFutureWatcher<QStringList> mWordProcessor;
+    QMutex mDocumentWordsLock;
 };
 
 } // namespace qtc::plugin::sphinx

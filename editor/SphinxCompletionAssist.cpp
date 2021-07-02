@@ -99,6 +99,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
             auto wordUnderCursor = line.mid(linePos, startPosition);
 
             QObject::connect(&mWordProcessor, &QFutureWatcher<QStringList>::finished, [this]() {
+                QMutexLocker lock(&mDocumentWordsLock);
                 mDocumentWords = mWordProcessor.result();
             });
 
@@ -221,6 +222,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
         // load from this document words
         if (!context.isEmpty()) {
+            QMutexLocker lock(&mDocumentWordsLock);
             for (const auto &word : mDocumentWords) {
                 if (word.startsWith(context)) { // this should match all directives
                     auto item = new TextEditor::AssistProposalItem;

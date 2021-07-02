@@ -36,7 +36,7 @@ public:
 
     static ReSTCheckHighLighter *instance();
 
-    bool run(TextEditor::TextDocument *document, const QString &fileNameTip);
+    bool run(TextEditor::TextDocument *document);
 
 private:
     class Range

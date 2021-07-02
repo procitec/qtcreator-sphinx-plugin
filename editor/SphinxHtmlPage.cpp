@@ -3,12 +3,15 @@
 
 #include <projectexplorer/buildmanager.h>
 
+#include <QtCore/QLoggingCategory>
 #include <QtCore/QUrl>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
+
+Q_LOGGING_CATEGORY(log_html, "qtc.sphinx.htmlpage");
 
 namespace qtc::plugin::sphinx {
 
@@ -36,8 +39,7 @@ static QByteArray getData(const QUrl &url)
     return data;
 }
 
-HtmlPage::HtmlPage(QWidget *parent)
-    : QWidget(parent)
+HtmlPage::HtmlPage(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout();
     auto *customFirstRow = new QHBoxLayout();
@@ -68,7 +70,9 @@ HtmlPage::HtmlPage(QWidget *parent)
     layout->addWidget(mView);
 
     QPalette p = palette();
-    p.setColor(QPalette::Inactive, QPalette::Highlight, p.color(QPalette::Active, QPalette::Highlight));
+    p.setColor(QPalette::Inactive,
+               QPalette::Highlight,
+               p.color(QPalette::Active, QPalette::Highlight));
     p.setColor(QPalette::Inactive,
                QPalette::HighlightedText,
                p.color(QPalette::Active, QPalette::HighlightedText));

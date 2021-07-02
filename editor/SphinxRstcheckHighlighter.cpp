@@ -100,18 +100,20 @@ ReSTCheckHighLighter *ReSTCheckHighLighter::instance()
 }
 
 // return false if we are busy, true if everything is ok (or rstcheck wasn't found)
-bool ReSTCheckHighLighter::run(TextEditor::TextDocument *document, const QString &fileNameTip)
+bool ReSTCheckHighLighter::run(TextEditor::TextDocument *document)
 {
+    if (!document) {
+        return true;
+    }
+
     if (!mReSTCheckProcess) {
         initReSTCheckProcess();
     }
+
     if (mBusy || mReSTCheckProcess->state() == QProcess::Starting)
         return false;
     if (!mReSTCheckFound)
         return true;
-
-    const QString filePath = document->filePath().isEmpty() ? fileNameTip
-                                                            : document->filePath().toString();
 
     QByteArray data = document->plainText().toUtf8();
     if (!data.isEmpty()) {

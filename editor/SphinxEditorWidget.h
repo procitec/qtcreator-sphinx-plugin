@@ -12,10 +12,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+class TestRightPane;
+
 namespace qtc::plugin::sphinx {
 class EditorWidget : public TextEditor::TextEditorWidget
 {
     Q_OBJECT
+    friend class TestRightPane;
+
 public:
     EditorWidget();
     virtual ~EditorWidget();
@@ -65,9 +69,11 @@ public Q_SLOTS:
 
 protected:
     void finalizeInitialization() override;
+    void finalizeInitializationAfterDuplication(TextEditorWidget *) override;
     void keyPressEvent(QKeyEvent *e) override;
     void showEvent(QShowEvent *) override;
     void hideEvent(QHideEvent *) override;
+    void focusInEvent(QFocusEvent *e) override;
 
 private Q_SLOTS:
     void onCustomContextMenu(const QPoint &pos);
@@ -79,7 +85,7 @@ private:
     void addToolBar();
 
     void readSettings();
-    void readFileSettings();
+    void readFileSettings(const Utils::FilePath &);
     void saveFileSettings();
     void connectActions();
     void handleTabKeyRemove();
@@ -120,8 +126,7 @@ private:
     QTimer mPreviewTimer;
     bool mPreviewPending = false;
     bool mUsePreview = false;
-
-    QString mRealFileName;
+    bool mRightPaneVisible = false;
     RightPaneWidget *mRightPane = nullptr;
 
     QAction *mUrlAction = nullptr;

@@ -11,6 +11,10 @@
 #include "projectexplorer/project.h"
 #include "projectexplorer/session.h"
 
+#include <QtCore/QLoggingCategory>
+
+Q_LOGGING_CATEGORY(log_editor, "qtc.sphinx.editor");
+
 namespace qtc::plugin::sphinx {
 
 const int RSTCHECK_UPDATE_INTERVAL = 300;
@@ -49,6 +53,15 @@ void EditorWidget::finalizeInitialization()
     connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::schedulePreview);
 }
 
+void EditorWidget::finalizeInitializationAfterDuplication(TextEditorWidget *)
+{
+    if (textDocumentPtr()) {
+        readFileSettings(textDocumentPtr()->filePath().absoluteFilePath());
+        onShowRightPane(true);
+        schedulePreview();
+    }
+}
+
 void EditorWidget::onCustomContextMenu(const QPoint &pos)
 {
     QMenu menu(this);
@@ -79,8 +92,7 @@ EditorWidget::~EditorWidget()
 void EditorWidget::aboutToOpen(const Utils::FilePath &filePath, const Utils::FilePath &realFilePath)
 {
     Q_UNUSED(filePath)
-    mRealFileName = realFilePath.toString();
-    readFileSettings();
+    readFileSettings(realFilePath);
 }
 
 void EditorWidget::connectActions()
@@ -167,7 +179,7 @@ void EditorWidget::onToggleRightPane()
 {
     if (mRightPane) {
         onShowRightPane(!mRightPane->isVisible());
-        if (mUsePreview && mRightPane->isVisible()) {
+        if (mRightPane->isVisible()) {
             mRightPane->setCurrentTab(RightPaneWidget::PAGE_PREVIEW);
             mRightPane->preview().updateView();
         }
@@ -201,10 +213,9 @@ void EditorWidget::readSettings()
     mUsePreview = s->value(SettingsIds::RST2HTML, QVariant(mUsePreview)).toBool();
     s->endGroup();
 
-    if (mUsePreview) {
-        if (!mRightPane) {
-            mRightPane = new RightPaneWidget(this);
-        }
+    if (!mRightPane) {
+        mRightPane = new RightPaneWidget(this);
+        onShowRightPane(false);
     }
 
     mParts = "#";
@@ -221,9 +232,9 @@ void EditorWidget::readSettings()
     mParagraphsOverline = false;
 }
 
-void EditorWidget::readFileSettings()
+void EditorWidget::readFileSettings(const Utils::FilePath &file_path)
 {
-    auto *project = ProjectExplorer::SessionManager::projectForFile(textDocument()->filePath());
+    auto *project = ProjectExplorer::SessionManager::projectForFile(file_path);
     if (!project) {
         project = ProjectExplorer::SessionManager::startupProject();
     }
@@ -231,8 +242,7 @@ void EditorWidget::readFileSettings()
         const auto projectSettings = Internal::ProjectSettings::getSettings(project);
         auto linkedPreviews = projectSettings->linkedPreviews();
         for (auto iter = linkedPreviews.begin(); iter != linkedPreviews.end(); ++iter) {
-            auto filePath = Utils::FilePath::fromString(mRealFileName);
-            if (filePath == iter.key()) {
+            if (file_path == iter.key()) {
                 if (!iter.value().isEmpty()) {
                     if (!mRightPane) {
                         mRightPane = new RightPaneWidget(this);
@@ -375,30 +385,32 @@ void EditorWidget::handleTabKeyRemove()
 
 void EditorWidget::keyPressEvent(QKeyEvent *e)
 {
-    auto k = e->key();
-    bool forwardToBase = true;
+    if (e) {
+        auto k = e->key();
+        bool forwardToBase = true;
 
-    if (k == Qt::Key_Tab) {
-        handleTabKeyInsert();
-        forwardToBase = false;
-    } else if (k == Qt::Key_Backtab) {
-        handleTabKeyRemove();
-        forwardToBase = false;
-    } else if (k == Qt::Key_Return || k == Qt::Key_Enter) {
-        for (auto line = 0; line < spacing(); line++) {
+        if (k == Qt::Key_Tab) {
+            handleTabKeyInsert();
+            forwardToBase = false;
+        } else if (k == Qt::Key_Backtab) {
+            handleTabKeyRemove();
+            forwardToBase = false;
+        } else if (k == Qt::Key_Return || k == Qt::Key_Enter) {
+            for (auto line = 0; line < spacing(); line++) {
+                TextEditorWidget::keyPressEvent(e);
+            }
+
+            forwardToBase = false;
+            //textDocumentPtr()->autoIndent(textCursor());
+            if (0 < mAutoIndent) {
+                auto tc = textCursor();
+                tc.insertText(QString().fill(' ', indent()));
+            }
+        }
+
+        if (forwardToBase) {
             TextEditorWidget::keyPressEvent(e);
         }
-
-        forwardToBase = false;
-        //textDocumentPtr()->autoIndent(textCursor());
-        if (0 < mAutoIndent) {
-            auto tc = textCursor();
-            tc.insertText(QString().fill(' ', indent()));
-        }
-    }
-
-    if (forwardToBase) {
-        TextEditorWidget::keyPressEvent(e);
     }
 }
 
@@ -415,8 +427,7 @@ void EditorWidget::scheduleRstCheckUpdate()
 
 void EditorWidget::updateRstCheck()
 {
-    if (mUseReSTCheckHighlighter
-        && !ReSTCheckHighLighter::instance()->run(textDocument(), mRealFileName)) {
+    if (mUseReSTCheckHighlighter && !ReSTCheckHighLighter::instance()->run(textDocument())) {
         mReSTCheckUpdatePending = true;
         mUpdateRstCheckTimer.start();
     }
@@ -435,7 +446,7 @@ void EditorWidget::schedulePreview()
 
 void EditorWidget::updatePreview()
 {
-    if (mUsePreview && !ReST2Html::instance()->run(textDocument(), mRealFileName)) {
+    if (mUsePreview && !ReST2Html::instance()->run(textDocument())) {
         mPreviewPending = true;
         mPreviewTimer.start();
     }
@@ -443,15 +454,36 @@ void EditorWidget::updatePreview()
 
 void EditorWidget::showEvent(QShowEvent *e)
 {
-    onShowRightPane(true);
-    TextEditorWidget::showEvent(e);
+    onShowRightPane(mRightPaneVisible);
+    if (e) {
+        TextEditorWidget::showEvent(e);
+    }
 }
 
 void EditorWidget::hideEvent(QHideEvent *e)
 {
+    mRightPaneVisible = mRightPane ? mRightPane->isVisible() : false;
     onShowRightPane(false);
-    TextEditorWidget::hideEvent(e);
+
+    if (e) {
+        TextEditorWidget::hideEvent(e);
+    }
 }
+
+void EditorWidget::focusInEvent(QFocusEvent *e)
+{
+    if (e) {
+        TextEditorWidget::focusInEvent(e);
+    }
+    //    onShowRightPane(mRightPaneVisible);
+    schedulePreview();
+}
+
+//void EditorWidget::focusOutEvent(QFocusEvent *e)
+//{
+//    onShowRightPane(false);
+//    TextEditorWidget::focusOutEvent(e);
+//}
 
 void EditorWidget::onShowRightPane(bool show)
 {

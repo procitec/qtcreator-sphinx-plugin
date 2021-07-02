@@ -8,6 +8,7 @@
 
 #include "tests/tst_completion.h"
 #include "tests/tst_formatter.h"
+#include "tests/tst_rightpane.h"
 
 #include <texteditor/codestylepool.h>
 #include <texteditor/simplecodestylepreferences.h>
@@ -151,7 +152,7 @@ QVector<QObject *> Plugin::createTestObjects() const
 {
 #ifdef WITH_TESTS
     QVector<QObject *> tests;
-    tests << new TestFormatter << new TestCompletion;
+    tests << new TestFormatter << new TestCompletion << new TestRightPane;
     return tests;
 #else
     return {};
