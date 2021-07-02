@@ -28,6 +28,8 @@ set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
+set( QTC_PLUGIN_REVISION 212)
+
 add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
     DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::XmlPatterns QtCreator::qlitehtml
@@ -92,9 +94,12 @@ extend_qtc_plugin( ${QTC_PLUGIN_NAME}
   CONDITION WITH_TESTS
   SOURCES
       tests/tst_formatter.cpp
-      tests/tst_completion.cpp
       tests/tst_formatter.h
+      tests/tst_completion.cpp
       tests/tst_completion.h
+      tests/tst_rightpane.cpp
+      tests/tst_rightpane.h
+
   DEPENDS  ${QtX}::Test
 )
 

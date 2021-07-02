@@ -1,6 +1,6 @@
 {
     \"Name\" : \"Sphinx\",
-    \"Version\" : \"$$QTCREATOR_VERSION_26\",
+    \"Version\" : \"$$QTCREATOR_VERSION_$$QTC_PLUGIN_REVISION\",
     \"CompatVersion\" : \"$$QTCREATOR_COMPAT_VERSION\",
     \"Vendor\" : \"PROCITEC GmbH \",
     \"Copyright\" : \"(C) PROCITEC GmbH \",
