@@ -36,7 +36,7 @@ public:
 
     static ReST2Html *instance();
 
-    bool run(TextEditor::TextDocument *document, const QString &fileNameTip);
+    bool run(TextEditor::TextDocument *document);
 
 signals:
     void htmlChanged(const QString &);
@@ -91,8 +91,7 @@ private:
     void processReST2HtmlOutput();
     Offenses processReST2HtmlErrorOutput();
     Range lineColumnLengthToRange(int line, int column, int length);
-    QString logFilePath() const;
-
+    std::unique_ptr<QTemporaryFile> logFilePath() const;
 
     bool mReST2HtmlFound = false;
     bool mBusy = false;
@@ -113,6 +112,6 @@ private:
     QString mStartSeq = "%<$<!<";
     QString mEndSeq = ">!>$>%";
     QString mOutHtml;
-    const QString mLogFile = "rest2html.log";
+    std::unique_ptr<QTemporaryFile> mLogFile = nullptr;
 };
 } // namespace qtc::plugin::sphinx

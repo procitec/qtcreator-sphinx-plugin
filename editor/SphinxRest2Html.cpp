@@ -4,6 +4,9 @@
 
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
+#include <utils/temporarydirectory.h>
+#include <utils/temporaryfile.h>
+
 #include <texteditor/semantichighlighter.h>
 #include <texteditor/textdocument.h>
 #include <texteditor/textmark.h>
@@ -24,7 +27,7 @@ static ReST2Html *theRest2HtmlInstance = nullptr;
 class ReST2HtmlFucture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
 {
 public:
-    ReST2HtmlFucture(const Offenses &offenses) { reportResults(offenses); }
+    explicit ReST2HtmlFucture(const Offenses &offenses) { reportResults(offenses); }
 };
 
 class TextMark : public TextEditor::TextMark
@@ -91,6 +94,8 @@ ReST2Html::ReST2Html()
         qCWarning(log_rst2html) << "not executable or wrong configured rst2html script call:"
                                 << mPythonFilePath << " " << mReST2HtmlScript;
     }
+
+    mLogFile = logFilePath();
 }
 
 ReST2Html::~ReST2Html()
@@ -106,20 +111,22 @@ ReST2Html *ReST2Html::instance()
 }
 
 // return false if we are busy, true if everything is ok (or ReST2Html wasn't found)
-bool ReST2Html::run(TextEditor::TextDocument *document, const QString &fileNameTip)
+bool ReST2Html::run(TextEditor::TextDocument *document /*, const QString &fileNameTip*/)
 {
-    // todo
-    // run the process in context of the file path for parsing ".. include:: correctly"
+    if (!document) {
+        return true;
+    }
 
-    const QString filePath = QFileInfo(document->filePath().isEmpty()
-                                           ? fileNameTip
-                                           : document->filePath().toString())
-                                 .absoluteDir()
-                                 .absolutePath();
+    bool filePathValid = !document->filePath().isEmpty();
+    if (!filePathValid) {
+        return true;
+    }
+    const QString filePath = QFileInfo(document->filePath().toString()).absoluteDir().absolutePath();
 
     if (!mReST2HtmlProcess) {
         initReST2HtmlProcess(filePath);
     } else if (mReST2HtmlProcess->workingDirectory() != filePath) {
+        // run the process in context of the file path for parsing ".. include:: correctly"
         restartReST2HtmlProcess(filePath);
     }
 
@@ -144,15 +151,23 @@ bool ReST2Html::run(TextEditor::TextDocument *document, const QString &fileNameT
     return true;
 }
 
-QString ReST2Html::logFilePath() const
+std::unique_ptr<QTemporaryFile> ReST2Html::logFilePath() const
 {
     auto relResource = QString(qtc::plugin::sphinx::Constants::SnippetGroupId).toLower();
-    auto path = Core::ICore::cacheResourcePath(relResource).toString();
-    const QDir fi(path);
-    if (!fi.exists()) {
-        fi.mkpath(fi.absolutePath());
-    }
-    return path + "/" + mLogFile;
+
+    const QString fileTemplate = QLatin1String("/rst2html") + QLatin1String("-XXXXXX.log");
+
+    auto temporary_dir = Utils::TemporaryDirectory(relResource);
+    temporary_dir.setAutoRemove(false);
+
+    auto temporaryFile = std::make_unique<QTemporaryFile>(temporary_dir.path() + fileTemplate);
+    temporaryFile->open();
+    temporaryFile->setAutoRemove(false);
+
+    qCInfo(log_rst2html()) << "using temporary file" << temporaryFile->fileName()
+                           << "for rst2html logs";
+
+    return temporaryFile;
 }
 
 void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
@@ -161,16 +176,13 @@ void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
         mReST2HtmlProcess = new QProcess;
         mReST2HtmlProcess->setWorkingDirectory(workingDirectoy);
         void (QProcess::*signal)(int, QProcess::ExitStatus) = &QProcess::finished;
-        QObject::connect(mReST2HtmlProcess,
-                         signal,
-                         [&](int status, QProcess::ExitStatus /*exitStatus*/) {
-                             if (status) {
-                                 Core::MessageManager::instance()->writeFlashing(
-                                     QString("rst2html exited with error: %1\n").arg(status)
-                                     + QString::fromUtf8(
-                                         mReST2HtmlProcess->readAllStandardError().trimmed()));
-                             }
-                         });
+        QObject::connect(mReST2HtmlProcess, signal, [&](int status, QProcess::ExitStatus /*exitStatus*/) {
+            if (status) {
+                Core::MessageManager::instance()->writeFlashing(
+                    QString("rst2html exited with error: %1\n").arg(status)
+                    + QString::fromUtf8(mReST2HtmlProcess->readAllStandardError().trimmed()));
+            }
+        });
 
         QObject::connect(mReST2HtmlProcess, &QProcess::readyReadStandardOutput, [&]() {
             mOutputBuffer.append(QString::fromUtf8(mReST2HtmlProcess->readAllStandardOutput()));
@@ -180,7 +192,7 @@ void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
         });
 
         mReST2HtmlProcess->start(mPythonFilePath,
-                                 {mReST2HtmlScript, mStartSeq, mEndSeq, logFilePath()},
+                                 {mReST2HtmlScript, mStartSeq, mEndSeq, mLogFile->fileName()},
                                  QIODevice::ReadWrite | QIODevice::Text);
     }
 }
@@ -188,18 +200,22 @@ void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
 void ReST2Html::closeReST2HtmlProcess()
 {
     if (mReST2HtmlProcess) {
-        mReST2HtmlProcess->write(mEndSeq.toUtf8().constData());
-        mReST2HtmlProcess->close();
+        //mReST2HtmlProcess->write(mEndSeq.toUtf8().constData());
+        mReST2HtmlProcess->closeWriteChannel();
+        mReST2HtmlProcess->waitForBytesWritten();
         mReST2HtmlProcess->waitForFinished(300);
         if (mReST2HtmlProcess->state() == QProcess::NotRunning) {
             delete mReST2HtmlProcess;
             mReST2HtmlProcess = nullptr;
+        } else {
+            qCWarning(log_rst2html()) << "process could not be stopped gracefully";
         }
     }
 }
 
 void ReST2Html::restartReST2HtmlProcess(const QString &workingDirectory)
 {
+    qCInfo(log_rst2html()) << "restart html process during new workingDirectory:" << workingDirectory;
     closeReST2HtmlProcess();
     initReST2HtmlProcess(workingDirectory);
 }
@@ -215,22 +231,16 @@ void ReST2Html::finishReST2HtmlHighlight()
     bool isHtml = (mOutputBuffer.startsWith("<!DOCTYPE html>")) ? true : false;
     // normal output or error output?
     if (!isHtml) {
+        qCInfo(log_rst2html()) << "received error output in rst2html" << mOutputBuffer;
         Offenses offenses = processReST2HtmlErrorOutput();
         const Utils::FilePath filePath = mDocument->filePath();
         for (Diagnostic &diag : mDiagnostics[filePath]) {
-            diag.textMark = std::make_shared<TextMark>(filePath,
-                                                       diag.line,
-                                                       diag.severity,
-                                                       diag.message);
+            diag.textMark = std::make_shared<TextMark>(filePath, diag.line, diag.severity, diag.message);
             mDocument->addMark(diag.textMark.get());
         }
         ReST2HtmlFucture ReST2HtmlFucture(offenses);
         TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
-            mDocument->syntaxHighlighter(),
-            ReST2HtmlFucture.future(),
-            0,
-            offenses.count(),
-            mExtraFormats);
+            mDocument->syntaxHighlighter(), ReST2HtmlFucture.future(), 0, offenses.count(), mExtraFormats);
         TextEditor::SemanticHighlighter::clearExtraAdditionalFormatsUntilEnd(
             mDocument->syntaxHighlighter(), ReST2HtmlFucture.future());
     } else {
@@ -318,9 +328,7 @@ void ReST2Html::processReST2HtmlOutput()
     mOutputBuffer.clear();
 }
 
-qtc::plugin::sphinx::ReST2Html::Range ReST2Html::lineColumnLengthToRange(int line,
-                                                                         int column,
-                                                                         int length)
+qtc::plugin::sphinx::ReST2Html::Range ReST2Html::lineColumnLengthToRange(int line, int column, int length)
 {
     const QTextBlock block = mDocument->document()->findBlockByLineNumber(line - 1);
     const int pos = block.position() + column;

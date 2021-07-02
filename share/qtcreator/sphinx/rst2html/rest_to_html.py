@@ -65,6 +65,8 @@ class Preview:
         ).decode('utf-8')
     except Exception as error:
         output=ErrorString(error)
+        logger.error(f"{output}")
+        print(f"{self.endSeq}", flush=True);
 
     logger.debug(f"{output}")
     print(f"{output}")
@@ -95,4 +97,3 @@ else:
   for line in input_stream:
     logger.debug("MAIN() new stdin: %s", line)
     preview.process(line)
-
