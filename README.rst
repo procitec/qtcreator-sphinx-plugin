@@ -12,14 +12,14 @@ Features
 
 * Extends TextEditor with Toolbar for formating options
 * Custom Sphinx highlighting
-* *Preview* warnings by using [rstcheck](https://pypi.org/project/rstcheck/)
+* *Preview* warnings by using `rstcheck <https://pypi.org/project/rstcheck/>`_
 * Code completion for directive and roles (proof of concept, directive config later)
 * Parser for Sphinx Warnings and Errors
 * Configurable Sphinx Snippets
 * File To HTML Result Linkage with View in right sidebar
-* Quick preview during typing with [rst2html5](https://pypi.org/project/rst2html5/)
+* Quick preview during typing with `rst2html5 <https://pypi.org/project/rst2html5/>`_
 
-For further details refer to [Usage documentation](doc/Usage.md).
+For further details refer to `Usage documentation <doc/Usage.md>`_.
 
 Build
 =====
