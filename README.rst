@@ -19,7 +19,7 @@ Features
 * File To HTML Result Linkage with View in right sidebar
 * Quick preview during typing with `rst2html5 <https://pypi.org/project/rst2html5/>`_
 
-For further details refer to `Usage documentation <doc/Usage.md>`_.
+For further details refer to `Usage documentation <doc/Usage.rst>`_.
 
 Build
 =====
