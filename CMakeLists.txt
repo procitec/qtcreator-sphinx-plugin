@@ -89,7 +89,6 @@ add_qtc_plugin( ${QTC_PLUGIN_NAME}
 
 add_translation_targets( ${QTC_PLUGIN_NAME} INSTALL_DESTINATION "${IDE_DATA_PATH}/translations" LANGUAGES "de"  TARGETS ${QTC_PLUGIN_NAME} )
 
-
 extend_qtc_plugin( ${QTC_PLUGIN_NAME}
   CONDITION WITH_TESTS
   SOURCES
@@ -109,7 +108,6 @@ INSTALL( DIRECTORY "share/qtcreator/sphinx" DESTINATION "${IDE_DATA_PATH}" PATTE
 INSTALL( FILES "share/qtcreator/snippets/sphinx.xml"  DESTINATION "${IDE_DATA_PATH}/snippets" )
 
 string( REPLACE "${IDE_CMAKE_INSTALL_PATH}/${IDE_CASED_ID}" "" qtc_DIR "${QtCreator_DIR}" )
-message("qt creator dir ${qtc_DIR}")
 
 function( qtc_add_plugin_test plugin)
     string( REPLACE "${IDE_CMAKE_INSTALL_PATH}/${IDE_CASED_ID}" "" qtc_DIR "${QtCreator_DIR}" )
