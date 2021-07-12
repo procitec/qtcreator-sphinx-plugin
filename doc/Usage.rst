@@ -97,7 +97,6 @@ code models.
 
     Directive Completion with directive content
 
-
 Preview
 =======
 
@@ -154,7 +153,7 @@ Like other plugins the settings for this plugin could be viewed/set in QtCreator
 The Sphinx plugin currently supports setting
 
 * Custom Highlighting or QtCreator Kate Highlighting if disabled
-* Path and exectuable name to python3 which is used for :ref:`rstcheck` and :ref:`Preview`.
+* Path and exectuable name to python3 which is used for  `rstcheck`_ and `Preview`_.
 
     Modules must be installed in this python installation. A future enhancment is to check at startup
     if the modules could be used and show appropriate error messages if not.
