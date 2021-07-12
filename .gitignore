@@ -43,3 +43,4 @@ build-dbg
 *.pro.user
 CMakeLists.txt.user
 
+doc/_build
