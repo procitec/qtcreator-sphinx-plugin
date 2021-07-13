@@ -1,12 +1,12 @@
 #include "SphinxRstcheckHighlighter.h"
 #include "../options/SphinxSettings.h"
 #include "../qtcreator-sphinx-pluginconstants.h"
+#include "SphinxWidgetHelpers.h"
 
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
 #include <texteditor/semantichighlighter.h>
 #include <texteditor/textdocument.h>
-#include <texteditor/textmark.h>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDebug>
@@ -21,40 +21,11 @@ namespace qtc::plugin::sphinx {
 
 static ReSTCheckHighLighter *theReSTCheckHighlighterInstance = nullptr;
 
-class ReSTCheckFucture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
-{
-public:
-    ReSTCheckFucture(const Offenses &offenses) { reportResults(offenses); }
-};
-
-class TextMark : public TextEditor::TextMark
-{
-public:
-    static Utils::Theme::Color colorForSeverity(int severity)
-    {
-        switch (severity) {
-        case 1:
-            return Utils::Theme::TextColorNormal;
-        case 2:
-            return Utils::Theme::CodeModel_Warning_TextMarkColor;
-        case 3:
-            return Utils::Theme::CodeModel_Error_TextMarkColor;
-        case 4:
-            return Utils::Theme::CodeModel_Error_TextMarkColor;
-        default:
-            return Utils::Theme::TextColorNormal;
-        }
-    }
-    TextMark(const Utils::FilePath &fileName, int line, int severity, const QString &text)
-        : TextEditor::TextMark(fileName, line, "rstcheck")
-    {
-        setColor(colorForSeverity(severity));
-        setPriority(TextEditor::TextMark::Priority(severity));
-        setLineAnnotation(text);
-        QString tooltip = text;
-        setToolTip(tooltip);
-    }
-};
+//class ReSTCheckFucture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
+//{
+//public:
+//    explicit ReSTCheckFucture(const Offenses &offenses) { reportResults(offenses); }
+//};
 
 ReSTCheckHighLighter::ReSTCheckHighLighter()
 {
@@ -83,6 +54,8 @@ ReSTCheckHighLighter::ReSTCheckHighLighter()
         mPythonFilePath.clear();
         mReSTCheckFound = false;
     }
+
+    mLogFile = logFilePath();
 }
 
 ReSTCheckHighLighter::~ReSTCheckHighLighter()
@@ -151,7 +124,7 @@ void ReSTCheckHighLighter::initReSTCheckProcess()
     });
 
     mReSTCheckProcess->start(mPythonFilePath,
-                             {mReSTCheckScript, mStartSeq, mEndSeq},
+                             {mReSTCheckScript, mStartSeq, mEndSeq, mLogFile->fileName()},
                              QIODevice::ReadWrite | QIODevice::Text);
 }
 
@@ -163,17 +136,20 @@ void ReSTCheckHighLighter::finishReSTCheckHighlight()
         return;
     }
 
-    Offenses offenses = processReSTCheckOutput();
+    /*Offenses offenses = */ processReSTCheckOutput();
     const Utils::FilePath filePath = mDocument->filePath();
-    for (Diagnostic &diag : mDiagnostics[filePath]) {
-        diag.textMark = std::make_shared<TextMark>(filePath, diag.line, diag.severity, diag.message);
+    for (auto &diag : mDiagnostics[filePath]) {
+        diag.textMark = std::make_shared<Marks::TextMark>(filePath,
+                                                          diag.line,
+                                                          diag.severity,
+                                                          diag.message);
         mDocument->addMark(diag.textMark.get());
     }
-    ReSTCheckFucture ReSTCheckFucture(offenses);
-    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
-        mDocument->syntaxHighlighter(), ReSTCheckFucture.future(), 0, offenses.count(), mExtraFormats);
-    TextEditor::SemanticHighlighter::clearExtraAdditionalFormatsUntilEnd(mDocument->syntaxHighlighter(),
-                                                                         ReSTCheckFucture.future());
+    //    ReSTCheckFucture ReSTCheckFucture(offenses);
+    //    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
+    //        mDocument->syntaxHighlighter(), ReSTCheckFucture.future(), 0, offenses.count(), mExtraFormats);
+    //    TextEditor::SemanticHighlighter::clearExtraAdditionalFormatsUntilEnd(mDocument->syntaxHighlighter(),
+    //                                                                         ReSTCheckFucture.future());
 
     mBusy = false;
 }
@@ -199,10 +175,25 @@ static int kindOfSeverity(const QStringRef &severity)
     return kind;
 }
 
-Offenses ReSTCheckHighLighter::processReSTCheckOutput()
+std::unique_ptr<QTemporaryFile> ReSTCheckHighLighter::logFilePath() const
 {
-    Offenses result;
-    Diagnostics &diag = mDiagnostics[mDocument->filePath()] = Diagnostics();
+    auto temporary_dir = WidgetHelpers::log_directory();
+    const QString fileTemplate = QLatin1String("/rstcheck") + QLatin1String("-XXXXXX.log");
+
+    auto temporaryFile = std::make_unique<QTemporaryFile>(temporary_dir + fileTemplate);
+    temporaryFile->open();
+    temporaryFile->setAutoRemove(false);
+
+    qCInfo(log_rstcheck()) << "using temporary file" << temporaryFile->fileName()
+                           << "for rstcheck logs";
+
+    return temporaryFile;
+}
+
+void ReSTCheckHighLighter::processReSTCheckOutput()
+{
+    //    Offenses result;
+    auto &diag = mDiagnostics[mDocument->filePath()];
 
     const QVector<QStringRef> lines = mOutputBuffer.splitRef('\n');
     for (const QStringRef &line : lines) {
@@ -215,9 +206,10 @@ Offenses ReSTCheckHighLighter::processReSTCheckOutput()
         int kind = kindOfSeverity(fields[1]);
         int column = -1;
         //fields[2].toInt();
-        int length = -1;
+        //int length = -1;
         //fields[3].toInt();
-        result << TextEditor::HighlightingResult(uint(lineN), uint(column), uint(length), kind);
+        //result << TextEditor::HighlightingResult(uint(lineN), uint(column), uint(length), kind);
+        qCInfo(log_rstcheck) << "adding offense at " << lineN << column << kind;
 
         QRegularExpression messageRegEx = QRegularExpression(
             "\\((INFO|WARNING|ERROR|SEVERE)/\\d+\\)(.*)");
@@ -226,20 +218,20 @@ Offenses ReSTCheckHighLighter::processReSTCheckOutput()
         if (match.hasMatch()) {
             message = match.captured(2).trimmed();
         }
-        diag.push_back(Diagnostic{lineN, kind, message, nullptr});
+        diag[lineN] = (Marks::Diagnostic{lineN, kind, message, nullptr});
     }
 
-    mOutputBuffer.clear();
+    qCInfo(log_rstcheck) << "found diagnostic issues with rstcheck" << diag.size() << " in file "
+                         << qPrintable(mDocument->filePath().toString());
 
-    return result;
+    mOutputBuffer.clear();
 }
 
-qtc::plugin::sphinx::ReSTCheckHighLighter::Range ReSTCheckHighLighter::lineColumnLengthToRange(
-    int line, int column, int length)
+Marks::Range ReSTCheckHighLighter::lineColumnLengthToRange(int line, int column, int length)
 {
     const QTextBlock block = mDocument->document()->findBlockByLineNumber(line - 1);
     const int pos = block.position() + column;
-    return Range(line, pos, length);
+    return Marks::Range(line, pos, length);
 }
 
 } // namespace qtc::plugin::sphinx

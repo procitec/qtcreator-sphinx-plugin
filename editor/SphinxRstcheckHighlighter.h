@@ -1,12 +1,12 @@
 #pragma once
 
+#include "SphinxWidgetHelpers.h"
 #include <texteditor/semantichighlighter.h>
-
 #include <utils/fileutils.h>
 
 #include <QElapsedTimer>
-#include <QFuture>
-#include <QFutureWatcher>
+//#include <QFuture>
+//#include <QFutureWatcher>
 #include <QObject>
 #include <QPointer>
 #include <QTemporaryFile>
@@ -24,9 +24,6 @@ namespace qtc::plugin::sphinx {
 
 class TextMark;
 
-typedef TextEditor::HighlightingResult Offense;
-typedef QVector<TextEditor::HighlightingResult> Offenses;
-
 class ReSTCheckHighLighter : public QObject
 {
     Q_OBJECT
@@ -39,52 +36,11 @@ public:
     bool run(TextEditor::TextDocument *document);
 
 private:
-    class Range
-    {
-    public:
-        int line = 0;
-        int pos = 0;
-        int length = 0;
-
-        Range() = default;
-        Range(int pos, int length)
-            : pos(pos)
-            , length(length)
-        {}
-        Range(int line, int pos, int length)
-            : line(line)
-            , pos(pos)
-            , length(length)
-        {}
-
-        // Not really equal, since the length attribute is ignored.
-        bool operator==(const Range &other) const
-        {
-            const int value = other.pos;
-            return value >= pos && value < (pos + length);
-        }
-
-        bool operator<(const Range &other) const
-        {
-            const int value = other.pos;
-            return pos < value && (pos + length) < value;
-        }
-    };
-
-    struct Diagnostic
-    {
-        int line;
-        int severity;
-        QString message;
-        std::shared_ptr<TextMark> textMark;
-    };
-
-    using Diagnostics = std::vector<Diagnostic>;
-
     void initReSTCheckProcess();
     void finishReSTCheckHighlight();
-    Offenses processReSTCheckOutput();
-    Range lineColumnLengthToRange(int line, int column, int length);
+    void processReSTCheckOutput();
+    Marks::Range lineColumnLengthToRange(int line, int column, int length);
+    std::unique_ptr<QTemporaryFile> logFilePath() const;
 
     bool mReSTCheckFound = false;
     bool mBusy = false;
@@ -98,11 +54,12 @@ private:
     QPointer<TextEditor::TextDocument> mDocument;
     QHash<int, QTextCharFormat> mExtraFormats;
 
-    QHash<Utils::FilePath, Diagnostics> mDiagnostics;
+    QHash<Utils::FilePath, Marks::Diagnostics> mDiagnostics;
     std::vector<TextMark *> mTextMarks;
 
     QElapsedTimer mTimer;
     QString mStartSeq = "%<$<!<";
     QString mEndSeq = ">!>$>%";
+    std::unique_ptr<QTemporaryFile> mLogFile = nullptr;
 };
 } // namespace qtc::plugin::sphinx

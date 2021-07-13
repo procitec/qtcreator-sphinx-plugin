@@ -1,7 +1,7 @@
 #pragma once
 
+#include "SphinxWidgetHelpers.h"
 #include <texteditor/semantichighlighter.h>
-
 #include <utils/fileutils.h>
 
 #include <QElapsedTimer>
@@ -24,8 +24,8 @@ namespace qtc::plugin::sphinx {
 
 class TextMark;
 
-typedef TextEditor::HighlightingResult Offense;
-typedef QVector<TextEditor::HighlightingResult> Offenses;
+//typedef TextEditor::HighlightingResult Offense;
+//typedef QVector<TextEditor::HighlightingResult> Offenses;
 
 class ReST2Html : public QObject
 {
@@ -42,14 +42,6 @@ signals:
     void htmlChanged(const QString &);
 
 private:
-    struct Diagnostic
-    {
-        int line;
-        int severity;
-        QString message;
-        std::shared_ptr<TextMark> textMark;
-    };
-
     class Range
     {
     public:
@@ -82,14 +74,13 @@ private:
         }
     };
 
-    using Diagnostics = std::vector<Diagnostic>;
-
     void initReST2HtmlProcess(const QString &);
     void restartReST2HtmlProcess(const QString &);
     void closeReST2HtmlProcess();
-    void finishReST2HtmlHighlight();
-    void processReST2HtmlOutput();
-    Offenses processReST2HtmlErrorOutput();
+    void finishReST2HtmlOutput();
+    void processReST2HtmlOutput(const QString &buffer);
+    void processReST2HtmlErrors(const QString &buffer);
+    /*Offenses*/ void processReST2HtmlErrorOutput(const QString &buffer);
     Range lineColumnLengthToRange(int line, int column, int length);
     std::unique_ptr<QTemporaryFile> logFilePath() const;
 
@@ -100,12 +91,13 @@ private:
     QTemporaryFile mTemporaryFile;
     QString mPythonFilePath;
     QString mOutputBuffer;
+    QString mErrorBuffer;
 
     int mStartRevision = 0;
     QPointer<TextEditor::TextDocument> mDocument;
     QHash<int, QTextCharFormat> mExtraFormats;
 
-    QHash<Utils::FilePath, Diagnostics> mDiagnostics;
+    QHash<Utils::FilePath, Marks::Diagnostics> mDiagnostics;
     std::vector<TextMark *> mTextMarks;
 
     QElapsedTimer mTimer;
@@ -113,5 +105,6 @@ private:
     QString mEndSeq = ">!>$>%";
     QString mOutHtml;
     std::unique_ptr<QTemporaryFile> mLogFile = nullptr;
+    QList<QString> mMessageFilter;
 };
 } // namespace qtc::plugin::sphinx

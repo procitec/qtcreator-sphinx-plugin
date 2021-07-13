@@ -147,10 +147,10 @@ void HtmlPage::updateView()
 void HtmlPage::onBuildQueueFinished()
 {
     if (!htmlFile().isEmpty()) {
-        auto pos = SphinxWidgetHelpers::scrollBarPos(mView);
+        auto pos = WidgetHelpers::scrollBarPos(mView);
         reload();
         //mView->update();
-        SphinxWidgetHelpers::setScrollBarPos(mView, pos);
+        WidgetHelpers::setScrollBarPos(mView, pos);
     }
 }
 

@@ -1,11 +1,11 @@
 #include "SphinxRest2Html.h"
 #include "../options/SphinxSettings.h"
 #include "../qtcreator-sphinx-pluginconstants.h"
+#include "SphinxWidgetHelpers.h"
 
 #include <coreplugin/icore.h>
 #include <coreplugin/messagemanager.h>
 #include <utils/temporarydirectory.h>
-#include <utils/temporaryfile.h>
 
 #include <texteditor/semantichighlighter.h>
 #include <texteditor/textdocument.h>
@@ -24,40 +24,11 @@ namespace qtc::plugin::sphinx {
 
 static ReST2Html *theRest2HtmlInstance = nullptr;
 
-class ReST2HtmlFucture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
-{
-public:
-    explicit ReST2HtmlFucture(const Offenses &offenses) { reportResults(offenses); }
-};
-
-class TextMark : public TextEditor::TextMark
-{
-public:
-    static Utils::Theme::Color colorForSeverity(int severity)
-    {
-        switch (severity) {
-        case 1:
-            return Utils::Theme::TextColorNormal;
-        case 2:
-            return Utils::Theme::CodeModel_Warning_TextMarkColor;
-        case 3:
-            return Utils::Theme::CodeModel_Error_TextMarkColor;
-        case 4:
-            return Utils::Theme::CodeModel_Error_TextMarkColor;
-        default:
-            return Utils::Theme::TextColorNormal;
-        }
-    }
-    TextMark(const Utils::FilePath &fileName, int line, int severity, const QString &text)
-        : TextEditor::TextMark(fileName, line, "rest2html")
-    {
-        setColor(colorForSeverity(severity));
-        setPriority(TextEditor::TextMark::Priority(severity));
-        setLineAnnotation(text);
-        QString tooltip = text;
-        setToolTip(tooltip);
-    }
-};
+//class ReST2HtmlFuture : public QFutureInterface<TextEditor::HighlightingResult>, public QObject
+//{
+//public:
+//    explicit ReST2HtmlFuture(const Offenses &offenses) { reportResults(offenses); }
+//};
 
 ReST2Html::ReST2Html()
 {
@@ -96,6 +67,7 @@ ReST2Html::ReST2Html()
     }
 
     mLogFile = logFilePath();
+    mMessageFilter = {"Unknown directive"};
 }
 
 ReST2Html::~ReST2Html()
@@ -144,7 +116,12 @@ bool ReST2Html::run(TextEditor::TextDocument *document /*, const QString &fileNa
         mDocument = document;
 
         mReST2HtmlProcess->write(mStartSeq.toUtf8().constData());
-        mReST2HtmlProcess->write(data.constData(), data.length());
+        QVariantMap content;
+        content["source"] = data.constData();
+        content["source_path"] = document->filePath().toString();
+        QJsonDocument json;
+        json.setObject(QJsonObject::fromVariantMap(content));
+        mReST2HtmlProcess->write(json.toJson().constData(), json.toJson().length());
         mReST2HtmlProcess->write(mEndSeq.toUtf8().constData());
         mReST2HtmlProcess->write("\n");
     }
@@ -153,14 +130,11 @@ bool ReST2Html::run(TextEditor::TextDocument *document /*, const QString &fileNa
 
 std::unique_ptr<QTemporaryFile> ReST2Html::logFilePath() const
 {
-    auto relResource = QString(qtc::plugin::sphinx::Constants::SnippetGroupId).toLower();
-
     const QString fileTemplate = QLatin1String("/rst2html") + QLatin1String("-XXXXXX.log");
 
-    auto temporary_dir = Utils::TemporaryDirectory(relResource);
-    temporary_dir.setAutoRemove(false);
+    auto temporary_dir = WidgetHelpers::log_directory();
 
-    auto temporaryFile = std::make_unique<QTemporaryFile>(temporary_dir.path() + fileTemplate);
+    auto temporaryFile = std::make_unique<QTemporaryFile>(temporary_dir + fileTemplate);
     temporaryFile->open();
     temporaryFile->setAutoRemove(false);
 
@@ -179,17 +153,22 @@ void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
         QObject::connect(mReST2HtmlProcess, signal, [&](int status, QProcess::ExitStatus /*exitStatus*/) {
             if (status) {
                 Core::MessageManager::instance()->writeFlashing(
-                    QString("rst2html exited with error: %1\n").arg(status)
-                    + QString::fromUtf8(mReST2HtmlProcess->readAllStandardError().trimmed()));
+                    QString("rst2html exited with error: %1\n").arg(status) + mErrorBuffer);
             }
         });
 
         QObject::connect(mReST2HtmlProcess, &QProcess::readyReadStandardOutput, [&]() {
             mOutputBuffer.append(QString::fromUtf8(mReST2HtmlProcess->readAllStandardOutput()));
             if (mOutputBuffer.endsWith(mEndSeq + "\n")) {
-                finishReST2HtmlHighlight();
+                finishReST2HtmlOutput();
             }
         });
+        QObject::connect(mReST2HtmlProcess, &QProcess::readyReadStandardError, [&]() {
+            mErrorBuffer.append(QString::fromUtf8(mReST2HtmlProcess->readAllStandardError()));
+        });
+
+        mErrorBuffer.clear();
+        mOutputBuffer.clear();
 
         mReST2HtmlProcess->start(mPythonFilePath,
                                  {mReST2HtmlScript, mStartSeq, mEndSeq, mLogFile->fileName()},
@@ -220,7 +199,7 @@ void ReST2Html::restartReST2HtmlProcess(const QString &workingDirectory)
     initReST2HtmlProcess(workingDirectory);
 }
 
-void ReST2Html::finishReST2HtmlHighlight()
+void ReST2Html::finishReST2HtmlOutput()
 {
     QTextDocument *doc = mDocument ? mDocument->document() : nullptr;
     if (!doc || mStartRevision != doc->revision()) {
@@ -229,25 +208,37 @@ void ReST2Html::finishReST2HtmlHighlight()
     }
 
     bool isHtml = (mOutputBuffer.startsWith("<!DOCTYPE html>")) ? true : false;
-    // normal output or error output?
-    if (!isHtml) {
-        qCInfo(log_rst2html()) << "received error output in rst2html" << mOutputBuffer;
-        Offenses offenses = processReST2HtmlErrorOutput();
-        const Utils::FilePath filePath = mDocument->filePath();
-        for (Diagnostic &diag : mDiagnostics[filePath]) {
-            diag.textMark = std::make_shared<TextMark>(filePath, diag.line, diag.severity, diag.message);
-            mDocument->addMark(diag.textMark.get());
-        }
-        ReST2HtmlFucture ReST2HtmlFucture(offenses);
-        TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
-            mDocument->syntaxHighlighter(), ReST2HtmlFucture.future(), 0, offenses.count(), mExtraFormats);
-        TextEditor::SemanticHighlighter::clearExtraAdditionalFormatsUntilEnd(
-            mDocument->syntaxHighlighter(), ReST2HtmlFucture.future());
-    } else {
-        processReST2HtmlOutput();
+    if (isHtml) {
+        processReST2HtmlOutput(mOutputBuffer);
+    }
+    if (!mErrorBuffer.isEmpty()) {
+        processReST2HtmlErrors(mErrorBuffer);
     }
 
+    mOutputBuffer.clear();
+    mErrorBuffer.clear();
+
     mBusy = false;
+}
+
+void ReST2Html::processReST2HtmlErrors(const QString &buffer)
+{
+    qCInfo(log_rst2html()) << "received error output in rst2html" << buffer;
+    /*Offenses offenses = */
+    processReST2HtmlErrorOutput(buffer);
+    const Utils::FilePath filePath = mDocument->filePath();
+    for (auto &diag : mDiagnostics[filePath]) {
+        diag.textMark = std::make_shared<Marks::TextMark>(filePath,
+                                                          diag.line,
+                                                          diag.severity,
+                                                          diag.message);
+        mDocument->addMark(diag.textMark.get());
+    }
+    //    ReST2HtmlFuture ReST2HtmlFuture(offenses);
+    //    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
+    //        mDocument->syntaxHighlighter(), ReST2HtmlFuture.future(), 0, offenses.count(), mExtraFormats);
+    //    TextEditor::SemanticHighlighter::clearExtraAdditionalFormatsUntilEnd(mDocument->syntaxHighlighter(),
+    //                                                                         ReST2HtmlFuture.future());
 }
 
 static int kindOfSeverity(const QStringRef &severity)
@@ -271,17 +262,14 @@ static int kindOfSeverity(const QStringRef &severity)
     return kind;
 }
 
-Offenses ReST2Html::processReST2HtmlErrorOutput()
+void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
 {
     //        SystemMessage: <string>:13: (SEVERE/4) Problems with "include" directive path:
     //        InputError: [Errno 2] No such file or directory: 'test.rst'.
 
-    Offenses result;
-    Diagnostics &diag = mDiagnostics[mDocument->filePath()] = Diagnostics();
+    // Offenses result;
 
-    mOutHtml.clear();
-
-    const QVector<QStringRef> lines = mOutputBuffer.splitRef('\n');
+    const QVector<QStringRef> lines = buffer.splitRef('\n');
     for (const QStringRef &line : lines) {
         if (line == mEndSeq)
             break;
@@ -289,33 +277,53 @@ Offenses ReST2Html::processReST2HtmlErrorOutput()
         QVector<QStringRef> fields = line.split(':');
         if (fields.size() < 2)
             continue;
-        int lineN = fields[0].toInt();
-        int kind = kindOfSeverity(fields[1]);
+
+        auto filename = fields[0].toString();
+        int lineN = fields[1].toInt();
+        int kind = kindOfSeverity(fields[2]);
         int column = -1;
         //fields[2].toInt();
-        int length = -1;
+        //int length = -1;
         //fields[3].toInt();
-        result << TextEditor::HighlightingResult(uint(lineN), uint(column), uint(length), kind);
+        //result << TextEditor::HighlightingResult(uint(lineN), uint(column), uint(length), kind);
 
+        //<string>:9: (ERROR/3) Content block expected for the \"code\" directive
         QRegularExpression messageRegEx = QRegularExpression(
             "\\((INFO|WARNING|ERROR|SEVERE)/\\d+\\)(.*)");
-        QRegularExpressionMatch match = messageRegEx.match(fields[1]);
+        QRegularExpressionMatch match = messageRegEx.match(fields[2]);
         QString message;
         if (match.hasMatch()) {
             message = match.captured(2).trimmed();
+            for (const auto &f : mMessageFilter) {
+                if (message.startsWith(f)) {
+                    message.clear();
+                    break;
+                }
+            }
         }
-        diag.push_back(Diagnostic{lineN, kind, message, nullptr});
+        // filename handling
+        if (filename == "<string>" || filename.isEmpty())
+            continue;
+
+        if (0 < lineN && 0 < kind && !message.isEmpty()) {
+            QFileInfo fi = (QFileInfo::exists(filename))
+                               ? filename
+                               : mReST2HtmlProcess->workingDirectory() + "/" + filename;
+
+            qCInfo(log_rst2html) << "adding diag for " << fi.absoluteFilePath() << " at " << lineN
+                                 << column << kind;
+            auto &diag = mDiagnostics[Utils::FilePath::fromFileInfo(fi)];
+            diag[lineN] = (Marks::Diagnostic{lineN, kind, message, nullptr});
+        }
     }
 
-    mOutputBuffer.clear();
-
-    return result;
+    // return {};
 }
 
-void ReST2Html::processReST2HtmlOutput()
+void ReST2Html::processReST2HtmlOutput(const QString &buffer)
 {
     mOutHtml.clear();
-    const QVector<QStringRef> lines = mOutputBuffer.splitRef('\n');
+    const QVector<QStringRef> lines = buffer.splitRef('\n');
     for (const QStringRef &line : lines) {
         if (line == mEndSeq)
             break;
@@ -324,8 +332,6 @@ void ReST2Html::processReST2HtmlOutput()
     }
 
     emit htmlChanged(mOutHtml);
-
-    mOutputBuffer.clear();
 }
 
 qtc::plugin::sphinx::ReST2Html::Range ReST2Html::lineColumnLengthToRange(int line, int column, int length)

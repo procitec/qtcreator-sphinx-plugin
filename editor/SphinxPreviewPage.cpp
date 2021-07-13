@@ -48,9 +48,9 @@ PreviewPage::~PreviewPage() {}
 void PreviewPage::setHtml(const QString &html)
 {
     // preserve scroll position
-    auto pos = SphinxWidgetHelpers::scrollBarPos(mView);
+    auto pos = WidgetHelpers::scrollBarPos(mView);
     mView->setHtml(html);
-    SphinxWidgetHelpers::setScrollBarPos(mView, pos);
+    WidgetHelpers::setScrollBarPos(mView, pos);
 }
 
 void PreviewPage::updateView()
