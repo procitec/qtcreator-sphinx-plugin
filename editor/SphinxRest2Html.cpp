@@ -144,11 +144,11 @@ std::unique_ptr<QTemporaryFile> ReST2Html::logFilePath() const
     return temporaryFile;
 }
 
-void ReST2Html::initReST2HtmlProcess(const QString &workingDirectoy)
+void ReST2Html::initReST2HtmlProcess(const QString &workingDirectory)
 {
     if (!mReST2HtmlProcess) {
         mReST2HtmlProcess = new QProcess;
-        mReST2HtmlProcess->setWorkingDirectory(workingDirectoy);
+        mReST2HtmlProcess->setWorkingDirectory(workingDirectory);
         void (QProcess::*signal)(int, QProcess::ExitStatus) = &QProcess::finished;
         QObject::connect(mReST2HtmlProcess, signal, [&](int status, QProcess::ExitStatus /*exitStatus*/) {
             if (status) {
@@ -331,7 +331,7 @@ void ReST2Html::processReST2HtmlOutput(const QString &buffer)
         mOutHtml.append(line + "\n");
     }
 
-    emit htmlChanged(mOutHtml);
+    emit htmlChanged(mOutHtml, mReST2HtmlProcess->workingDirectory());
 }
 
 qtc::plugin::sphinx::ReST2Html::Range ReST2Html::lineColumnLengthToRange(int line, int column, int length)

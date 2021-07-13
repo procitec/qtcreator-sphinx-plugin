@@ -45,10 +45,11 @@ PreviewPage::PreviewPage(QWidget *parent)
 
 PreviewPage::~PreviewPage() {}
 
-void PreviewPage::setHtml(const QString &html)
+void PreviewPage::setHtml(const QString &html, const QString &workingDirectory)
 {
     // preserve scroll position
     auto pos = WidgetHelpers::scrollBarPos(mView);
+    mView->setUrl(QUrl(QString("file://%1/index.html").arg(workingDirectory)));
     mView->setHtml(html);
     WidgetHelpers::setScrollBarPos(mView, pos);
 }

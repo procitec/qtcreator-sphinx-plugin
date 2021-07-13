@@ -14,7 +14,7 @@ public:
     virtual ~PreviewPage() override;
 
     void updateView();
-    void setHtml(const QString &);
+    void setHtml(const QString &, const QString &workingDirectory);
 
 private:
     //QWebEngineView *mView;

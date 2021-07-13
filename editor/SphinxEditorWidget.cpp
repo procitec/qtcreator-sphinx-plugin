@@ -186,12 +186,12 @@ void EditorWidget::onToggleRightPane()
     }
 }
 
-void EditorWidget::onPreviewHtmlChanged(const QString &html)
+void EditorWidget::onPreviewHtmlChanged(const QString &html, const QString &workingDirectory)
 {
     if (!html.isEmpty() && mRightPane && mRightPane->isVisible()) {
         onShowRightPane(true);
         mRightPane->setTabEnabled(RightPaneWidget::PAGE_PREVIEW, true);
-        mRightPane->preview().setHtml(html);
+        mRightPane->preview().setHtml(html, workingDirectory);
     }
 }
 

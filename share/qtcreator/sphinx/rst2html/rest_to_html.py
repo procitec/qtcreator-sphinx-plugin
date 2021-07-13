@@ -52,14 +52,6 @@ class Preview:
                 logger.debug("process(): parser result: %s", result)
                 self.__processCommands(result)
 
-    def __debugOutput(self, enable):
-        if enable:
-            logger.setLevel(logging.DEBUG)
-        else:
-            logger.setLevel(logging.WARNING)
-
-        print(f"{self.endSeq}", flush=True)
-
     def __processCommands(self, commands):
         content = "\n".join(commands)
         j_content = json.loads(content)

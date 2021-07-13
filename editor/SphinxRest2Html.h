@@ -39,7 +39,7 @@ public:
     bool run(TextEditor::TextDocument *document);
 
 signals:
-    void htmlChanged(const QString &);
+    void htmlChanged(const QString &html, const QString &workingDirectory);
 
 private:
     class Range

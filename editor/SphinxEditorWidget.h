@@ -79,7 +79,7 @@ private Q_SLOTS:
     void onCustomContextMenu(const QPoint &pos);
     void onUrlAction();
     void onToggleRightPane();
-    void onPreviewHtmlChanged(const QString &);
+    void onPreviewHtmlChanged(const QString &html, const QString &workingDirectory);
 
 private:
     void addToolBar();
