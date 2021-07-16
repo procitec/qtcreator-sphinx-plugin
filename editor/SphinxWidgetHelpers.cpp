@@ -54,7 +54,7 @@ QString log_directory()
         mTempDir->setAutoRemove(false);
     }
 
-    return mTempDir->path();
+    return mTempDir->path().toString();
 }
 
 } // namespace WidgetHelpers

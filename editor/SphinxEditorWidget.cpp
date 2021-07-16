@@ -162,6 +162,7 @@ void EditorWidget::connectActions()
     mUrlAction = new QAction(tr("link to preview url"), this);
     connect(mUrlAction, &QAction::triggered, this, &EditorWidget::onUrlAction);
     mShowRightPaneAction = new QAction(tr("toggle preview"), this);
+    mShowRightPaneAction->setShortcut(Qt::Key_F4);
     connect(mShowRightPaneAction, &QAction::triggered, this, &EditorWidget::onToggleRightPane);
     connect(ReST2Html::instance(), &ReST2Html::htmlChanged, this, &EditorWidget::onPreviewHtmlChanged);
 }
@@ -394,6 +395,9 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
             forwardToBase = false;
         } else if (k == Qt::Key_Backtab) {
             handleTabKeyRemove();
+            forwardToBase = false;
+        } else if (k == Qt::Key_F4) {
+            onToggleRightPane();
             forwardToBase = false;
         } else if (k == Qt::Key_Return || k == Qt::Key_Enter) {
             for (auto line = 0; line < spacing(); line++) {
