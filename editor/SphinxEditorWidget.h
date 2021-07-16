@@ -12,8 +12,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-class TestRightPane;
-
 namespace qtc::plugin::sphinx {
 class EditorWidget : public TextEditor::TextEditorWidget
 {
