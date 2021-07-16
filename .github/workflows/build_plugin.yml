@@ -26,12 +26,12 @@ jobs:
     strategy:
       matrix:
         config:
-#        - {
-#            name: "Windows Latest MSVC", artifact: "Windows-x64",
-#            os: windows-latest,
-#            cc: "cl", cxx: "cl",
-#            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-#          }
+        - {
+            name: "Windows Latest MSVC", artifact: "Windows-x64",
+            os: windows-latest,
+            cc: "cl", cxx: "cl",
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+          }
         - {
             name: "Ubuntu Latest GCC", artifact: "Linux-x64",
             os: ubuntu-latest,
@@ -262,18 +262,18 @@ jobs:
           message("output from configure: ${output}")
           message(FATAL_ERROR "Configure failed")
         endif()
-        
+
     - uses: actions/upload-artifact@v2
       id: upload_artifact
       with:
         name: ${{ env.PLUGIN_NAME}}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
         path: |
             ./${{ env.PLUGIN_NAME }}-${{ env.QT_CREATOR_VERSION }}-${{ matrix.config.artifact }}.7z
-        
+
   release_info:
       runs-on: ubuntu-latest
       needs: build
-      
+
       steps:
       - uses: actions/checkout@v2
 
@@ -284,7 +284,7 @@ jobs:
             set( qt_version "$ENV{QT_VERSION}")
             set( qtc_version "$ENV{QT_CREATOR_VERSION}" )
             set( qtc_url "${{ needs.build.outputs.qtc_url }}" )
-            string( REPLACE "refs/tags/" "" tag_name "$ENV{GITHUB_REF}" ) 
+            string( REPLACE "refs/tags/" "" tag_name "$ENV{GITHUB_REF}" )
             set( readme_url "$ENV{GITHUB_SERVER_URL}/$ENV{GITHUB_REPOSITORY}/blob/${tag_name}/RELEASENOTES.md" )
             configure_file( $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md.in $ENV{GITHUB_WORKSPACE}/RELEASEINFO.md @ONLY )
 
@@ -305,11 +305,11 @@ jobs:
       id: download
       with:
         path: download
-        
+
 #    - name: Display structure of downloaded files
 #      run: ls -R
 #      working-directory: download
-    
+
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
