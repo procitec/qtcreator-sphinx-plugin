@@ -69,7 +69,6 @@ protected:
     void finalizeInitialization() override;
     void finalizeInitializationAfterDuplication(TextEditorWidget *) override;
     void keyPressEvent(QKeyEvent *e) override;
-    void keyReleaseEvent(QKeyEvent *e) override;
     void showEvent(QShowEvent *) override;
     void hideEvent(QHideEvent *) override;
     //    void focusInEvent(QFocusEvent *e) override;

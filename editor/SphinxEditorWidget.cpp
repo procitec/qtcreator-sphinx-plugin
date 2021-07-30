@@ -40,7 +40,12 @@ EditorWidget::EditorWidget()
 }
 void EditorWidget::finalizeInitialization()
 {
-    //connect(document(), &QTextDocument::contentsChanged, this, [this]() { mToolsTimer.start(); });
+    connect(
+        document(),
+        &QTextDocument::contentsChanged,
+        this,
+        [this]() { mToolsTimer.start(); },
+        Qt::QueuedConnection);
     mToolsTimer.start();
 }
 
@@ -375,14 +380,6 @@ void EditorWidget::handleTabKeyRemove()
     mFormatter.removeTextAtBlockStart(this, text);
 }
 
-void EditorWidget::keyReleaseEvent(QKeyEvent *e)
-{
-    if (e)
-        TextEditorWidget::keyReleaseEvent(e);
-
-    mToolsTimer.start();
-}
-
 void EditorWidget::keyPressEvent(QKeyEvent *e)
 {
     if (e) {
@@ -437,6 +434,7 @@ void EditorWidget::showEvent(QShowEvent *e)
         TextEditorWidget::showEvent(e);
     }
     onShowRightPane(mRightPaneVisible);
+    mToolsTimer.start();
 }
 
 void EditorWidget::hideEvent(QHideEvent *e)
