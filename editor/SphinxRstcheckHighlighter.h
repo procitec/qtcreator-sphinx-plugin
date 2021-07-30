@@ -39,6 +39,7 @@ private:
     void initReSTCheckProcess();
     void finishReSTCheckHighlight();
     void processReSTCheckOutput();
+    void removeMarks();
     Marks::Range lineColumnLengthToRange(int line, int column, int length);
     std::unique_ptr<QTemporaryFile> logFilePath() const;
 

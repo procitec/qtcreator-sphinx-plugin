@@ -80,6 +80,7 @@ private:
     void finishReST2HtmlOutput();
     void processReST2HtmlOutput(const QString &buffer);
     void processReST2HtmlErrors(const QString &buffer);
+    void removeMarks();
     /*Offenses*/ void processReST2HtmlErrorOutput(const QString &buffer);
     Range lineColumnLengthToRange(int line, int column, int length);
     std::unique_ptr<QTemporaryFile> logFilePath() const;

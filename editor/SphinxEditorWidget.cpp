@@ -17,8 +17,7 @@ Q_LOGGING_CATEGORY(log_editor, "qtc.sphinx.editor");
 
 namespace qtc::plugin::sphinx {
 
-const int RSTCHECK_UPDATE_INTERVAL = 300;
-const int PREVIEW_UPDATE_INTERVAL = 300;
+const int TOOLS_UPDATE_INTERVAL = 100;
 
 EditorWidget::EditorWidget()
     : TextEditor::TextEditorWidget()
@@ -29,19 +28,11 @@ EditorWidget::EditorWidget()
     connectActions();
     addToolBar();
 
-    mUpdateRstCheckTimer.setSingleShot(true);
-    mUpdateRstCheckTimer.setInterval(RSTCHECK_UPDATE_INTERVAL);
-    connect(&mUpdateRstCheckTimer, &QTimer::timeout, this, [this] {
-        if (mReSTCheckUpdatePending)
-            updateRstCheck();
-    });
-
-    mPreviewTimer.setSingleShot(true);
-    mPreviewTimer.setInterval(PREVIEW_UPDATE_INTERVAL);
-    connect(&mPreviewTimer, &QTimer::timeout, this, [this] {
-        if (mPreviewPending) {
-            updatePreview();
-        }
+    mToolsTimer.setSingleShot(true);
+    mToolsTimer.setInterval(TOOLS_UPDATE_INTERVAL);
+    connect(&mToolsTimer, &QTimer::timeout, this, [this] {
+        updatePreview();
+        updateRstCheck();
     });
 
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -49,8 +40,8 @@ EditorWidget::EditorWidget()
 }
 void EditorWidget::finalizeInitialization()
 {
-    connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::scheduleRstCheckUpdate);
-    connect(document(), &QTextDocument::contentsChanged, this, &EditorWidget::schedulePreview);
+    //connect(document(), &QTextDocument::contentsChanged, this, [this]() { mToolsTimer.start(); });
+    mToolsTimer.start();
 }
 
 void EditorWidget::finalizeInitializationAfterDuplication(TextEditorWidget *)
@@ -58,7 +49,7 @@ void EditorWidget::finalizeInitializationAfterDuplication(TextEditorWidget *)
     if (textDocumentPtr()) {
         readFileSettings(textDocumentPtr()->filePath().absoluteFilePath());
         onShowRightPane(true);
-        schedulePreview();
+        mToolsTimer.start();
     }
 }
 
@@ -182,7 +173,7 @@ void EditorWidget::onToggleRightPane()
         onShowRightPane(!mRightPane->isVisible());
         if (mRightPane->isVisible()) {
             mRightPane->setCurrentTab(RightPaneWidget::PAGE_PREVIEW);
-            mRightPane->preview().updateView();
+            mToolsTimer.start();
         }
     }
 }
@@ -384,6 +375,14 @@ void EditorWidget::handleTabKeyRemove()
     mFormatter.removeTextAtBlockStart(this, text);
 }
 
+void EditorWidget::keyReleaseEvent(QKeyEvent *e)
+{
+    if (e)
+        TextEditorWidget::keyReleaseEvent(e);
+
+    mToolsTimer.start();
+}
+
 void EditorWidget::keyPressEvent(QKeyEvent *e)
 {
     if (e) {
@@ -418,50 +417,26 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void EditorWidget::scheduleRstCheckUpdate()
-{
-    mReSTCheckUpdatePending = mUpdateRstCheckTimer.isActive();
-    if (mReSTCheckUpdatePending)
-        return;
-
-    mReSTCheckUpdatePending = false;
-    updateRstCheck();
-    mUpdateRstCheckTimer.start();
-}
-
 void EditorWidget::updateRstCheck()
 {
     if (mUseReSTCheckHighlighter && !ReSTCheckHighLighter::instance()->run(textDocument())) {
-        mReSTCheckUpdatePending = true;
-        mUpdateRstCheckTimer.start();
+        mToolsTimer.start();
     }
-}
-
-void EditorWidget::schedulePreview()
-{
-    mPreviewPending = mPreviewTimer.isActive();
-    if (mPreviewPending)
-        return;
-
-    mPreviewPending = false;
-    updatePreview();
-    mPreviewTimer.start();
 }
 
 void EditorWidget::updatePreview()
 {
     if (mUsePreview && !ReST2Html::instance()->run(textDocument())) {
-        mPreviewPending = true;
-        mPreviewTimer.start();
+        mToolsTimer.start();
     }
 }
 
 void EditorWidget::showEvent(QShowEvent *e)
 {
-    onShowRightPane(mRightPaneVisible);
     if (e) {
         TextEditorWidget::showEvent(e);
     }
+    onShowRightPane(mRightPaneVisible);
 }
 
 void EditorWidget::hideEvent(QHideEvent *e)
@@ -474,14 +449,14 @@ void EditorWidget::hideEvent(QHideEvent *e)
     }
 }
 
-void EditorWidget::focusInEvent(QFocusEvent *e)
-{
-    if (e) {
-        TextEditorWidget::focusInEvent(e);
-    }
-    //    onShowRightPane(mRightPaneVisible);
-    schedulePreview();
-}
+//void EditorWidget::focusInEvent(QFocusEvent *e)
+//{
+//    if (e) {
+//        TextEditorWidget::focusInEvent(e);
+//    }
+//    //    onShowRightPane(mRightPaneVisible);
+//    mToolsTimer.start();
+//}
 
 //void EditorWidget::focusOutEvent(QFocusEvent *e)
 //{

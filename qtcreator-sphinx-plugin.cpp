@@ -162,7 +162,6 @@ void Plugin::createActions()
 {
     Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
     menu->menu()->setTitle(tr("Sphinx Editor"));
-    // auto action = new QAction(tr("Sphinx Editor Action"), this);
 
     Core::Command *cmd = nullptr;
     QAction *action = nullptr;
@@ -175,7 +174,6 @@ void Plugin::createActions()
                                                   qPrintable(action->objectName()),
                                                   Core::Context(Core::Constants::C_EDIT_MODE));
         cmd->setDefaultKeySequence(action->shortcut());
-        connect(action, &QAction::triggered, this, &Plugin::triggerAction);
         menu->addAction(cmd);
     }
     menu->addSeparator();
@@ -187,7 +185,6 @@ void Plugin::createActions()
                                                   qPrintable(action->objectName()),
                                                   Core::Context(Core::Constants::C_EDIT_MODE));
         cmd->setDefaultKeySequence(action->shortcut());
-        connect(action, &QAction::triggered, this, &Plugin::triggerAction);
         menu->addAction(cmd);
     }
 
@@ -201,29 +198,9 @@ void Plugin::createActions()
                                                   qPrintable(action->objectName()),
                                                   Core::Context(Core::Constants::C_EDIT_MODE));
         cmd->setDefaultKeySequence(action->shortcut());
-        connect(action, &QAction::triggered, this, &Plugin::triggerAction);
         menu->addAction(cmd);
     }
 
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
-}
-
-void Plugin::triggerAction()
-{
-    auto id = Core::EditorManager::currentDocument()->id();
-    if (id == Constants::EditorId) {
-        auto *editor = static_cast<Editor *>(Core::EditorManager::currentEditor());
-        if (editor) {
-            auto *editorWidget = static_cast<EditorWidget *>(editor->widget());
-            if (editorWidget) {
-                auto objName = sender()->objectName();
-                QString actionID = "Sphinx Editor.Action.";
-
-                if (objName == actionID + ".Bold") {
-                    editorWidget->onBold();
-                }
-            }
-        }
-    }
 }
 } // namespace qtc::plugin::sphinx

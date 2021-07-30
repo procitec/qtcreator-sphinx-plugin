@@ -44,7 +44,6 @@ private:
     void initializeToolsSettings();
 
     Internal::PluginPrivate *d = nullptr;
-    void triggerAction();
     void createActions();
 
     FormatActions mFormatActions;

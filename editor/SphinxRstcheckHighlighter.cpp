@@ -60,11 +60,14 @@ ReSTCheckHighLighter::ReSTCheckHighLighter()
 
 ReSTCheckHighLighter::~ReSTCheckHighLighter()
 {
-    if (!mReSTCheckProcess)
-        return;
-    mReSTCheckProcess->closeWriteChannel();
-    mReSTCheckProcess->waitForFinished(3000);
+    if (mReSTCheckProcess) {
+        mReSTCheckProcess->closeWriteChannel();
+        mReSTCheckProcess->waitForFinished(3000);
+    }
+
     delete mReSTCheckProcess;
+    mReSTCheckProcess = nullptr;
+    removeMarks();
 }
 
 ReSTCheckHighLighter *ReSTCheckHighLighter::instance()
@@ -138,12 +141,14 @@ void ReSTCheckHighLighter::finishReSTCheckHighlight()
 
     /*Offenses offenses = */ processReSTCheckOutput();
     const Utils::FilePath filePath = mDocument->filePath();
-    for (auto &diag : mDiagnostics[filePath]) {
-        diag.textMark = std::make_shared<Marks::TextMark>(filePath,
-                                                          diag.line,
-                                                          diag.severity,
-                                                          diag.message);
-        mDocument->addMark(diag.textMark.get());
+    if (!filePath.isEmpty()) {
+        for (auto &diag : mDiagnostics[filePath]) {
+            diag.textMark = std::make_shared<Marks::TextMark>(filePath,
+                                                              diag.line,
+                                                              diag.severity,
+                                                              diag.message);
+            mDocument->addMark(diag.textMark.get());
+        }
     }
     //    ReSTCheckFucture ReSTCheckFucture(offenses);
     //    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
@@ -189,11 +194,24 @@ std::unique_ptr<QTemporaryFile> ReSTCheckHighLighter::logFilePath() const
 
     return temporaryFile;
 }
+void ReSTCheckHighLighter::removeMarks()
+{
+    if (!mDocument->filePath().isEmpty()) {
+        for (auto &diag : mDiagnostics[mDocument->filePath()]) {
+            if (diag.textMark) {
+                mDocument->removeMark(diag.textMark.get());
+                mDocument->removeMarkFromMarksCache(diag.textMark.get());
+            }
+        }
+    }
+    mDiagnostics.clear();
+}
 
 void ReSTCheckHighLighter::processReSTCheckOutput()
 {
-    //    Offenses result;
-    auto &diag = mDiagnostics[mDocument->filePath()];
+    removeMarks();
+
+    auto &diags = mDiagnostics[mDocument->filePath()];
 
     const QVector<QStringRef> lines = mOutputBuffer.splitRef('\n');
     for (const QStringRef &line : lines) {
@@ -218,10 +236,10 @@ void ReSTCheckHighLighter::processReSTCheckOutput()
         if (match.hasMatch()) {
             message = match.captured(2).trimmed();
         }
-        diag[lineN] = (Marks::Diagnostic{lineN, kind, message, nullptr});
+        diags[lineN] = (Marks::Diagnostic{lineN, kind, message, nullptr});
     }
 
-    qCInfo(log_rstcheck) << "found diagnostic issues with rstcheck" << diag.size() << " in file "
+    qCInfo(log_rstcheck) << "found diagnostic issues with rstcheck" << diags.size() << " in file "
                          << qPrintable(mDocument->filePath().toString());
 
     mOutputBuffer.clear();

@@ -72,9 +72,8 @@ ReST2Html::ReST2Html()
 
 ReST2Html::~ReST2Html()
 {
-    if (!mReST2HtmlProcess)
-        return;
     closeReST2HtmlProcess();
+    removeMarks();
 }
 
 ReST2Html *ReST2Html::instance()
@@ -227,12 +226,19 @@ void ReST2Html::processReST2HtmlErrors(const QString &buffer)
     /*Offenses offenses = */
     processReST2HtmlErrorOutput(buffer);
     const Utils::FilePath filePath = mDocument->filePath();
-    for (auto &diag : mDiagnostics[filePath]) {
-        diag.textMark = std::make_shared<Marks::TextMark>(filePath,
-                                                          diag.line,
-                                                          diag.severity,
-                                                          diag.message);
-        mDocument->addMark(diag.textMark.get());
+    if (!filePath.isEmpty()) {
+        if (mDiagnostics.contains(filePath)) {
+            for (auto &diag : mDiagnostics[filePath]) {
+                diag.textMark = std::make_shared<Marks::TextMark>(filePath,
+                                                                  diag.line,
+                                                                  diag.severity,
+                                                                  diag.message);
+                qCInfo(log_rst2html()) << "adding diag mark due to errors";
+                mDocument->addMark(diag.textMark.get());
+            }
+        }
+    } else {
+        qCWarning(log_rst2html()) << "current document file path is empty!";
     }
     //    ReST2HtmlFuture ReST2HtmlFuture(offenses);
     //    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
@@ -262,12 +268,25 @@ static int kindOfSeverity(const QStringRef &severity)
     return kind;
 }
 
+void ReST2Html::removeMarks()
+{
+    if (!mDocument->filePath().isEmpty()) {
+        for (auto &diag : mDiagnostics[mDocument->filePath()]) {
+            if (diag.textMark) {
+                mDocument->removeMark(diag.textMark.get());
+                mDocument->removeMarkFromMarksCache(diag.textMark.get());
+            }
+        }
+    }
+    mDiagnostics.clear();
+}
+
 void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
 {
     //        SystemMessage: <string>:13: (SEVERE/4) Problems with "include" directive path:
     //        InputError: [Errno 2] No such file or directory: 'test.rst'.
 
-    // Offenses result;
+    removeMarks();
 
     const QVector<QStringRef> lines = buffer.splitRef('\n');
     for (const QStringRef &line : lines) {
@@ -281,7 +300,6 @@ void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
         auto filename = fields[0].toString();
         int lineN = fields[1].toInt();
         int kind = kindOfSeverity(fields[2]);
-        int column = -1;
         //fields[2].toInt();
         //int length = -1;
         //fields[3].toInt();
@@ -306,6 +324,8 @@ void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
             continue;
 
         if (0 < lineN && 0 < kind && !message.isEmpty()) {
+            int column = -1;
+
             QFileInfo fi = (QFileInfo::exists(filename))
                                ? filename
                                : mReST2HtmlProcess->workingDirectory() + "/" + filename;

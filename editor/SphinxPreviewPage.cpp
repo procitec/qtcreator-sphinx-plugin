@@ -52,6 +52,8 @@ void PreviewPage::setHtml(const QString &html, const QString &workingDirectory)
     mView->setUrl(QUrl(QString("file://%1/index.html").arg(workingDirectory)));
     mView->setHtml(html);
     WidgetHelpers::setScrollBarPos(mView, pos);
+    mView->update();
+    update();
 }
 
 void PreviewPage::updateView()

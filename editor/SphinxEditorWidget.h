@@ -69,9 +69,10 @@ protected:
     void finalizeInitialization() override;
     void finalizeInitializationAfterDuplication(TextEditorWidget *) override;
     void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
     void showEvent(QShowEvent *) override;
     void hideEvent(QHideEvent *) override;
-    void focusInEvent(QFocusEvent *e) override;
+    //    void focusInEvent(QFocusEvent *e) override;
 
 private Q_SLOTS:
     void onCustomContextMenu(const QPoint &pos);
@@ -88,10 +89,8 @@ private:
     void connectActions();
     void handleTabKeyRemove();
     void handleTabKeyInsert();
-    void scheduleRstCheckUpdate();
-    void updateRstCheck();
-    void schedulePreview();
     void onShowRightPane(bool show);
+    void updateRstCheck();
     void updatePreview();
 
     int mAutoIndent = 0;
@@ -117,12 +116,9 @@ private:
     bool mSubSubSectionsOverline = false;
     bool mParagraphsOverline = false;
 
-    QTimer mUpdateRstCheckTimer;
-    bool mReSTCheckUpdatePending = false;
     bool mUseReSTCheckHighlighter = false;
 
-    QTimer mPreviewTimer;
-    bool mPreviewPending = false;
+    QTimer mToolsTimer;
     bool mUsePreview = false;
     bool mRightPaneVisible = false;
     RightPaneWidget *mRightPane = nullptr;
