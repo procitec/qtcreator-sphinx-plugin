@@ -309,9 +309,9 @@ jobs:
       with:
         path: download
 
-#    - name: Display structure of downloaded files
-#      run: ls -R
-#      working-directory: download
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: download
 
     - name: Create Release
       id: create_release
@@ -323,4 +323,4 @@ jobs:
          draft: true
          prerelease: false
          files: |
-           'download/*.7z'
+           download/*.7z
