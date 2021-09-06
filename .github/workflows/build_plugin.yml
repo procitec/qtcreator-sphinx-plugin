@@ -323,4 +323,4 @@ jobs:
          draft: true
          prerelease: false
          files: |
-           'download/**/*.7z'
+           'download/*.7z'
