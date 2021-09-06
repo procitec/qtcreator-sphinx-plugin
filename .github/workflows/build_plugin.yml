@@ -324,4 +324,4 @@ jobs:
          prerelease: false
          files: |
            download/qtcreator-sphinx-plugin-*/qtcreator-sphinx-plugin-*.7z
-           RELEASEINFO.md/RELEASEINFO.md
+           download/RELEASEINFO.md/RELEASEINFO.md
