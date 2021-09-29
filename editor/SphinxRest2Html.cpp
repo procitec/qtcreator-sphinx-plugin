@@ -225,20 +225,22 @@ void ReST2Html::processReST2HtmlErrors(const QString &buffer)
     qCInfo(log_rst2html()) << "received error output in rst2html" << buffer;
     /*Offenses offenses = */
     processReST2HtmlErrorOutput(buffer);
-    const Utils::FilePath filePath = mDocument->filePath();
-    if (!filePath.isEmpty()) {
-        if (mDiagnostics.contains(filePath)) {
-            for (auto &diag : mDiagnostics[filePath]) {
-                diag.textMark = std::make_shared<Marks::TextMark>(filePath,
-                                                                  diag.line,
-                                                                  diag.severity,
-                                                                  diag.message);
-                qCInfo(log_rst2html()) << "adding diag mark due to errors";
-                mDocument->addMark(diag.textMark.get());
+    if (mDocument) {
+        const Utils::FilePath filePath = mDocument->filePath();
+        if (!filePath.isEmpty()) {
+            if (mDiagnostics.contains(filePath)) {
+                for (auto &diag : mDiagnostics[filePath]) {
+                    diag.textMark = std::make_shared<Marks::TextMark>(filePath,
+                                                                      diag.line,
+                                                                      diag.severity,
+                                                                      diag.message);
+                    qCInfo(log_rst2html()) << "adding diag mark due to errors";
+                    mDocument->addMark(diag.textMark.get());
+                }
             }
+        } else {
+            qCWarning(log_rst2html()) << "current document file path is empty!";
         }
-    } else {
-        qCWarning(log_rst2html()) << "current document file path is empty!";
     }
     //    ReST2HtmlFuture ReST2HtmlFuture(offenses);
     //    TextEditor::SemanticHighlighter::incrementalApplyExtraAdditionalFormats(
@@ -270,7 +272,7 @@ static int kindOfSeverity(const QStringRef &severity)
 
 void ReST2Html::removeMarks()
 {
-    if (!mDocument->filePath().isEmpty()) {
+    if (mDocument && !mDocument->filePath().isEmpty()) {
         for (auto &diag : mDiagnostics[mDocument->filePath()]) {
             if (diag.textMark) {
                 mDocument->removeMark(diag.textMark.get());

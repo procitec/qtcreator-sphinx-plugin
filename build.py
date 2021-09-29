@@ -16,6 +16,8 @@ def get_arguments():
     parser.add_argument('--output-path', help='Output path for resulting 7zip files', default="build")
     parser.add_argument('--with-docs', help='Build and install documentation.',
                         action='store_true', default=False)
+    parser.add_argument('--add-sanitize-flags', help="Sets flags for sanitizer compilation flags used in Debug builds",
+                        action='append', dest='sanitize_flags', default=[] )
     parser.add_argument('--build-type', help='Build type to pass to CMake (defaults to RelWithDebInfo)',
                         default='RelWithDebInfo')
     args = parser.parse_args()
@@ -30,7 +32,7 @@ def check_print_call(command, workdir=None, env=None):
     subprocess.check_call(command, cwd=workdir, env=env)
 
 def build(args):
-    check_print_call(["python",f"{args.qtc_path}/share/qtcreator/scripts/build_plugin.py", "--name", args.name, "--src", args.src, "--build", args.build, "--qt-path", args.qt_path, "--qtc-path", args.qtc_path, "--output-path", args.output_path, "--build-type", args.build_type])
+    check_print_call(["python3",f"{args.qtc_path}/share/qtcreator/scripts/build_plugin.py", "--name", args.name, "--src", args.src, "--build", args.build, "--qt-path", args.qt_path, "--qtc-path", args.qtc_path, "--output-path", args.output_path, "--add-sanitize-flags", ",".join(args.sanitize_flags), "--build-type", args.build_type])
 
 def main():
     args = get_arguments()

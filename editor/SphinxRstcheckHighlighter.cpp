@@ -196,7 +196,7 @@ std::unique_ptr<QTemporaryFile> ReSTCheckHighLighter::logFilePath() const
 }
 void ReSTCheckHighLighter::removeMarks()
 {
-    if (!mDocument->filePath().isEmpty()) {
+    if (mDocument && !mDocument->filePath().isEmpty()) {
         for (auto &diag : mDiagnostics[mDocument->filePath()]) {
             if (diag.textMark) {
                 mDocument->removeMark(diag.textMark.get());

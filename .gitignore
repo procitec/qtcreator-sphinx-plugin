@@ -36,8 +36,7 @@ __pycache__
 *.pyc
 
 build
-build-rel
-build-dbg
+build-*
 
 # QtCreator files
 *.pro.user
