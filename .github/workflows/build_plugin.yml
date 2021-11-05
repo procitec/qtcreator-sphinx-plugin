@@ -320,7 +320,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
          body_path: download/RELEASEINFO.md/RELEASEINFO.md
-         draft: true
+         draft: false
          prerelease: false
          files: |
            download/qtcreator-sphinx-plugin-*/qtcreator-sphinx-plugin-*.7z
