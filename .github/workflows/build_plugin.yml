@@ -285,6 +285,7 @@ jobs:
           string(REGEX MATCH "FAILED:.*$" error_message "${output}")
           string(REPLACE "\n" "%0A" error_message "${error_message}")
           message("::error::${error_message}")
+          message("::output::${output}")
           message(FATAL_ERROR "Build failed")
         endif()
 
