@@ -24,7 +24,7 @@ set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
 find_package(QtCreator COMPONENTS Core TextEditor ProjectExplorer REQUIRED)
 #find_package(QT NAMES Qt6 Qt5 COMPONENTS Test XmlPatterns LinguistTools Widgets REQUIRED)
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Test LinguistTools Widgets REQUIRED)
+find_package(QT NAMES Qt6 COMPONENTS Test LinguistTools Widgets REQUIRED)
 set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
