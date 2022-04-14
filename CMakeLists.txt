@@ -28,7 +28,7 @@ set(QtX Qt${QT_VERSION_MAJOR})
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-set( QTC_PLUGIN_REVISION 212)
+set( QTC_PLUGIN_REVISION 221)
 
 add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
