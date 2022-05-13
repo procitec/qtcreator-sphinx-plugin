@@ -13,7 +13,8 @@ OptionsPage::OptionsPage(Settings *settings, QObject *parent)
     setDisplayCategory("Sphinx");        // category label in options - set once
     auto prefix = QIcon::themeName().contains("dark", Qt::CaseInsensitive) ? QStringLiteral("/dark")
                                                                            : QStringLiteral("");
-    setCategoryIcon(Utils::Icon((QString(":%1/sphinx.png").arg(prefix)))); // category icon - set once
+    setCategoryIcon(Utils::Icon(Utils::FilePath::fromString(
+        QString(":%1/sphinx.png").arg(prefix)))); // category icon - set once
 }
 
 QWidget *OptionsPage::widget()

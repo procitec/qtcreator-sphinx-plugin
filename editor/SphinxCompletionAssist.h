@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <texteditor/codeassist/assistinterface.h>
 #include <texteditor/codeassist/completionassistprovider.h>
 #include <texteditor/codeassist/iassistprocessor.h>
 #include <texteditor/snippets/snippetassistcollector.h>
@@ -15,7 +16,8 @@ class CodeModel;
 class CompletionAssistProvider : public TextEditor::CompletionAssistProvider
 {
 public:
-    TextEditor::IAssistProcessor *createProcessor() const override;
+    TextEditor::IAssistProcessor *createProcessor(
+        const TextEditor::AssistInterface *assistInterface) const override;
 
     int activationCharSequenceLength() const override { return 1; }
     bool isActivationCharSequence(const QString &sequence) const override;

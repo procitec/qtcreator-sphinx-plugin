@@ -245,7 +245,7 @@ void EditorWidget::readFileSettings(const Utils::FilePath &file_path)
                         mRightPane = new RightPaneWidget(this);
                     }
                     onShowRightPane(true);
-                    mRightPane->html().setHtmlFile(iter.value());
+                    mRightPane->html().setHtmlFile(QFileInfo(iter.value()));
                 }
             }
         }

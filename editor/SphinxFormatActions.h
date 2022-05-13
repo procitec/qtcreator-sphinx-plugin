@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QList>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QToolBar>
 

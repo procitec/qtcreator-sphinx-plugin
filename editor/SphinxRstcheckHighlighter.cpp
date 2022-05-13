@@ -159,7 +159,7 @@ void ReSTCheckHighLighter::finishReSTCheckHighlight()
     mBusy = false;
 }
 
-static int kindOfSeverity(const QStringRef &severity)
+static int kindOfSeverity(const QStringView &severity)
 {
     int kind = 0;
 
@@ -213,11 +213,11 @@ void ReSTCheckHighLighter::processReSTCheckOutput()
 
     auto &diags = mDiagnostics[mDocument->filePath()];
 
-    const QVector<QStringRef> lines = mOutputBuffer.splitRef('\n');
-    for (const QStringRef &line : lines) {
+    auto lines = mOutputBuffer.split('\n');
+    for (const auto &line : lines) {
         if (line == mEndSeq)
             break;
-        QVector<QStringRef> fields = line.split(':');
+        auto fields = line.split(':');
         if (fields.size() < 2)
             continue;
         int lineN = fields[0].toInt();

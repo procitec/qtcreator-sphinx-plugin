@@ -17,9 +17,10 @@
 
 namespace qtc::plugin::sphinx {
 
-TextEditor::IAssistProcessor *CompletionAssistProvider::createProcessor() const
+TextEditor::IAssistProcessor *CompletionAssistProvider::createProcessor(
+    const TextEditor::AssistInterface *assistInterface) const
 {
-    return new CompletionAssistProcessor;
+    return new CompletionAssistProcessor();
 }
 
 bool CompletionAssistProvider::isActivationCharSequence(const QString &sequence) const
@@ -81,7 +82,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     const QString line = interface->textDocument()->findBlock(startPosition).text();
     const int blockPos = interface->textDocument()->findBlock(startPosition).position();
 
-    auto linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
+    auto linePos = line.lastIndexOf(QRegularExpression(R"-(\s)-"));
     QString context;
 
     if (0 < linePos) {
@@ -124,9 +125,9 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     if (snippetProposal.empty()) {
         // load from code model, search for directives
-        linePos = line.lastIndexOf(QRegExp(R"-(^\s*\.{2}\s+)-"));
+        linePos = line.lastIndexOf(QRegularExpression(R"-(^\s*\.{2}\s+)-"));
         if (0 <= linePos) {
-            linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
+            linePos = line.lastIndexOf(QRegularExpression(R"-(\s)-"));
             linePos++;
             context = line.mid(linePos, startPosition);
 
@@ -146,7 +147,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     if (snippetProposal.empty()) {
         // load from code model, search for directive options
-        linePos = line.lastIndexOf(QRegExp(R"-(^\s+:)-"));
+        linePos = line.lastIndexOf(QRegularExpression(R"-(^\s+:)-"));
         if (0 <= linePos) {
             // this could be a role or an option. We have to look if we are in context of a directive
             for (auto block = interface->textDocument()->findBlock(startPosition).blockNumber() - 1;
@@ -160,7 +161,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
                     if (match.hasMatch()) {
                         auto directive = match.captured(1);
 
-                        linePos = line.lastIndexOf(QRegExp(R"-(:)-"));
+                        linePos = line.lastIndexOf(QRegularExpression(R"-(:)-"));
                         linePos++;
                         context = line.mid(linePos, startPosition);
 
@@ -188,9 +189,9 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
 
     if (snippetProposal.empty()) {
         // load from code model, search for roles
-        linePos = line.lastIndexOf(QRegExp(R"-(^\s*:|\s+:)-"));
+        linePos = line.lastIndexOf(QRegularExpression(R"-(^\s*:|\s+:)-"));
         if (0 <= linePos) {
-            linePos = line.lastIndexOf(QRegExp(R"-(:)-"));
+            linePos = line.lastIndexOf(QRegularExpression(R"-(:)-"));
             linePos++;
             context = line.mid(linePos, startPosition);
 
@@ -209,7 +210,7 @@ TextEditor::IAssistProposal *CompletionAssistProcessor::perform(const TextEditor
     }
 
     if (snippetProposal.empty()) {
-        linePos = line.lastIndexOf(QRegExp(R"-(\s)-"));
+        linePos = line.lastIndexOf(QRegularExpression(R"-(\s)-"));
 
         if (0 < linePos) {
             linePos++; // the letter after the space

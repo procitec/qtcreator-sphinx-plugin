@@ -248,7 +248,7 @@ void TestCompletion::testWords()
     QTest::keyPress(qApp->focusWidget(), Qt::Key_Return);
     QTest::qWait(KEYPRESS_TIMEOUT);
     auto completed = mEditor->toPlainText();
-    auto pos = completed.lastIndexOf(QRegExp(R"-(\s)-"));
+    auto pos = completed.lastIndexOf(QRegularExpression(R"-(\s)-"));
     QString word;
 
     if (0 < pos) {

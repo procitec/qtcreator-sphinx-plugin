@@ -4,7 +4,7 @@
 
 #include "texteditor/snippets/snippet.h"
 
-class QXmlSchema;
+//class QXmlSchema;
 
 namespace qtc::plugin::sphinx {
 
@@ -22,7 +22,7 @@ public:
 private:
     void readXML(const QString &fileName, const QString &snippetId);
 
-    bool verifyXML(const QString &fileName, const QXmlSchema &schema) const;
+    //   bool verifyXML(const QString &fileName, const QXmlSchema &schema) const;
 
     class DirectiveOption
     {

@@ -249,7 +249,7 @@ void ReST2Html::processReST2HtmlErrors(const QString &buffer)
     //                                                                         ReST2HtmlFuture.future());
 }
 
-static int kindOfSeverity(const QStringRef &severity)
+static int kindOfSeverity(const QStringView &severity)
 {
     int kind = 0;
 
@@ -290,16 +290,16 @@ void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
 
     removeMarks();
 
-    const QVector<QStringRef> lines = buffer.splitRef('\n');
-    for (const QStringRef &line : lines) {
+    auto lines = buffer.split('\n');
+    for (const QString &line : lines) {
         if (line == mEndSeq)
             break;
 
-        QVector<QStringRef> fields = line.split(':');
+        auto fields = line.split(':');
         if (fields.size() < 2)
             continue;
 
-        auto filename = fields[0].toString();
+        auto filename = fields[0];
         int lineN = fields[1].toInt();
         int kind = kindOfSeverity(fields[2]);
         //fields[2].toInt();
@@ -329,8 +329,8 @@ void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
             int column = -1;
 
             QFileInfo fi = (QFileInfo::exists(filename))
-                               ? filename
-                               : mReST2HtmlProcess->workingDirectory() + "/" + filename;
+                               ? QFileInfo(filename)
+                               : QFileInfo(mReST2HtmlProcess->workingDirectory() + "/" + filename);
 
             qCInfo(log_rst2html) << "adding diag for " << fi.absoluteFilePath() << " at " << lineN
                                  << column << kind;
@@ -345,8 +345,8 @@ void ReST2Html::processReST2HtmlErrorOutput(const QString &buffer)
 void ReST2Html::processReST2HtmlOutput(const QString &buffer)
 {
     mOutHtml.clear();
-    const QVector<QStringRef> lines = buffer.splitRef('\n');
-    for (const QStringRef &line : lines) {
+    auto lines = buffer.split('\n');
+    for (const QString &line : lines) {
         if (line == mEndSeq)
             break;
 
