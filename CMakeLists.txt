@@ -24,8 +24,7 @@ set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
 find_package(QtCreator COMPONENTS Core TextEditor ProjectExplorer REQUIRED)
 #find_package(QT NAMES Qt6 Qt5 COMPONENTS Test XmlPatterns LinguistTools Widgets REQUIRED)
-find_package(QT NAMES Qt6 COMPONENTS Test LinguistTools Widgets REQUIRED)
-set(QtX Qt6)
+find_package(Qt6 COMPONENTS Test LinguistTools Widgets REQUIRED)
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
@@ -33,7 +32,7 @@ set( QTC_PLUGIN_REVISION 221)
 
 add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
-    DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::Test QtCreator::qlitehtml
+    DEPENDS  Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Test QtCreator::qlitehtml
     SOURCES
     editor/SphinxCodeModel.cpp
     qtcreator-sphinx-plugin.cpp
@@ -100,7 +99,7 @@ extend_qtc_plugin( ${QTC_PLUGIN_NAME}
       tests/tst_rightpane.cpp
       tests/tst_rightpane.h
 
-  DEPENDS  ${QtX}::Test
+  DEPENDS  Qt6::Test
 )
 
 enable_testing()
