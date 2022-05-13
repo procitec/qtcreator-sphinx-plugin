@@ -33,7 +33,7 @@ set( QTC_PLUGIN_REVISION 221)
 
 add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer
-    DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets QtCreator::qlitehtml
+    DEPENDS  ${QtX}::Core ${QtX}::Gui ${QtX}::Widgets ${QtX}::Test QtCreator::qlitehtml
     SOURCES
     editor/SphinxCodeModel.cpp
     qtcreator-sphinx-plugin.cpp
