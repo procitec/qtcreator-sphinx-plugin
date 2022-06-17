@@ -3,6 +3,8 @@
 
 ### Buildsystem 
 
+* Update to Qt6 and newest QtCreator Release (7.0.2)
+
 
 ### Issues
 
