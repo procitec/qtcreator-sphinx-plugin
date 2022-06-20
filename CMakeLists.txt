@@ -24,11 +24,11 @@ set( CMAKE_INSTALL_MESSAGE "LAZY" ) # one of NEVER, LAZY, ALWAYS
 
 find_package(QtCreator COMPONENTS Core TextEditor ProjectExplorer REQUIRED)
 #find_package(QT NAMES Qt6 Qt5 COMPONENTS Test XmlPatterns LinguistTools Widgets REQUIRED)
-find_package(Qt6 COMPONENTS Test LinguistTools Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Test LinguistTools Widgets REQUIRED)
 
 add_feature_info("Build tests" ${WITH_TESTS} "")
 
-set( QTC_PLUGIN_REVISION 221)
+set( QTC_PLUGIN_REVISION 222)
 
 add_qtc_plugin( ${QTC_PLUGIN_NAME}
     PLUGIN_DEPENDS QtCreator::Core QtCreator::TextEditor QtCreator::ProjectExplorer

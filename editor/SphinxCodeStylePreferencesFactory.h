@@ -11,7 +11,7 @@ public:
     Utils::Id languageId() override;
     QString displayName() override;
     TextEditor::ICodeStylePreferences *createCodeStyle() const override;
-    QWidget *createEditor(TextEditor::ICodeStylePreferences *, QWidget *parent) const override;
+    QWidget *createEditor(TextEditor::ICodeStylePreferences *, ProjectExplorer::Project *project = nullptr, QWidget *parent =nullptr) const override;
     TextEditor::Indenter *createIndenter(QTextDocument *doc) const override;
     QString snippetProviderGroupId() const override;
     QString previewText() const override;

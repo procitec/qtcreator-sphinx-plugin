@@ -32,7 +32,11 @@ def check_print_call(command, workdir=None, env=None):
     subprocess.check_call(command, cwd=workdir, env=env)
 
 def build(args):
-    check_print_call(["python3",f"{args.qtc_path}/share/qtcreator/scripts/build_plugin.py", "--name", args.name, "--src", args.src, "--build", args.build, "--qt-path", args.qt_path, "--qtc-path", args.qtc_path, "--output-path", args.output_path, "--add-sanitize-flags", ",".join(args.sanitize_flags), "--build-type", args.build_type])
+    sanitize_opts = []
+    if 0 < len(args.sanitize_flags):
+        sanitize_opts = ["--add-sanitize-flags", ",".join(args.sanitize_flags)]
+
+    check_print_call(["python3",f"{args.qtc_path}/share/qtcreator/scripts/build_plugin.py", "--name", args.name, "--src", args.src, "--build", args.build, "--qt-path", args.qt_path, "--qtc-path", args.qtc_path, "--output-path", args.output_path, "--build-type", args.build_type] + sanitize_opts)
 
 def main():
     args = get_arguments()

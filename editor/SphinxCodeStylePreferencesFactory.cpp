@@ -28,6 +28,7 @@ TextEditor::ICodeStylePreferences *CodeStylePreferencesFactory::createCodeStyle(
 }
 
 QWidget *CodeStylePreferencesFactory::createEditor(TextEditor::ICodeStylePreferences *,
+                                                   ProjectExplorer::Project *,
                                                    QWidget *parent) const
 {
     return new QLabel(tr("Not yet implemented"), parent);
