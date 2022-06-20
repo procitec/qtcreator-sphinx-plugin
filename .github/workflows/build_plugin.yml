@@ -14,7 +14,7 @@ on:
 
 env:
   PLUGIN_NAME: qtcreator-sphinx-plugin
-  QT_VERSION: 6.3.0
+  QT_VERSION: 6.2.3
   QT_CREATOR_VERSION: 7.0.2
   QT_CREATOR_SNAPSHOT:
   CMAKE_VERSION: 3.23.1
